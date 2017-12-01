@@ -1,0 +1,45 @@
+{
+  "name": "apicinesis",
+  "version": "1.0.0",
+  "description": "API para la web de cinesis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrateDev": "node_modules/.bin/sequelize db:create --env test && node_modules/.bin/sequelize db:migrate --env test && node_modules/.bin/sequelize db:seed:all --env test && yarn run dev",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/mfliri_ao/apicinesis.git"
+  },
+  "keywords": [
+    "cinesis",
+    "mendoza",
+    "argentina",
+    "tratamiento",
+    "calidad"
+  ],
+  "author": "As-One",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/mfliri_ao/apicinesis#readme",
+  "dependencies": {
+    "bcrypt-nodejs": "^0.0.3",
+    "dotenv": "^4.0.0",
+    "eslint": "^4.12.1",
+    "jsonwebtoken": "^8.1.0",
+    "jwt-decode": "^2.2.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.3",
+    "mysql2": "^1.5.1",
+    "nodemon": "^1.12.1",
+    "restify": "^6.3.4",
+    "restify-cors-middleware": "^1.0.1",
+    "restify-jwt": "^0.4.0",
+    "sequelize": "^4.23.4",
+    "sequelize-cli": "^3.1.0"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  }
+}
