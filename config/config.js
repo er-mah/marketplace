@@ -4,12 +4,12 @@ module.exports = {
     url: process.env.DATABASE_URL,
     use_env_variable: 'DATABASE_URL',
     dialect: 'postgres',
-    operatorsAliases: false,    
+    operatorsAliases: false,
   },
   test: {
     username: 'root',
     password: 'root',
-    database: 'cinesis_test',
+    database: 'mah_test',
     host: '127.0.0.1',
     dialect: 'mysql',
     seederStorage: 'sequelize',
@@ -18,9 +18,9 @@ module.exports = {
   development: {
     username: 'root',
     password: 'root',
-    database: 'cinesis_development',
+    database: 'mah_development',
     host: '127.0.0.1',
     dialect: 'mysql',
-    operatorsAliases: false,    
+    operatorsAliases: false,
   },
 };
