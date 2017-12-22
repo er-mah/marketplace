@@ -14,6 +14,10 @@ module.exports = {
     dialect: 'mysql',
     seederStorage: 'sequelize',
     operatorsAliases: false,
+    databases: {
+      tauto: 'tauto',
+      mah_test: 'mah_test',
+    },
   },
   development: {
     username: 'root',
@@ -23,4 +27,5 @@ module.exports = {
     dialect: 'mysql',
     operatorsAliases: false,
   },
+
 };

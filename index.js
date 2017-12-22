@@ -3,16 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const graphql = require('graphql');
 const bcrypt = require('bcrypt-nodejs');
-
-const {
-  GraphQLSchema: Schema,
-  GraphQLList: List,
-  GraphQLNonNull: NotNull,
-  GraphQLObjectType: ObjectGraph,
-  GraphQLInt: Int,
-} = graphql;
 const models = require('./models');
-const { resolver } = require('graphql-sequelize');
 const jwt = require('express-jwt');
 const jsonwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
@@ -20,16 +11,16 @@ const graphqlHTTP = require('express-graphql');
 const _ = require('lodash');
 const socketioJwt = require('socketio-jwt');
 const cors = require('cors');
-
-const {
-  Users,
-} = models;
+const schema = require('./schema');
 
 // SERVER CONFIGURATION ----------------------------------------------
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cors());
+app.listen(process.env.PORT || 4000);
+console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
+
 
 const httpGraphQLHandler = (req, res) => {
   const { query, variables, rootVals } = req.query;
@@ -43,6 +34,7 @@ app.use(jwt({ secret: 'marketGot2017' }).unless({
   path: [
     '/login',
     /^\/images/,
+    '/graphql',
   ],
 }));
 
