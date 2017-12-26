@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'grupos',
+    timestamps: false,
   });
   return grupos;
 };

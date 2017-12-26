@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'asimil',
+    timestamps: false,
   });
   return asimil;
 };

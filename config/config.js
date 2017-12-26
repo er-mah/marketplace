@@ -15,7 +15,7 @@ module.exports = {
     seederStorage: 'sequelize',
     operatorsAliases: false,
     databases: {
-      tauto: 'tauto',
+      tauto: 'tautos',
       mah_test: 'mah_test',
     },
   },

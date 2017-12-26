@@ -76,6 +76,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'extrad',
+    timestamps: false,
+
   });
   return extrad;
 };

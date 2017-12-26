@@ -92,6 +92,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'extrad2',
+    timestamps: false,
   });
   return extrad2;
 };

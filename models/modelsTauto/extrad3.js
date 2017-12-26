@@ -60,6 +60,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'extrad3',
+    timestamps: false,
   });
   return extrad3;
 };

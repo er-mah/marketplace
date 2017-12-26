@@ -156,6 +156,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     tableName: 'tautos30',
+    timestamps: false,
   });
   return tautos30;
 };
