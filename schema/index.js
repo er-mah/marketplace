@@ -7,8 +7,9 @@ const _ = require('lodash');
 const { UserType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
 const { Tautos30type } = require('../gtypes/Tautos30type');
+const { ExtradType } = require('../gtypes/ExtradType');
 const { User } = require('../models').mah;
-const { tautos30, grupos } = require('../models').tauto;
+const { tautos30, grupos, extrad } = require('../models').tauto;
 
 
 const {
@@ -145,6 +146,60 @@ const schema = new Schema({
               }
             }
             return (precios);
+          },
+        }),
+      },
+      Caracteristics: {
+        type: new ObjectGraph({
+          name: 'Caracteristicas',
+          fields: {
+            Combustible: { type: Gstring },
+            Alimentacion: { type: Gstring },
+            Motor: { type: Gstring },
+            Puertas: { type: graphql.GraphQLInt },
+            Clasificacion: { type: Gstring },
+            Cabina: { type: Gstring },
+            Carga: { type: Gstring },
+            PesoTotal: { type: Gstring },
+            VelocidadMax: { type: Gstring },
+            Potencia: { type: Gstring },
+            Direccion: { type: Gstring },
+            AireAcondicionado: { type: Gstring },
+            Traccion: { type: Gstring },
+            Importado: { type: Gstring },
+            Caja: { type: Gstring },
+            FrenosAbs: { type: Gstring },
+            AirBag: { type: Gstring },
+          },
+        }),
+        args: {
+          ext_codia:
+            {
+              description: 'El id del auto',
+              type: new NotNull(Int),
+            },
+        },
+        resolve: resolver(extrad, {
+          after(result) {
+            return {
+              Combustible: result.dataValues.ext_combu,
+              Alimentacion: result.dataValues.ext_alime,
+              Motor: result.dataValues.ext_motor,
+              Puertas: result.dataValues.ext_puert,
+              Clasificacion: result.dataValues.ext_clasi,
+              Cabina: result.dataValues.ext_cabin,
+              Carga: result.dataValues.ext_carga,
+              PesoTotal: result.dataValues.ext_pesot,
+              VelocidadMax: result.dataValues.ext_veloc,
+              Potencia: result.dataValues.ext_poten,
+              Direccion: result.dataValues.ext_direc,
+              AireAcondicionado: result.dataValues.ext_airea,
+              Traccion: result.dataValues.ext_tracc,
+              Importado: result.dataValues.ext_impor,
+              Caja: result.dataValues.ext_cajav,
+              FrenosAbs: result.dataValues.ext_frabs,
+              AirBag: result.dataValues.ext_airba,
+            };
           },
         }),
       },
