@@ -7,9 +7,11 @@ const _ = require('lodash');
 const { UserType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
 const { Tautos30type } = require('../gtypes/Tautos30type');
-const { ExtradType } = require('../gtypes/ExtradType');
 const { User } = require('../models').mah;
-const { tautos30, grupos, extrad } = require('../models').tauto;
+const {
+  tautos30, grupos, extrad, extrad3,
+  extrad2,
+} = require('../models').tauto;
 
 
 const {
@@ -199,6 +201,114 @@ const schema = new Schema({
               Caja: result.dataValues.ext_cajav,
               FrenosAbs: result.dataValues.ext_frabs,
               AirBag: result.dataValues.ext_airba,
+            };
+          },
+        }),
+      },
+      TecnicalData: {
+        type: new ObjectGraph({
+          name: 'MoreCaracteristics',
+          fields: {
+            Climatizador: { type: Gstring },
+            FarosAntiniebla: { type: Gstring },
+            TechoCorredizo: { type: Gstring },
+            SensorEstacionamiento: { type: Gstring },
+            AirbagLateral: { type: Gstring },
+            AirbagCabezaConductor: { type: Gstring },
+            AirbagCortina: { type: Gstring },
+            AirbagRodilla: { type: Gstring },
+            FijacionISOFIX: { type: Gstring },
+            ControlDeTraccion: { type: Gstring },
+            ControlDeEstabilidad: { type: Gstring },
+            ControlDeDescenso: { type: Gstring },
+            SistemaArranqueEnPendiente: { type: Gstring },
+            ControlDinamicoConduccion: { type: Gstring },
+            BloqueoDiferencial: { type: Gstring },
+            RepartidorElectronicoDeFrenado: { type: Gstring },
+            AsistenteDeFrenadoDeEmergencia: { type: Gstring },
+            ReguladorParFrenado: { type: Gstring },
+            Largo: { type: Gstring },
+            Ancho: { type: Gstring },
+            Alto: { type: Gstring },
+          },
+        }),
+        args: {
+          ext_codia:
+            {
+              description: 'El id del auto',
+              type: new NotNull(Int),
+            },
+        },
+        resolve: resolver(extrad2, {
+          after(result) {
+            return {
+              Climatizador: result.dataValues.ex2_clima,
+              FarosAntiniebla: result.dataValues.ex2_fanti,
+              TechoCorredizo: result.dataValues.ex2_tcorr,
+              SensorEstacionamiento: result.dataValues.ex2_sesta,
+              AirbagLateral: result.dataValues.ex2_alate,
+              AirbagCabezaConductor: result.dataValues.ex2_acabe,
+              AirbagCortina: result.dataValues.ex2_acort,
+              AirbagRodilla: result.dataValues.ex2_arodi,
+              FijacionISOFIX: result.dataValues.ex2_isofi,
+              ControlDeTraccion: result.dataValues.ex2_ctrac,
+              ControlDeEstabilidad: result.dataValues.ex2_cesta,
+              ControlDeDescenso: result.dataValues.ex2_cdesc,
+              SistemaArranqueEnPendiente: result.dataValues.ex2_sapen,
+              ControlDinamicoConduccion: result.dataValues.ex2_cdina,
+              BloqueoDiferencial: result.dataValues.ex2_bdife,
+              RepartidorElectronicoDeFrenado: result.dataValues.ex2_relef,
+              AsistenteDeFrenadoDeEmergencia: result.dataValues.ex2_afree,
+              ReguladorParFrenado: result.dataValues.ex2_rparf,
+              Largo: result.dataValues.ex2_largo,
+              Ancho: result.dataValues.ex2_ancho,
+              Alto: result.dataValues.ex2_alto,
+            };
+          },
+        }),
+      },
+      Additionals: {
+        type: new ObjectGraph({
+          name: 'Adicionales',
+          fields: {
+            TapizadoCuero: { type: Gstring },
+            AsientosElectronicos: { type: Gstring },
+            ComputadoraABordo: { type: Gstring },
+            FarosDeXenon: { type: graphql.GraphQLInt },
+            LlantasDeAleacion: { type: Gstring },
+            TechoPanoramico: { type: Gstring },
+            SensorDeLluvia: { type: Gstring },
+            SensorCrepuscular: { type: Gstring },
+            IndicadorPresionNeumaticos: { type: Gstring },
+            VolanteConLevas: { type: Gstring },
+            Bluetooth: { type: Gstring },
+            AsientosTermicos: { type: Gstring },
+            RunFlat: { type: Gstring },
+          },
+        }),
+        args: {
+          ex3_codia:
+            {
+              description: 'Atributos adicionales del auto',
+              type: new NotNull(Int),
+            },
+        },
+        resolve: resolver(extrad3, {
+          after(result) {
+            return {
+              TapizadoCuero: result.dataValues.ex3_tapcu,
+              AsientosElectronicos: result.dataValues.ex3_aelec,
+              ComputadoraABordo: result.dataValues.ex3_cabor,
+              FarosDeXenon: result.dataValues.ex3_fxeno,
+              LlantasDeAleacion: result.dataValues.ex3_lalea,
+              TechoPanoramico: result.dataValues.ex3_tpano,
+              SensorDeLluvia: result.dataValues.ex3_slluv,
+              SensorCrepuscular: result.dataValues.ex3_screp,
+              IndicadorPresionNeumaticos: result.dataValues.ex3_ipneu,
+              VolanteConLevas: result.dataValues.ex3_vleva,
+              Bluetooth: result.dataValues.ex3_bluet,
+              AsientosTermicos: result.dataValues.ex3_aterm,
+              RunFlat: result.dataValues.ex3_rflat,
             };
           },
         }),
