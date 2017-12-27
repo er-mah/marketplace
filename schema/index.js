@@ -7,6 +7,9 @@ const _ = require('lodash');
 const { UserType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
 const { Tautos30type } = require('../gtypes/Tautos30type');
+const { CaracteristicType } = require('../gtypes/CaracteristicType');
+const { TechnicalDataType } = require('../gtypes/TechnicalDataType');
+const { AdditionalsType } = require('../gtypes/AdditionalsType');
 const { User } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
@@ -152,28 +155,7 @@ const schema = new Schema({
         }),
       },
       Caracteristics: {
-        type: new ObjectGraph({
-          name: 'Caracteristicas',
-          fields: {
-            Combustible: { type: Gstring },
-            Alimentacion: { type: Gstring },
-            Motor: { type: Gstring },
-            Puertas: { type: graphql.GraphQLInt },
-            Clasificacion: { type: Gstring },
-            Cabina: { type: Gstring },
-            Carga: { type: Gstring },
-            PesoTotal: { type: Gstring },
-            VelocidadMax: { type: Gstring },
-            Potencia: { type: Gstring },
-            Direccion: { type: Gstring },
-            AireAcondicionado: { type: Gstring },
-            Traccion: { type: Gstring },
-            Importado: { type: Gstring },
-            Caja: { type: Gstring },
-            FrenosAbs: { type: Gstring },
-            AirBag: { type: Gstring },
-          },
-        }),
+        type: CaracteristicType,
         args: {
           ext_codia:
             {
@@ -206,34 +188,9 @@ const schema = new Schema({
         }),
       },
       TecnicalData: {
-        type: new ObjectGraph({
-          name: 'MoreCaracteristics',
-          fields: {
-            Climatizador: { type: Gstring },
-            FarosAntiniebla: { type: Gstring },
-            TechoCorredizo: { type: Gstring },
-            SensorEstacionamiento: { type: Gstring },
-            AirbagLateral: { type: Gstring },
-            AirbagCabezaConductor: { type: Gstring },
-            AirbagCortina: { type: Gstring },
-            AirbagRodilla: { type: Gstring },
-            FijacionISOFIX: { type: Gstring },
-            ControlDeTraccion: { type: Gstring },
-            ControlDeEstabilidad: { type: Gstring },
-            ControlDeDescenso: { type: Gstring },
-            SistemaArranqueEnPendiente: { type: Gstring },
-            ControlDinamicoConduccion: { type: Gstring },
-            BloqueoDiferencial: { type: Gstring },
-            RepartidorElectronicoDeFrenado: { type: Gstring },
-            AsistenteDeFrenadoDeEmergencia: { type: Gstring },
-            ReguladorParFrenado: { type: Gstring },
-            Largo: { type: Gstring },
-            Ancho: { type: Gstring },
-            Alto: { type: Gstring },
-          },
-        }),
+        type: TechnicalDataType,
         args: {
-          ext_codia:
+          ex2_codia:
             {
               description: 'El id del auto',
               type: new NotNull(Int),
@@ -268,24 +225,7 @@ const schema = new Schema({
         }),
       },
       Additionals: {
-        type: new ObjectGraph({
-          name: 'Adicionales',
-          fields: {
-            TapizadoCuero: { type: Gstring },
-            AsientosElectronicos: { type: Gstring },
-            ComputadoraABordo: { type: Gstring },
-            FarosDeXenon: { type: graphql.GraphQLInt },
-            LlantasDeAleacion: { type: Gstring },
-            TechoPanoramico: { type: Gstring },
-            SensorDeLluvia: { type: Gstring },
-            SensorCrepuscular: { type: Gstring },
-            IndicadorPresionNeumaticos: { type: Gstring },
-            VolanteConLevas: { type: Gstring },
-            Bluetooth: { type: Gstring },
-            AsientosTermicos: { type: Gstring },
-            RunFlat: { type: Gstring },
-          },
-        }),
+        type: AdditionalsType,
         args: {
           ex3_codia:
             {
