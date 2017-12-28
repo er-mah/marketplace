@@ -47,6 +47,14 @@ module.exports = {
         key: 'id',
       },
     },
+    user_id: {
+      allowNull: true,
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,
@@ -59,7 +67,15 @@ module.exports = {
       allowNull: true,
       type: Sequelize.DATE,
     },
-
+    name: {
+      type: Sequelize.STRING,
+    },
+    email: {
+      type: Sequelize.STRING,
+    },
+    phone: {
+      type: Sequelize.STRING,
+    },
   }),
   down: (queryInterface, Sequelize) => queryInterface.dropTable('Publications'),
 };

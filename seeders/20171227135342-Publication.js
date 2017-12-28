@@ -16,6 +16,7 @@ module.exports = {
     createdAt: moment().format('YYYY-MM-DD'),
     updatedAt: moment().format('YYYY-MM-DD'),
     deletedAt: null,
+    user_id: 1,
   }], {}),
   down: (queryInterface, Sequelize) => {
     /*

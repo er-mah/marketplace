@@ -11,10 +11,17 @@ module.exports = (sequelize, DataTypes) => {
     fuel: DataTypes.STRING,
     observation: DataTypes.TEXT,
     imageGroup_id: DataTypes.INTEGER,
-    carState_id: DataTypes.INTEGER,
+    carState: DataTypes.ENUM('Nuevo', 'Usado'),
     codia: DataTypes.INTEGER,
+    name: DataTypes.STRING,
+    email: DataTypes.STRING,
+    phone: DataTypes.STRING,
   }, {
     paranoid: true,
   });
+  Publication.associate = (models) => {
+    Publication.ImageGroup = Publication.belongsTo(models.mah.ImageGroup, { foreignKey: 'imageGroup_id' });
+
+  };
   return Publication;
 };

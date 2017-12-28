@@ -13,8 +13,5 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: false,
   });
-  ImageGroup.associate = (models) => {
-    ImageGroup.hasOne(models.Publication, { foreignKey: 'imageGroup_id' });
-  };
   return ImageGroup;
 };

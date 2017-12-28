@@ -13,12 +13,10 @@ module.exports = (sequelize, DataTypes) => {
     agencyPhone: DataTypes.STRING,
     profileImage: DataTypes.STRING,
     bannerImage: DataTypes.STRING,
-  }, {
-    classMethods: {
-      associate(models) {
-        // associations can be defined here
-      },
-    },
   });
+  User.associate = (models) => {
+    User.Publication = User.hasMany(models.mah.Publication, { foreignKey: 'user_id' });
+  };
+
   return User;
 };

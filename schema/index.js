@@ -10,7 +10,8 @@ const { Tautos30type } = require('../gtypes/Tautos30type');
 const { CaracteristicType } = require('../gtypes/CaracteristicType');
 const { TechnicalDataType } = require('../gtypes/TechnicalDataType');
 const { AdditionalsType } = require('../gtypes/AdditionalsType');
-const { User } = require('../models').mah;
+const { PublicationType } = require('../gtypes/PublicationType');
+const { User, Publication } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
   extrad2,
@@ -30,29 +31,8 @@ const schema = new Schema({
   query: new ObjectGraph({
     name: 'Root',
     fields: {
-      User: {
-        type: UserType,
-        // args will automatically be mapped to `where`
-        args: {
-          id: {
-            description: 'id of the user',
-            type: new NotNull(Int),
-          },
-        },
-        resolve: resolver(User),
-      },
-      AllUsers: {
-        type: new List(UserType),
-        args: {
-          limit: {
-            type: Int,
-          },
-          order: {
-            type: Gstring,
-          },
-        },
-        resolve: resolver(User),
-      },
+
+      // BD TAUTO
       AllBrands: {
         type: new List(Tautos30type),
         args: {
@@ -252,6 +232,58 @@ const schema = new Schema({
             };
           },
         }),
+      },
+
+      // BD MAH
+      User: {
+        type: UserType,
+        // args will automatically be mapped to `where`
+        args: {
+          id: {
+            description: 'id of the user',
+            type: new NotNull(Int),
+          },
+        },
+        resolve: resolver(User),
+      },
+      AllUsers: {
+        type: new List(UserType),
+        args: {
+          limit: {
+            type: Int,
+          },
+          order: {
+            type: Gstring,
+          },
+        },
+        resolve: resolver(User),
+      },
+      Publication: {
+        type: PublicationType,
+        args: {
+          id: {
+            description: 'id de la publicación',
+            type: new NotNull(Int),
+          },
+        },
+        resolve: resolver(Publication),
+
+      },
+      AllPublications: {
+        type: new List(PublicationType),
+        args: {
+          user_id: {
+            type: Int,
+            description: 'El id de un usuario registrado',
+          },
+          limit: {
+            type: Int,
+          },
+          order: {
+            type: Gstring,
+          },
+        },
+        resolve: resolver(Publication),
       },
     },
   }),

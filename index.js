@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const graphql = require('graphql');
+const Graphql = require('graphql').graphql;
 const bcrypt = require('bcrypt-nodejs');
 const models = require('./models');
 const jwt = require('express-jwt');
@@ -25,16 +25,17 @@ console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT
 const httpGraphQLHandler = (req, res) => {
   const { query, variables, rootVals } = req.query;
   const authToken = req.user || {};
-  return graphql(schema, query, { authToken, rootVals }, variables)
-    .then(result => res.send(result));
+  return Graphql(schema, query, { authToken, rootVals }, variables)
+    .then(result => res.send(result))
+    .catch(err => console.log(err));
 };
 app.post('/', httpGraphQLHandler);
 app.use(express.static('images'));
 app.use(jwt({ secret: 'marketGot2017' }).unless({
   path: [
+    '/graphql',
     '/login',
     /^\/images/,
-    '/graphql',
   ],
 }));
 
