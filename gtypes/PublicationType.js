@@ -2,8 +2,8 @@ const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
 const { Publication, User, ImageGroup } = require('../models').mah;
-const { UserType } = require('./UserType');
 const { ImageGroupType } = require('./ImageGroupType');
+const { PublicationStateType } = require('./PublicationStateType');
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -19,6 +19,17 @@ const PublicationType = new ObjectGraph({
       ImageGroup: {
         type: ImageGroupType,
         resolve: resolver(Publication.ImageGroup),
+      },
+    },
+    {
+      State: {
+        type: List(PublicationStateType),
+        resolve: resolver(Publication.state, {
+          before: options => options,
+          after(result) {
+            return result;
+          },
+        }),
       },
     },
   ),

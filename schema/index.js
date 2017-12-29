@@ -11,7 +11,8 @@ const { CaracteristicType } = require('../gtypes/CaracteristicType');
 const { TechnicalDataType } = require('../gtypes/TechnicalDataType');
 const { AdditionalsType } = require('../gtypes/AdditionalsType');
 const { PublicationType } = require('../gtypes/PublicationType');
-const { User, Publication } = require('../models').mah;
+const { PublicationStateType } = require('../gtypes/PublicationStateType');
+const { User, Publication, PublicationState } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
   extrad2,
@@ -284,6 +285,17 @@ const schema = new Schema({
           },
         },
         resolve: resolver(Publication),
+      },
+      PublicationState: {
+        type: PublicationStateType,
+        args: {
+          id: {
+            description: ' id de los estados',
+            type: new NotNull(Int),
+          },
+        },
+        resolve: resolver(PublicationState),
+
       },
     },
   }),

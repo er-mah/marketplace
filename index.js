@@ -30,7 +30,8 @@ const httpGraphQLHandler = (req, res) => {
     .catch(err => console.log(err));
 };
 app.post('/', httpGraphQLHandler);
-app.use(express.static('images'));
+app.use('/images', express.static(`${__dirname}/images`));
+
 app.use(jwt({ secret: 'marketGot2017' }).unless({
   path: [
     '/graphql',
