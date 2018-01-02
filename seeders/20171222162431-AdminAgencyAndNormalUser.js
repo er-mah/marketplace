@@ -4,6 +4,15 @@ const moment = require('moment');
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.bulkInsert('Users', [
     {
+      email: 'amin@yopmail.com',
+      password: bcrypt.hashSync('123123', bcrypt.genSaltSync(8), null),
+      name: 'Admin',
+      profileImage: 'ejemplo.jpg',
+      createdAt: moment().format('YYYY-MM-DD'),
+      updatedAt: moment().format('YYYY-MM-DD'),
+      isAdmin: true,
+    },
+    {
       email: 'usuario@yopmail.com',
       password: bcrypt.hashSync('123123', bcrypt.genSaltSync(8), null),
       name: 'Usuario',
@@ -12,6 +21,7 @@ module.exports = {
       profileImage: 'ejemplo.jpg',
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
+      isAdmin: false,
     },
     {
       email: 'encargado@yopmail.com',
@@ -25,6 +35,7 @@ module.exports = {
       agencyPhone: '23124123',
       profileImage: 'agencia.jpg',
       bannerImage: 'banner.jpg',
+      isAdmin: false,
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
     },
