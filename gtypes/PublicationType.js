@@ -5,10 +5,7 @@ const { Publication, User, ImageGroup } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
 
-const {
-  GraphQLObjectType: ObjectGraph,
-  GraphQLList: List,
-} = graphql;
+const { GraphQLObjectType: ObjectGraph, GraphQLList: List } = graphql;
 
 const PublicationType = new ObjectGraph({
   name: 'Publicacion',
@@ -22,11 +19,56 @@ const PublicationType = new ObjectGraph({
       },
     },
     {
-      State: {
+      HistoryState: {
         type: List(PublicationStateType),
         resolve: resolver(Publication.state, {
-          before: options => options,
+          before: (options) => {
+            options.include = [
+              {
+                model: Publication,
+                attributes: {
+                  exclude: [
+                    'kms',
+                    'brand',
+                    'group',
+                    'modelName',
+                    'price',
+                    'year',
+                    'fuel',
+                    'observation',
+                    'imageGroup_id',
+                    'carState',
+                    'codia',
+                    'name',
+                    'email',
+                    'phone',
+                    'createdAt',
+                    'updatedAt',
+                    'deletedAt',
+                  ],
+                },
+                through: {
+                  attributes: ['createdAt'],
+                },
+              },
+            ];
+            return options;
+          },
           after(result) {
+            const resultWithDate = [];
+            result.map((row) => {
+              row.createdAt = row.HistoryState.dataValues.createdAt;
+              resultWithDate.push(row);
+            });
+            return resultWithDate;
+          },
+        }),
+      },
+      CurrentState: {
+        type: PublicationStateType,
+        resolve: resolver(Publication.state, {
+          after(result) {
+            result = _.last(result);
             return result;
           },
         }),
