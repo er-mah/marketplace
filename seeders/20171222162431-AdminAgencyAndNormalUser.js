@@ -4,7 +4,7 @@ const moment = require('moment');
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.bulkInsert('Users', [
     {
-      email: 'amin@yopmail.com',
+      email: 'admin@yopmail.com',
       password: bcrypt.hashSync('123123', bcrypt.genSaltSync(8), null),
       name: 'Admin',
       profileImage: 'ejemplo.jpg',

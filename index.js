@@ -5,22 +5,22 @@ const Graphql = require('graphql').graphql;
 const bcrypt = require('bcrypt-nodejs');
 const models = require('./models');
 const jwt = require('express-jwt');
-const jsonwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
+const formidable = require('express-formidable');
 const graphqlHTTP = require('express-graphql');
-const _ = require('lodash');
 const socketioJwt = require('socketio-jwt');
 const cors = require('cors');
 const schema = require('./schema');
+const { login, createPublication } = require('./routes');
 
 // SERVER CONFIGURATION ----------------------------------------------
 const app = express();
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(formidable({
+  uploadDir: './images',
+  multiples: true, // req.files to be arrays of files
+}));
 app.use(cors());
 app.listen(process.env.PORT || 4000);
 console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
-
 
 const httpGraphQLHandler = (req, res) => {
   const { query, variables, rootVals } = req.query;
@@ -32,14 +32,13 @@ const httpGraphQLHandler = (req, res) => {
 app.post('/', httpGraphQLHandler);
 app.use('/images', express.static(`${__dirname}/images`));
 
-app.use(jwt({ secret: 'marketGot2017' }).unless({
+app.use(jwt({ secret: 'MAH2018!#' }).unless({
   path: [
     '/graphql',
     '/login',
     /^\/images/,
   ],
 }));
-
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -100,72 +99,7 @@ io.of('/offerChat').on('connection', (socket) => {
 // ===================================================================
 
 // ROUTES --------------------------------------------------------------
-const loginAdmin = (req, res) => {
-  const { username, password } = req.params;
-  Users.findOne({ where: { username } })
-    .then((user) => {
-      if (_.isNull(user)) {
-        console.log('usuario inexistente');
-        res.send(400, {
-          status: 'error',
-          message: 'Usuario inexistente o contraseña incorrecta.',
-        });
-        return false;
-      }
-      if (password === user.password) {
-        const token = jsonwt.sign(
-          {
-            id: user.id,
-            name: user.name,
-          },
-          'MAH2018!#',
-          { expiresIn: '24h' },
-        );
-
-        res.send(200, {
-          status: 'ok',
-          message: token,
-        });
-
-        return false;
-      }
-      if (!user.validPassword(password, user.password)) {
-        res.send(401, {
-          status: 'error',
-          message: 'Usuario inexistente o contraseña incorrecta.',
-        });
-
-        return false;
-      }
-      if (user.isAdmin === false) {
-        res.send(400, {
-          status: 'error',
-          message: 'No tienes permisos para acceder aquí.',
-        });
-        return false;
-      }
-      const token = jsonwt.sign(
-        {
-          id: user.id,
-          name: user.name,
-        },
-        'MAH2018!#',
-        { expiresIn: '24h' },
-      );
-
-      res.send(200, {
-        status: 'ok',
-        message: token,
-      });
-
-      return false;
-    })
-    .catch(error =>
-      res.send(400, {
-        status: 'error',
-        message: error,
-      }));
-};
-app.post('/loginAdmin', loginAdmin);
+app.post('/login', login);
+app.post('/createPublication', createPublication);
 // ===================================================================
 

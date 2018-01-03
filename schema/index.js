@@ -18,6 +18,8 @@ const {
   extrad2,
 } = require('../models').tauto;
 
+/* const Subscription = require('../subscriptions');
+ */
 
 const {
   GraphQLSchema: Schema,

@@ -27,20 +27,22 @@
   "homepage": "https://bitbucket.org/mfliri_ao/apicinesis#readme",
   "dependencies": {
     "bcrypt-nodejs": "^0.0.3",
-    "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "eslint": "^4.12.1",
     "express": "^4.16.2",
+    "express-formidable": "^1.0.0",
     "express-graphql": "^0.6.11",
     "express-jwt": "^5.3.0",
     "graphql": "^0.12.3",
     "graphql-relay": "^0.5.4",
     "graphql-sequelize": "^5.6.1",
+    "graphql-subscriptions": "^0.5.6",
     "jsonwebtoken": "^8.1.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.19.3",
+    "multer": "^1.3.0",
     "mysql": "^2.15.0",
     "mysql2": "^1.5.1",
     "nodemon": "^1.12.1",
@@ -48,7 +50,8 @@
     "sequelize-auto": "^0.4.29",
     "sequelize-cli": "^3.1.0",
     "socket.io": "^2.0.4",
-    "socketio-jwt": "^4.5.0"
+    "socketio-jwt": "^4.5.0",
+    "subscriptions-transport-ws": "^0.9.4"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",

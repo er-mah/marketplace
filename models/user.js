@@ -1,4 +1,5 @@
 
+const bcrypt = require('bcrypt-nodejs');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -15,6 +16,12 @@ module.exports = (sequelize, DataTypes) => {
     bannerImage: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
   });
+  User.generateHash = password =>
+    bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+
+  User.prototype.validPassword = (password, userpass) =>
+    bcrypt.compareSync(password, userpass);
+
   User.associate = (models) => {
     User.Publication = User.hasMany(models.mah.Publication, { foreignKey: 'user_id' });
   };

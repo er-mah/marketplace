@@ -1,11 +1,13 @@
 const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { Publication, User, ImageGroup } = require('../models').mah;
+const { Publication } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
 
-const { GraphQLObjectType: ObjectGraph, GraphQLList: List } = graphql;
+const {
+  GraphQLObjectType: ObjectGraph, GraphQLList: List, GraphQLString: Gstring,
+} = graphql;
 
 const PublicationType = new ObjectGraph({
   name: 'Publicacion',
