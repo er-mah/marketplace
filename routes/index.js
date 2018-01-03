@@ -1,5 +1,7 @@
 const jsonwt = require('jsonwebtoken');
-const { User, Publication, ImageGroup } = require('../models').mah;
+const {
+  User, Publication, ImageGroup, PublicationState,
+} = require('../models').mah;
 const _ = require('lodash');
 
 const login = (req, res) => {
@@ -73,11 +75,11 @@ const login = (req, res) => {
 const createPublication = (req, res) => {
   const {
     brand, group, modelName, kms, price, year, fuel, observation, carState, codia, name, email, phone, user_id,
-  } = req.fields;
-  const { imageGroup } = req.files;
+  } = req.body;
+  const imageGroup = req.files;
   const imageData = {};
-  for (let i = 1; i < imageGroup.length; i += 1) {
-    const objectName = `image${i}`;
+  for (let i = 0; i < imageGroup.length; i += 1) {
+    const objectName = `image${i + 1}`;
     imageData[objectName] = imageGroup[i].path.slice(7);
   }
   if (!email && !user_id) {
@@ -87,7 +89,7 @@ const createPublication = (req, res) => {
     });
     return false;
   }
-  User.findById(user_id)
+  return User.findById(user_id)
     .then((user) => {
       if (!user) {
         return Promise.reject();
@@ -113,14 +115,18 @@ const createPublication = (req, res) => {
             email,
             phone,
             user_id,
-          });
-        })
-        .then((r) => {
-          res.status(200).send({
-            status: 'ok',
-            message: 'Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy',
-            data: r,
-          });
+          })
+            .then((publication) => {
+              PublicationState.findOne({ where: { stateName: 'Pendiente' } })
+                .then((ps) => {
+                  publication.setPublicationStates(ps);
+                  res.status(200).send({
+                    status: 'ok',
+                    message: 'Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy',
+                    data: publication,
+                  });
+                });
+            });
         })
         .catch((e) => {
           res.status(400).send({

@@ -6,7 +6,7 @@ const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
 
 const {
-  GraphQLObjectType: ObjectGraph, GraphQLList: List, GraphQLString: Gstring,
+  GraphQLObjectType: ObjectGraph, GraphQLList: List,
 } = graphql;
 
 const PublicationType = new ObjectGraph({

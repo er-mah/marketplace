@@ -5,22 +5,25 @@ const Graphql = require('graphql').graphql;
 const bcrypt = require('bcrypt-nodejs');
 const models = require('./models');
 const jwt = require('express-jwt');
-const formidable = require('express-formidable');
+const bodyParser = require('body-parser');
 const graphqlHTTP = require('express-graphql');
 const socketioJwt = require('socketio-jwt');
 const cors = require('cors');
 const schema = require('./schema');
 const { login, createPublication } = require('./routes');
+const multer = require('multer');
+
+const upload = multer({ dest: './images' });
+
+const app = express();
 
 // SERVER CONFIGURATION ----------------------------------------------
-const app = express();
-app.use(formidable({
-  uploadDir: './images',
-  multiples: true, // req.files to be arrays of files
-}));
 app.use(cors());
 app.listen(process.env.PORT || 4000);
 console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
 
 const httpGraphQLHandler = (req, res) => {
   const { query, variables, rootVals } = req.query;
@@ -34,6 +37,7 @@ app.use('/images', express.static(`${__dirname}/images`));
 
 app.use(jwt({ secret: 'MAH2018!#' }).unless({
   path: [
+    '/',
     '/graphql',
     '/login',
     /^\/images/,
@@ -100,6 +104,6 @@ io.of('/offerChat').on('connection', (socket) => {
 
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
-app.post('/createPublication', createPublication);
+app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
 // ===================================================================
 
