@@ -3,6 +3,11 @@ const {
   User, Publication, ImageGroup, PublicationState,
 } = require('../models').mah;
 const _ = require('lodash');
+// Helper
+const ResponseObj = (status, message, data) => (
+  { status, message, data }
+);
+
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -80,7 +85,7 @@ const createPublication = (req, res) => {
   const imageData = {};
   for (let i = 0; i < imageGroup.length; i += 1) {
     const objectName = `image${i + 1}`;
-    imageData[objectName] = imageGroup[i].path.slice(7);
+    imageData[objectName] = imageGroup[i].filename;
   }
   if (!email && !user_id) {
     res.status(400).send({
@@ -136,12 +141,39 @@ const createPublication = (req, res) => {
           console.log(e);
         });
     })
-    .catch((error) => {
+    .catch(() => {
       res.status(400).send({
         status: 'error',
         error: 'No existe un usuario con ese id',
       });
     });
 };
-module.exports = { login, createPublication };
+const uploadAgencyImages = (req, res) => {
+  const { avatar, banner } = req.files;
+  const { id } = req.params;
+  const imageData = {};
+  if (avatar) { imageData.profileImage = avatar[0].filename; }
+  if (banner) { imageData.bannerImage = banner[0].filename; }
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        res.status(400).send(ResponseObj('error', 'No existe un usuario con ese id.'));
+      }
+      user.update(imageData)
+        .then(() => {
+          res.status(200).send({
+            status: 'ok',
+            message: 'Cambios guardados con éxito',
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+          res.status(400).send({
+            status: 'error',
+            e,
+          });
+        });
+    });
+};
+module.exports = { login, createPublication, uploadAgencyImages };
 

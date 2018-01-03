@@ -10,12 +10,13 @@ const graphqlHTTP = require('express-graphql');
 const socketioJwt = require('socketio-jwt');
 const cors = require('cors');
 const schema = require('./schema');
-const { login, createPublication } = require('./routes');
+const { login, createPublication, uploadAgencyImages } = require('./routes');
 const multer = require('multer');
 
 const upload = multer({ dest: './images' });
-
 const app = express();
+
+
 
 // SERVER CONFIGURATION ----------------------------------------------
 app.use(cors());
@@ -105,5 +106,6 @@ io.of('/offerChat').on('connection', (socket) => {
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
 app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
+app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), uploadAgencyImages);
 // ===================================================================
 
