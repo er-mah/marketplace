@@ -1,6 +1,7 @@
 
 const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
+const { maskErrors } = require('graphql-errors');
 
 const _ = require('lodash');
 
@@ -12,7 +13,15 @@ const { TechnicalDataType } = require('../gtypes/TechnicalDataType');
 const { AdditionalsType } = require('../gtypes/AdditionalsType');
 const { PublicationType } = require('../gtypes/PublicationType');
 const { PublicationStateType } = require('../gtypes/PublicationStateType');
-const { User, Publication, PublicationState } = require('../models').mah;
+const { CommentThreadType } = require('../gtypes/CommentThreadType');
+const { MessageType } = require('../gtypes/MessageType');
+
+const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
+const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMutations;
+
+const {
+  User, Publication, PublicationState, CommentThread, Message,
+} = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
   extrad2,
@@ -299,9 +308,30 @@ const schema = new Schema({
         resolve: resolver(PublicationState),
 
       },
+      CommentThread: {
+        type: CommentThreadType,
+        args: {
+          id: {
+            description: 'id del grupo de mensajes',
+            type: Int,
+          },
+          chatToken: {
+            description: 'Token del chat anonimo',
+            type: Gstring,
+          },
+        },
+        resolve: resolver(CommentThread),
+      },
+    },
+  }),
+  mutation: new ObjectGraph({
+    name: 'Mutations',
+    description: 'Donde las cosas mutan',
+    fields: {
+      createCommentThread, deleteCommentThread, addMessage, deleteMessage,
     },
   }),
 });
-
+maskErrors(schema);
 
 module.exports = schema;

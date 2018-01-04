@@ -46,6 +46,7 @@ module.exports = {
         model: 'ImageGroups',
         key: 'id',
       },
+      onDelete: 'CASCADE',
     },
     user_id: {
       allowNull: true,
@@ -54,6 +55,7 @@ module.exports = {
         model: 'Users',
         key: 'id',
       },
+      onDelete: 'CASCADE',        
     },
     createdAt: {
       allowNull: false,
