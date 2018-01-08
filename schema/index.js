@@ -290,6 +290,10 @@ const schema = new Schema({
             type: Int,
             description: 'El id de un usuario registrado',
           },
+          stateName: {
+            type: Gstring,
+            description: 'El estado actual de la publicacion',
+          },
           limit: {
             type: Int,
           },
@@ -297,7 +301,18 @@ const schema = new Schema({
             type: Gstring,
           },
         },
-        resolve: resolver(Publication),
+        resolve: resolver(Publication, {
+          before: (options, args) => {
+            if (args.stateName) {
+              options.include = [{
+                model: PublicationState,
+                where: { stateName: args.stateName },
+              }];
+              return options;
+            }
+            return options;
+          },
+        }),
       },
       PublicationState: {
         type: PublicationStateType,

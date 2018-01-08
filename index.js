@@ -35,7 +35,7 @@ const ws = createServer(app);
 
 // Set up the WebSocket for handling GraphQL subscriptions
 app.listen(process.env.PORT || 4000, () => {
-  console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
+  console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphiql`);
 
   SubscriptionServer.create({
     execute,

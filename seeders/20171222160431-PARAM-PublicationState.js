@@ -9,6 +9,9 @@ module.exports = {
       stateName: 'Publicada',
     },
     {
+      stateName: 'Destacada',
+    },
+    {
       stateName: 'Suspendida',
     },
     {
