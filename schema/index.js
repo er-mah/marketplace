@@ -19,6 +19,8 @@ const { MessageType } = require('../gtypes/MessageType');
 const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
 const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMutations;
 
+const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
+
 const {
   User, Publication, PublicationState, CommentThread, Message,
 } = require('../models').mah;
@@ -331,7 +333,13 @@ const schema = new Schema({
       createCommentThread, deleteCommentThread, addMessage, deleteMessage,
     },
   }),
+  subscription: new ObjectGraph({
+    name: 'Subscription',
+    description: 'Dónde las cosas se actualizan autómaticamente (como con sockets)',
+    fields: {
+      messageAdded,
+    },
+  }),
 });
-maskErrors(schema);
 
 module.exports = schema;

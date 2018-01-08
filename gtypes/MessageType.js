@@ -1,9 +1,11 @@
+
 /* eslint camelcase: 0 */
 
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 const jwtDecode = require('jwt-decode');
+const { PubSub, withFilter } = require('graphql-subscriptions');
 
 const graphql = require('graphql');
 const { Message, CommentThread, User } = require('../models').mah;
@@ -15,11 +17,15 @@ const {
   GraphQLString: Gstring,
 } = graphql;
 
+const pubsub = new PubSub();
+pubsub.publish('hola');
+
 const MessageType = new ObjectGraph({
-  name: 'Mensaje',
+  name: 'Message',
   description: 'Mensaje de un usuario a otro.',
   fields: _.assign(attributeFields(Message)),
 });
+
 const MessageMutations = {
   addMessage: {
     type: MessageType,
@@ -43,7 +49,10 @@ const MessageMutations = {
             content,
             commentThread_id,
           })
-            .then(msg => msg);
+            .then((msg) => {
+              pubsub.publish('messageAdded', { messageAdded: msg, commentThread_id: msg.commentThread_id });
+              return msg;
+            });
         }),
   },
   deleteMessage: {
@@ -79,4 +88,18 @@ const MessageMutations = {
   },
 };
 
-module.exports = { MessageType, MessageMutations };
+const MessageSubscriptions = {
+  messageAdded: {
+    name: 'messageAdded',
+    type: MessageType,
+    args: {
+      commentThread_id: { type: new NotNull(Int) },
+    },
+    subscribe: withFilter(
+      () =>
+        pubsub.asyncIterator('messageAdded'),
+      (payload, variables) => payload.commentThread_id === variables.commentThread_id,
+    ),
+  },
+};
+module.exports = { MessageType, MessageMutations, MessageSubscriptions };

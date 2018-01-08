@@ -2,28 +2,50 @@ require('dotenv').config();
 
 const express = require('express');
 const Graphql = require('graphql').graphql;
-const bcrypt = require('bcrypt-nodejs');
-const models = require('./models');
 const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
-const graphqlHTTP = require('express-graphql');
-const socketioJwt = require('socketio-jwt');
+
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
+
+/* const socketioJwt = require('socketio-jwt'); */
 const cors = require('cors');
 const schema = require('./schema');
 const { login, createPublication, uploadAgencyImages } = require('./routes');
 const multer = require('multer');
 
+const { execute, subscribe } = require('graphql');
+const { createServer } = require('http');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
+
 const upload = multer({ dest: './images' });
 const app = express();
 
-
-
 // SERVER CONFIGURATION ----------------------------------------------
 app.use(cors());
-app.listen(process.env.PORT || 4000);
-console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+app.use('/graphiql', graphiqlExpress({
+  endpointURL: '/graphql',
+  subscriptionsEndpoint: 'ws://localhost:4000/subscriptions',
+}));
+
+const ws = createServer(app);
+
+// Set up the WebSocket for handling GraphQL subscriptions
+app.listen(process.env.PORT || 4000, () => {
+  console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphql`);
+
+  SubscriptionServer.create({
+    execute,
+    subscribe,
+    schema,
+  }, {
+    server: ws,
+    path: '/subscriptions',
+  });
+});
 
 
 const httpGraphQLHandler = (req, res) => {
@@ -38,7 +60,7 @@ app.use('/images', express.static(`${__dirname}/images`));
 
 app.use(jwt({ secret: 'MAH2018!#' }).unless({
   path: [
-    '/',
+    '/subscriptions',
     '/graphql',
     '/login',
     /^\/images/,
@@ -51,15 +73,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/graphql', graphqlHTTP({
-  schema,
-  graphiql: true,
-}));
+/* console.log(schema.getSubscriptionType().getFields().messageAdded) */
 
 // ===================================================================
 
 // SOCKETS ------------------------------------------------------------
-const socketServer = require('http').createServer(app);
+/* const socketServer = require('http').createServer(app);
 const io = require('socket.io')(socketServer);
 
 socketServer.listen(process.env.PORT || 4100);
@@ -90,7 +109,7 @@ io.of('/offerChat').on('connection', (socket) => {
   });
   socket.on('buyerStopTyping', () => {
     socket.broadcast.emit('buyerStopTyping');
-  });
+  }); */
 
 /*   socket.on('newMessage', (data) => {
     createMessage(data.id_from, data.id_to, data.messageThread_id, data.content)
@@ -98,9 +117,9 @@ io.of('/offerChat').on('connection', (socket) => {
         socket.emit('messageCreated', res);
         socket.broadcast.emit('messageCreated', res);
       });
-  }); */
+  });
 });
-
+*/
 // ===================================================================
 
 // ROUTES --------------------------------------------------------------
