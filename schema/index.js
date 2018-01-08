@@ -22,7 +22,7 @@ const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMu
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
 
 const {
-  User, Publication, PublicationState, CommentThread, Message,
+  User, Publication, PublicationState, CommentThread, Message, sequelize,
 } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
@@ -303,7 +303,15 @@ const schema = new Schema({
         },
         resolve: resolver(Publication, {
           before: (options, args) => {
-            if (args.stateName) {
+            const { Op } = sequelize;
+            if (args.stateName === 'Activas') {
+              options.include = [{
+                model: PublicationState,
+                where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
+              }];
+              return options;
+            }
+            if (args.stateName && args.stateName !== 'Activas') {
               options.include = [{
                 model: PublicationState,
                 where: { stateName: args.stateName },
