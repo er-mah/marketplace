@@ -14,23 +14,21 @@ const { AdditionalsType } = require('../gtypes/AdditionalsType');
 const { PublicationType } = require('../gtypes/PublicationType');
 const { PublicationStateType } = require('../gtypes/PublicationStateType');
 const { CommentThreadType } = require('../gtypes/CommentThreadType');
-const { MessageType } = require('../gtypes/MessageType');
 
 const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
 const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMutations;
 
+const { searchPublication } = require('../gtypes/PublicationType').PublicationMutation;
+
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
 
 const {
-  User, Publication, PublicationState, CommentThread, Message, sequelize,
+  User, Publication, PublicationState, CommentThread, sequelize,
 } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
   extrad2,
 } = require('../models').tauto;
-
-/* const Subscription = require('../subscriptions');
- */
 
 const {
   GraphQLSchema: Schema,
@@ -344,6 +342,14 @@ const schema = new Schema({
             description: 'Token del chat anonimo',
             type: Gstring,
           },
+          publication_id: {
+            description: 'id de la publicacion asociada',
+            type: Int,
+          },
+          user_id: {
+            description: 'Id del usuario (requerido)',
+            type: Int,
+          },
         },
         resolve: resolver(CommentThread),
       },
@@ -353,7 +359,7 @@ const schema = new Schema({
     name: 'Mutations',
     description: 'Donde las cosas mutan',
     fields: {
-      createCommentThread, deleteCommentThread, addMessage, deleteMessage,
+      createCommentThread, deleteCommentThread, addMessage, deleteMessage, searchPublication,
     },
   }),
   subscription: new ObjectGraph({

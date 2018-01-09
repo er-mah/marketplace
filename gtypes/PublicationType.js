@@ -1,12 +1,18 @@
+
 const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { Publication } = require('../models').mah;
+const { Publication, sequelize } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
+const { PublicationDetailType } = require('./PublicationDetailType');
+const { CommentThreadType } = require('./CommentThreadType');
 
 const {
-  GraphQLObjectType: ObjectGraph, GraphQLList: List,
+  GraphQLObjectType: ObjectGraph,
+  GraphQLList: List,
+  GraphQLNonNull: NotNull,
+  GraphQLString: Gstring,
 } = graphql;
 
 const PublicationType = new ObjectGraph({
@@ -75,8 +81,46 @@ const PublicationType = new ObjectGraph({
           },
         }),
       },
+      Specifications: {
+        type: PublicationDetailType,
+        resolve: resolver(Publication.PublicationDetail),
+      },
     },
   ),
 });
 
-module.exports = { PublicationType };
+const PublicationMutation = {
+  searchPublication: {
+    type: List(PublicationType),
+    name: 'searchPublication',
+    description: 'Búsqueda de una publicacion con cualquier parámetro',
+    args: {
+      carState: { type: new NotNull(Gstring) },
+      text: { type: new NotNull(Gstring) },
+    },
+    resolve: resolver(Publication, {
+      before: (options, args) => {
+        const { Op } = sequelize;
+        args.text += '%';
+        options.where = {
+          [Op.or]: [
+            { brand: { [Op.like]: args.text } },
+            { group: { [Op.like]: args.text } },
+            { modelName: { [Op.like]: args.text } },
+            { kms: { [Op.like]: args.text } },
+            { price: { [Op.like]: args.text } },
+            { year: { [Op.like]: args.text } },
+            { fuel: { [Op.like]: args.text } },
+            { observation: { [Op.like]: args.text } },
+            { codia: { [Op.like]: args.text } },
+            { name: { [Op.like]: args.text } },
+          ],
+          [Op.and]: { carState: args.carState },
+        };
+        return options;
+      },
+    }),
+  },
+};
+
+module.exports = { PublicationType, PublicationMutation };

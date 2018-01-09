@@ -48,6 +48,15 @@ module.exports = {
       },
       onDelete: 'CASCADE',
     },
+    publicationDetail_id: {
+      allowNull: false,
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'PublicationDetails',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+    },
     user_id: {
       allowNull: true,
       type: Sequelize.INTEGER,

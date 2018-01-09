@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
   Publication.associate = (models) => {
     Publication.commentThread = Publication.hasMany(models.mah.CommentThread, { foreignKey: 'publication_id', onDelete: 'CASCADE' });
     Publication.ImageGroup = Publication.belongsTo(models.mah.ImageGroup, { foreignKey: 'imageGroup_id' });
+    Publication.PublicationDetail = Publication.belongsTo(models.mah.PublicationDetail, { foreignKey: 'publicationDetail_id', as: 'publicationDetail', onDelete: 'CASCADE' });
     Publication.state = Publication.belongsToMany(models.mah.PublicationState, {
       through: models.mah.HistoryState,
       foreignKey: 'publication_id',

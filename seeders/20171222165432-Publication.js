@@ -18,6 +18,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 1,
     },
     {
       brand: 'Citroen',
@@ -34,6 +35,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 2,
     },
     {
       brand: 'Citroen',
@@ -50,6 +52,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 3,
     },
     {
       brand: 'Citroen',
@@ -66,6 +69,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 4,
     },
     {
       brand: 'Citroen',
@@ -82,6 +86,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 5,
     },
     {
       brand: 'Citroen',
@@ -98,6 +103,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 6,
     },
     {
       brand: 'Citroen',
@@ -114,6 +120,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 7,
     },
     {
       brand: 'Citroen',
@@ -130,6 +137,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 8,
     },
     {
       brand: 'Citroen',
@@ -146,6 +154,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 9,
     },
     {
       brand: 'Citroen',
@@ -162,6 +171,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 10,
     },
     {
       brand: 'Citroen',
@@ -178,6 +188,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 11,
     },
     {
       brand: 'Citroen',
@@ -194,6 +205,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 12,
     },
     {
       brand: 'Citroen',
@@ -210,6 +222,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 13,
     },
     {
       brand: 'Citroen',
@@ -226,6 +239,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 14,
     },
     {
       brand: 'Citroen',
@@ -242,6 +256,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 2,
+      publicationDetail_id: 15,
     },
     {
       brand: 'Citroen',
@@ -258,6 +273,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 16,
     },
     {
       brand: 'Citroen',
@@ -274,6 +290,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 17,
     },
     {
       brand: 'Citroen',
@@ -290,6 +307,7 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 1,
+      publicationDetail_id: 18,
     },
     {
       brand: 'Citroen',
@@ -306,6 +324,8 @@ module.exports = {
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
       user_id: 2,
+      publicationDetail_id: 19,
+      
     },
     {
       brand: 'Citroen',
@@ -321,7 +341,9 @@ module.exports = {
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
       deletedAt: null,
-      user_id: 1
+      user_id: 1,
+      publicationDetail_id: 20,
+      
     },
   ], {}),
   down: (queryInterface, Sequelize) => {

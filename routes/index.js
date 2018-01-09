@@ -1,13 +1,14 @@
 const jsonwt = require('jsonwebtoken');
 const {
-  User, Publication, ImageGroup, PublicationState,
+  User,
+  Publication,
+  ImageGroup,
+  PublicationState,
+  PublicationDetail,
 } = require('../models').mah;
 const _ = require('lodash');
 // Helper
-const ResponseObj = (status, message, data) => (
-  { status, message, data }
-);
-
+const ResponseObj = (status, message, data) => ({ status, message, data });
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -79,7 +80,70 @@ const login = (req, res) => {
 };
 const createPublication = (req, res) => {
   const {
-    brand, group, modelName, kms, price, year, fuel, observation, carState, codia, name, email, phone, user_id,
+    brand,
+    group,
+    modelName,
+    kms,
+    price,
+    year,
+    fuel,
+    observation,
+    carState,
+    codia,
+    name,
+    email,
+    phone,
+    user_id,
+    Alimentacion,
+    Motor,
+    Puertas,
+    Clasificacion,
+    Cabina,
+    Carga,
+    PesoTotal,
+    VelocidadMax,
+    Potencia,
+    Direccion,
+    AireAcondicionado,
+    Traccion,
+    Importado,
+    Caja,
+    FrenosAbs,
+    Airbag,
+    Climatizador,
+    FarosAntiniebla,
+    TechoCorredizo,
+    SensorEstacionamiento,
+    AirbagLateral,
+    AirbagCabezaConductor,
+    AirbagCortina,
+    AirbagRodilla,
+    FijacionISOFIX,
+    ControlDeTraccion,
+    ControlDeEstabilidad,
+    ControlDeDescenso,
+    SistemaArranqueEnPendiente,
+    ControlDinamicoConduccion,
+    BloqueoDiferencial,
+    RepartidorElectronicoDeFrenado,
+    AsistenteDeFrenadoEmergencia,
+    ReguladorParFrenado,
+    Largo,
+    Ancho,
+    Alto,
+    TapizadoCuero,
+    AsientosElectronicos,
+    ComputadoraABordo,
+    FarosDeXenon,
+    LLantasDeAleacion,
+    TechoPanoramico,
+    SensorDeLluvia,
+    SensorCrepuscular,
+    IndicadorPresionNeumaticos,
+    VolanteConLevas,
+    Bluetooth,
+    AsientosTermicos,
+    RunFlat,
   } = req.body;
   const imageGroup = req.files;
   const imageData = {};
@@ -104,34 +168,97 @@ const createPublication = (req, res) => {
     .then(() => {
       ImageGroup.create(imageData)
         .then((resp) => {
-          Publication.create({
-            brand,
-            group,
-            modelName,
-            kms,
-            price,
-            year,
-            fuel,
-            observation,
-            carState,
-            codia,
-            imageGroup_id: resp.id,
-            name,
-            email,
-            phone,
-            user_id,
-          })
-            .then((publication) => {
-              PublicationState.findOne({ where: { stateName: 'Pendiente' } })
-                .then((ps) => {
-                  publication.setPublicationStates(ps);
-                  res.status(200).send({
-                    status: 'ok',
-                    message: 'Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy',
-                    data: publication,
-                  });
-                });
+          Publication.create(
+            {
+              brand,
+              group,
+              modelName,
+              kms,
+              price,
+              year,
+              fuel,
+              observation,
+              carState,
+              codia,
+              imageGroup_id: resp.id,
+              name,
+              email,
+              phone,
+              user_id,
+              publicationDetail: {
+                Alimentacion,
+                Motor,
+                Puertas,
+                Clasificacion,
+                Cabina,
+                Carga,
+                PesoTotal,
+                VelocidadMax,
+                Potencia,
+                Direccion,
+                AireAcondicionado,
+                Traccion,
+                Importado,
+                Caja,
+                FrenosAbs,
+                Airbag,
+                Climatizador,
+                FarosAntiniebla,
+                TechoCorredizo,
+                SensorEstacionamiento,
+                AirbagLateral,
+                AirbagCabezaConductor,
+                AirbagCortina,
+                AirbagRodilla,
+                FijacionISOFIX,
+                ControlDeTraccion,
+                ControlDeEstabilidad,
+                ControlDeDescenso,
+                SistemaArranqueEnPendiente,
+                ControlDinamicoConduccion,
+                BloqueoDiferencial,
+                RepartidorElectronicoDeFrenado,
+                AsistenteDeFrenadoEmergencia,
+                ReguladorParFrenado,
+                Largo,
+                Ancho,
+                Alto,
+                TapizadoCuero,
+                AsientosElectronicos,
+                ComputadoraABordo,
+                FarosDeXenon,
+                LLantasDeAleacion,
+                TechoPanoramico,
+                SensorDeLluvia,
+                SensorCrepuscular,
+                IndicadorPresionNeumaticos,
+                VolanteConLevas,
+                Bluetooth,
+                AsientosTermicos,
+                RunFlat,
+              },
+            },
+            {
+              include: [
+                {
+                  model: PublicationDetail,
+                  as: 'publicationDetail',
+                },
+              ],
+            },
+          ).then((publication) => {
+            PublicationState.findOne({
+              where: { stateName: 'Pendiente' },
+            }).then((ps) => {
+              publication.setPublicationStates(ps);
+              res.status(200).send({
+                status: 'ok',
+                message:
+                  'Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy',
+                data: publication,
+              });
             });
+          });
         })
         .catch((e) => {
           res.status(400).send({
@@ -152,28 +279,33 @@ const uploadAgencyImages = (req, res) => {
   const { avatar, banner } = req.files;
   const { id } = req.params;
   const imageData = {};
-  if (avatar) { imageData.profileImage = avatar[0].filename; }
-  if (banner) { imageData.bannerImage = banner[0].filename; }
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        res.status(400).send(ResponseObj('error', 'No existe un usuario con ese id.'));
-      }
-      user.update(imageData)
-        .then(() => {
-          res.status(200).send({
-            status: 'ok',
-            message: 'Cambios guardados con éxito',
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-          res.status(400).send({
-            status: 'error',
-            e,
-          });
+  if (avatar) {
+    imageData.profileImage = avatar[0].filename;
+  }
+  if (banner) {
+    imageData.bannerImage = banner[0].filename;
+  }
+  User.findById(id).then((user) => {
+    if (!user) {
+      res
+        .status(400)
+        .send(ResponseObj('error', 'No existe un usuario con ese id.'));
+    }
+    user
+      .update(imageData)
+      .then(() => {
+        res.status(200).send({
+          status: 'ok',
+          message: 'Cambios guardados con éxito',
         });
-    });
+      })
+      .catch((e) => {
+        console.log(e);
+        res.status(400).send({
+          status: 'error',
+          e,
+        });
+      });
+  });
 };
 module.exports = { login, createPublication, uploadAgencyImages };
-
