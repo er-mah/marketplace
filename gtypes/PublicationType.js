@@ -115,6 +115,9 @@ const PublicationMutation = {
     },
     resolve: resolver(Publication, {
       after: (result, args) => {
+        if (result === null) {
+          result = {};
+        }
         const { Op } = sequelize;
         const options = {};
         args.text += '%';
