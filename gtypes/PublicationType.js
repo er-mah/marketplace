@@ -6,6 +6,7 @@ const { Publication, sequelize } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
 const { PublicationDetailType } = require('./PublicationDetailType');
+const { UserType } = require('./UserType');
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -85,6 +86,10 @@ const PublicationType = new ObjectGraph({
       Specifications: {
         type: PublicationDetailType,
         resolve: resolver(Publication.PublicationDetail),
+      },
+      User: {
+        type: UserType,
+        resolve: resolver(Publication.User),
       },
       totalResult: { type: Int },
       hasNextPage: { type: Gboolean },
