@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
     PesoTotal: DataTypes.STRING,
     VelocidadMax: DataTypes.STRING,
     Potencia: DataTypes.STRING,
+    Largo: DataTypes.FLOAT,
+    Ancho: DataTypes.FLOAT,
+    Alto: DataTypes.FLOAT,
+
     Direccion: DataTypes.STRING,
     AireAcondicionado: DataTypes.BOOLEAN,
     Traccion: DataTypes.STRING,
@@ -26,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     AirbagCabezaConductor: DataTypes.BOOLEAN,
     AirbagCortina: DataTypes.BOOLEAN,
     AirbagRodilla: DataTypes.BOOLEAN,
+
     FijacionISOFIX: DataTypes.BOOLEAN,
     ControlDeTraccion: DataTypes.BOOLEAN,
     ControlDeEstabilidad: DataTypes.BOOLEAN,
@@ -36,9 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     RepartidorElectronicoDeFrenado: DataTypes.BOOLEAN,
     AsistenteDeFrenadoEmergencia: DataTypes.BOOLEAN,
     ReguladorParFrenado: DataTypes.BOOLEAN,
-    Largo: DataTypes.FLOAT,
-    Ancho: DataTypes.FLOAT,
-    Alto: DataTypes.FLOAT,
+    
     TapizadoCuero: DataTypes.BOOLEAN,
     AsientosElectronicos: DataTypes.BOOLEAN,
     ComputadoraABordo: DataTypes.BOOLEAN,

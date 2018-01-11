@@ -186,6 +186,7 @@ const createPublication = (req, res) => {
               phone,
               user_id,
               publicationDetail: {
+                hasDetails,
                 Alimentacion,
                 Motor,
                 Puertas,

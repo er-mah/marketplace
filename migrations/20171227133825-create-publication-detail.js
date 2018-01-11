@@ -35,6 +35,16 @@ module.exports = {
     Potencia: {
       type: Sequelize.STRING,
     },
+    Largo: {
+      type: Sequelize.FLOAT,
+    },
+    Ancho: {
+      type: Sequelize.FLOAT,
+    },
+    Alto: {
+      type: Sequelize.FLOAT,
+    },
+
     Direccion: {
       type: Sequelize.STRING,
     },
@@ -80,6 +90,7 @@ module.exports = {
     AirbagRodilla: {
       type: Sequelize.BOOLEAN,
     },
+    
     FijacionISOFIX: {
       type: Sequelize.BOOLEAN,
     },
@@ -109,15 +120,6 @@ module.exports = {
     },
     ReguladorParFrenado: {
       type: Sequelize.BOOLEAN,
-    },
-    Largo: {
-      type: Sequelize.FLOAT,
-    },
-    Ancho: {
-      type: Sequelize.FLOAT,
-    },
-    Alto: {
-      type: Sequelize.FLOAT,
     },
     TapizadoCuero: {
       type: Sequelize.BOOLEAN,

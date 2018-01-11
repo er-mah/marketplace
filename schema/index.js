@@ -46,6 +46,7 @@ const schema = new Schema({
 
       // BD TAUTO
       AllBrands: {
+        description: 'Los valores que importan son ta3_marca y ta3_nmarc',
         type: new List(Tautos30type),
         args: {
           limit: {
@@ -56,6 +57,12 @@ const schema = new Schema({
           },
           distinct: {
             type: Gstring,
+          },
+          ta3_marca: {
+            type: Gstring,
+          },
+          ta3_nmarc: {
+            type: Int,
           },
         },
         resolve: resolver(tautos30, {
@@ -77,6 +84,7 @@ const schema = new Schema({
 
       },
       Group: {
+        description: 'Se busca con el id de la marca, es ta3_nmarc = gru_nmarc',
         type: List(GruposType),
         args: {
           gru_nmarc: {
@@ -87,15 +95,20 @@ const schema = new Schema({
         resolve: resolver(grupos),
       },
       Models: {
+        description: 'Los valores que importan son: ta3_model y ta3_codia',
         type: List(Tautos30type),
         args: {
           ta3_nmarc: {
             description: 'Id de la marca',
-            type: new NotNull(Int),
+            type: Int,
           },
           ta3_cgrup: {
             description: 'Id del grupo',
-            type: new NotNull(Int),
+            type: Int,
+          },
+          ta3_model: {
+            description: 'Nombre del modelo',
+            type: Gstring,
           },
         },
         resolve: resolver(tautos30, {
@@ -157,6 +170,10 @@ const schema = new Schema({
         },
         resolve: resolver(extrad, {
           after(result) {
+            if (result === null) {
+              result = {};
+              return false;
+            }
             return {
               Combustible: result.dataValues.ext_combu,
               Alimentacion: result.dataValues.ext_alime,
@@ -190,6 +207,10 @@ const schema = new Schema({
         },
         resolve: resolver(extrad2, {
           after(result) {
+            if (result === null) {
+              result = {};
+              return false;
+            }
             return {
               Climatizador: result.dataValues.ex2_clima,
               FarosAntiniebla: result.dataValues.ex2_fanti,
@@ -227,6 +248,10 @@ const schema = new Schema({
         },
         resolve: resolver(extrad3, {
           after(result) {
+            if (result === null) {
+              result = {};
+              return false;
+            }
             return {
               TapizadoCuero: result.dataValues.ex3_tapcu,
               AsientosElectronicos: result.dataValues.ex3_aelec,

@@ -13,6 +13,7 @@ module.exports = {
       fuel: 'Nafta',
       observation: 'Ta como nuevo',
       carState: 'Usado',
+      codia: 110204,
       imageGroup_id: 1,
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
