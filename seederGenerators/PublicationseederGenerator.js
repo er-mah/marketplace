@@ -3,17 +3,17 @@ const casual = require('casual');
 const fs = require('fs');
 
 const array = [];
-for (let i = 0; i < 400; i += 1) {
+for (let i = 0; i < 14000; i += 1) {
   const casualObj = {
     brand: casual.random_value({
-      a: 'Citroen', b: 'BMW', c: 'Mercedez Benz', d: 'Audi', e: 'Chevrolet',
+      a: 'Citroen', b: 'BMW', c: 'Mercedes Benz', d: 'Audi', e: 'Chevrolet', f: 'Jaguar',
     }),
     group: casual.full_name,
     modelName: casual.string,
     kms: casual.integer(from = 2, to = 1000000),
     price: casual.integer(from = 10000, to = 1000000),
     year: casual.year,
-    fuel: casual.word,
+    fuel: casual.random_value({ a: 'Nafta', b: 'Diesel', c: 'GNC' }),
     observation: casual.sentences(n = 3),
     carState: 'Usado',
     imageGroup_id: 1,

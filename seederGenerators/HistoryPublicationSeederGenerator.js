@@ -3,7 +3,7 @@ const casual = require('casual');
 const fs = require('fs');
 
 const array = [];
-for (let i = 1; i < 401; i += 1) {
+for (let i = 1; i < 14001; i += 1) {
   const casualObj = {
     publication_id: i,
     publicationState_id: casual.random_value({
