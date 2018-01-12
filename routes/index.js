@@ -1,14 +1,18 @@
 const jsonwt = require('jsonwebtoken');
+const { split } = require('split-object');
+
 const {
   User,
   Publication,
   ImageGroup,
   PublicationState,
   PublicationDetail,
+  sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
 // Helper
 const ResponseObj = (status, message, data) => ({ status, message, data });
+//-----------------
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -309,4 +313,82 @@ const uploadAgencyImages = (req, res) => {
       });
   });
 };
-module.exports = { login, createPublication, uploadAgencyImages };
+const getFiltersAndTotalResult = (req, res) => {
+  req.body = req.body.search;
+  let { text } = req.body;
+  const { carState } = req.body;
+  const { Op } = sequelize;
+  text += '%';
+
+  Publication.findAll({
+    where: {
+      [Op.or]: [
+        { brand: { [Op.like]: text } },
+        { group: { [Op.like]: text } },
+        { modelName: { [Op.like]: text } },
+        { kms: { [Op.like]: text } },
+        { price: { [Op.like]: text } },
+        { year: { [Op.like]: text } },
+        { fuel: { [Op.like]: text } },
+        { codia: { [Op.like]: text } },
+        { name: { [Op.like]: text } },
+      ],
+      [Op.and]: { carState },
+    },
+    include: [User, PublicationState],
+  })
+    .then((results) => {
+      if (results === null) {
+        results = {};
+      }
+      const newObj = {};
+      newObj.fuel = {};
+      newObj.year = {};
+      newObj.carState = {};
+      newObj.state = {};
+      results.map(({ dataValues }) => {
+        split(dataValues).map((row) => {
+          if (
+            row.key === 'fuel' ||
+                row.key === 'year' ||
+                row.key === 'carState' ||
+                row.key === 'state'
+          ) {
+            newObj[row.key][row.value] = 0;
+          }
+          if (row.key === 'PublicationStates') {
+            row.key = 'state';
+            row.value = _.last(row.value).dataValues.stateName;
+            newObj[row.key][row.value] = 0;
+          }
+          return newObj;
+        });
+      });
+      results.map(({ dataValues }) => {
+        split(dataValues).map((row) => {
+          if (row.key === 'PublicationStates') {
+            row.key = 'state';
+            row.value = _.last(row.value).dataValues.stateName;
+            newObj[row.key][row.value] += 1;
+          }
+          switch (row.key) {
+            case 'fuel':
+              newObj[row.key][row.value] += 1;
+              break;
+            case 'year':
+              newObj[row.key][row.value] += 1;
+              break;
+            case 'carState':
+              newObj[row.key][row.value] += 1;
+              break;
+            default:
+              return '';
+          }
+        });
+      });
+      res.status(200).send(ResponseObj('ok', null, { filters: newObj, totalResults: results.length }));
+    });
+};
+module.exports = {
+  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult,
+};

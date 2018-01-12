@@ -91,8 +91,6 @@ const PublicationType = new ObjectGraph({
         type: UserType,
         resolve: resolver(Publication.User),
       },
-      totalResult: { type: Int },
-      hasNextPage: { type: Gboolean },
     },
   ),
 });
@@ -100,7 +98,6 @@ const PublicationType = new ObjectGraph({
 const SearchResult = new ObjectGraph({
   name: 'SearchResult',
   fields: {
-    totalResult: { type: Int },
     hasNextPage: { type: Gboolean },
     Publications: { type: List(PublicationType) },
   },
@@ -141,38 +138,34 @@ const PublicationMutation = {
           ],
           [Op.and]: { carState: args.carState },
         };
-        return Publication.count(options).then((res) => {
-          result.totalResult = res;
-
-          if (args.page) {
-            options.limit = LIMIT;
-            options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
-          }
-          options.where = {
-            [Op.or]: [
-              { brand: { [Op.like]: args.text } },
-              { group: { [Op.like]: args.text } },
-              { modelName: { [Op.like]: args.text } },
-              { kms: { [Op.like]: args.text } },
-              { price: { [Op.like]: args.text } },
-              { year: { [Op.like]: args.text } },
-              { fuel: { [Op.like]: args.text } },
-              { codia: { [Op.like]: args.text } },
-              { name: { [Op.like]: args.text } },
-            ],
-            [Op.and]: { carState: args.carState },
-          };
-          return Publication.findAll(options)
-            .then((publications) => {
-              if (publications.length < LIMIT) {
-                result.hasNextPage = false;
-              } else {
-                result.hasNextPage = true;
-              }
-              result.Publications = publications;
-              return result;
-            });
-        });
+        if (args.page) {
+          options.limit = LIMIT;
+          options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+        }
+        options.where = {
+          [Op.or]: [
+            { brand: { [Op.like]: args.text } },
+            { group: { [Op.like]: args.text } },
+            { modelName: { [Op.like]: args.text } },
+            { kms: { [Op.like]: args.text } },
+            { price: { [Op.like]: args.text } },
+            { year: { [Op.like]: args.text } },
+            { fuel: { [Op.like]: args.text } },
+            { codia: { [Op.like]: args.text } },
+            { name: { [Op.like]: args.text } },
+          ],
+          [Op.and]: { carState: args.carState },
+        };
+        return Publication.findAll(options)
+          .then((publications) => {
+            if (publications.length < LIMIT) {
+              result.hasNextPage = false;
+            } else {
+              result.hasNextPage = true;
+            }
+            result.Publications = publications;
+            return result;
+          });
       },
     }),
   },

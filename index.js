@@ -10,7 +10,9 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 /* const socketioJwt = require('socketio-jwt'); */
 const cors = require('cors');
 const schema = require('./schema');
-const { login, createPublication, uploadAgencyImages } = require('./routes');
+const {
+  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult,
+} = require('./routes');
 const multer = require('multer');
 
 const { execute, subscribe } = require('graphql');
@@ -63,6 +65,7 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/subscriptions',
     '/graphql',
     '/login',
+    '/getFiltersAndTotalResult',
     /^\/images/,
   ],
 }));
@@ -125,6 +128,7 @@ io.of('/offerChat').on('connection', (socket) => {
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
 app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
+app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), uploadAgencyImages);
 // ===================================================================
 

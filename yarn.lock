@@ -3160,6 +3160,10 @@ spdx-license-ids@^1.0.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz#c9df7a3424594ade6bd11900d596696dc06bac57"
 
+split-object@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/split-object/-/split-object-2.1.1.tgz#1b7970268b367da34c806eea6005adf7fd78fa9b"
+
 split@0.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/split/-/split-0.3.3.tgz#cd0eea5e63a211dfff7eb0f091c4133e2d0dd28f"

@@ -332,6 +332,9 @@ const schema = new Schema({
                 model: PublicationState,
                 where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
               }];
+              options.order = [
+                sequelize.fn('RAND'), // en postgres es RANDOM
+              ];
               return options;
             }
             if (args.stateName && args.stateName !== 'Activas') {

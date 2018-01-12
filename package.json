@@ -52,6 +52,7 @@
     "sequelize-cli": "^3.1.0",
     "socket.io": "^2.0.4",
     "socketio-jwt": "^4.5.0",
+    "split-object": "^2.1.1",
     "subscriptions-transport-ws": "^0.9.4"
   },
   "devDependencies": {
