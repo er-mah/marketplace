@@ -316,29 +316,47 @@ const uploadAgencyImages = (req, res) => {
 const getFiltersAndTotalResult = (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
-  const { carState } = req.body;
+  const {
+    carState, fuel, year, state,
+  } = req.body;
   const { Op } = sequelize;
   text += '%';
   const LIMIT = 9;
   let hasNextPage = true;
-  
-  Publication.findAll({
-    where: {
-      [Op.or]: [
-        { brand: { [Op.like]: text } },
-        { group: { [Op.like]: text } },
-        { modelName: { [Op.like]: text } },
-        { kms: { [Op.like]: text } },
-        { price: { [Op.like]: text } },
-        { year: { [Op.like]: text } },
-        { fuel: { [Op.like]: text } },
-        { codia: { [Op.like]: text } },
-        { name: { [Op.like]: text } },
-      ],
-      [Op.and]: { carState },
-    },
-    include: [User, PublicationState],
-  })
+  const options = {};
+  options.where = {
+    [Op.or]: [
+      { brand: { [Op.like]: text } },
+      { group: { [Op.like]: text } },
+      { modelName: { [Op.like]: text } },
+      { kms: { [Op.like]: text } },
+      { price: { [Op.like]: text } },
+      { year: { [Op.like]: text } },
+      { fuel: { [Op.like]: text } },
+      { codia: { [Op.like]: text } },
+      { name: { [Op.like]: text } },
+    ],
+    [Op.and]: { carState },
+  };
+  options.include = [User, PublicationState];
+  if (fuel) {
+    Object.assign(options.where, { [Op.and]: { fuel } });
+  }
+  if (year) {
+    Object.assign(options.where, { [Op.and]: { year } });
+  }
+  if (state) {
+    options.include = [
+      {
+        model: PublicationState,
+        where: {
+          stateName: state,
+        },
+      },
+      { model: User }];
+  }
+
+  Publication.findAll(options)
     .then((results) => {
       if (results === null) {
         results = {};
@@ -353,7 +371,6 @@ const getFiltersAndTotalResult = (req, res) => {
           if (
             row.key === 'fuel' ||
                 row.key === 'year' ||
-                row.key === 'carState' ||
                 row.key === 'state'
           ) {
             newObj[row.key][row.value] = 0;
@@ -383,9 +400,6 @@ const getFiltersAndTotalResult = (req, res) => {
               newObj[row.key][row.value] += 1;
               break;
             case 'year':
-              newObj[row.key][row.value] += 1;
-              break;
-            case 'carState':
               newObj[row.key][row.value] += 1;
               break;
             default:
