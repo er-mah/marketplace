@@ -340,10 +340,10 @@ const getFiltersAndTotalResult = (req, res) => {
   };
   options.include = [User, PublicationState];
   if (fuel) {
-    Object.assign(options.where, { [Op.and]: { fuel } });
+    options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
   }
   if (year) {
-    Object.assign(options.where, { [Op.and]: { year } });
+    options.where[Op.and] = Object.assign(options.where[Op.and], { year });
   }
   if (state) {
     options.include = [

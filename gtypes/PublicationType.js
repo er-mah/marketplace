@@ -148,10 +148,10 @@ const PublicationMutation = {
           [Op.and]: { carState: args.carState },
         };
         if (args.fuel) {
-          Object.assign(options.where, { [Op.and]: { fuel: args.fuel } });
+          options.where[Op.and] = Object.assign(options.where[Op.and], { fuel: args.fuel });
         }
         if (args.year) {
-          Object.assign(options.where, { [Op.and]: { year: args.year } });
+          options.where[Op.and] = Object.assign(options.where[Op.and], { year: args.year });
         }
         if (args.state) {
           options.include = [
@@ -162,6 +162,7 @@ const PublicationMutation = {
               },
             }];
         }
+
         return Publication.findAll(options)
           .then((publications) => {
             result.Publications = publications;
