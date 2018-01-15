@@ -364,7 +364,6 @@ const getFiltersAndTotalResult = (req, res) => {
       const newObj = {};
       newObj.fuel = {};
       newObj.year = {};
-      newObj.carState = {};
       newObj.state = {};
       results.map(({ dataValues }) => {
         split(dataValues).map((row) => {
