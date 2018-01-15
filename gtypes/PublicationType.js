@@ -2,7 +2,7 @@
 const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { Publication, sequelize } = require('../models').mah;
+const { Publication, PublicationState, sequelize } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { PublicationStateType } = require('./PublicationStateType');
 const { PublicationDetailType } = require('./PublicationDetailType');
@@ -114,6 +114,9 @@ const PublicationMutation = {
       page: { type: Int },
       limit: { type: Int },
       offset: { type: Int },
+      fuel: { type: Gstring },
+      year: { type: Int },
+      state: { type: Gstring },
     },
     resolve: resolver(Publication, {
       after: (result, args) => {
@@ -124,24 +127,12 @@ const PublicationMutation = {
         const options = {};
         args.text += '%';
         const LIMIT = 9;
-        options.where = {
-          [Op.or]: [
-            { brand: { [Op.like]: args.text } },
-            { group: { [Op.like]: args.text } },
-            { modelName: { [Op.like]: args.text } },
-            { kms: { [Op.like]: args.text } },
-            { price: { [Op.like]: args.text } },
-            { year: { [Op.like]: args.text } },
-            { fuel: { [Op.like]: args.text } },
-            { codia: { [Op.like]: args.text } },
-            { name: { [Op.like]: args.text } },
-          ],
-          [Op.and]: { carState: args.carState },
-        };
+
         if (args.page) {
           options.limit = LIMIT;
           options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
         }
+
         options.where = {
           [Op.or]: [
             { brand: { [Op.like]: args.text } },
@@ -156,13 +147,23 @@ const PublicationMutation = {
           ],
           [Op.and]: { carState: args.carState },
         };
+        if (args.fuel) {
+          Object.assign(options.where, { [Op.and]: { fuel: args.fuel } });
+        }
+        if (args.year) {
+          Object.assign(options.where, { [Op.and]: { year: args.year } });
+        }
+        if (args.state) {
+          options.include = [
+            {
+              model: PublicationState,
+              where: {
+                stateName: args.state,
+              },
+            }];
+        }
         return Publication.findAll(options)
           .then((publications) => {
-            if (publications.length < LIMIT) {
-              result.hasNextPage = false;
-            } else {
-              result.hasNextPage = true;
-            }
             result.Publications = publications;
             return result;
           });

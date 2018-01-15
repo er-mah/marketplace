@@ -319,7 +319,9 @@ const getFiltersAndTotalResult = (req, res) => {
   const { carState } = req.body;
   const { Op } = sequelize;
   text += '%';
-
+  const LIMIT = 9;
+  let hasNextPage = true;
+  
   Publication.findAll({
     where: {
       [Op.or]: [
@@ -364,6 +366,11 @@ const getFiltersAndTotalResult = (req, res) => {
           return newObj;
         });
       });
+      if (results.length < LIMIT) {
+        hasNextPage = false;
+      } else {
+        hasNextPage = true;
+      }
       results.map(({ dataValues }) => {
         split(dataValues).map((row) => {
           if (row.key === 'PublicationStates') {
@@ -386,7 +393,7 @@ const getFiltersAndTotalResult = (req, res) => {
           }
         });
       });
-      res.status(200).send(ResponseObj('ok', null, { filters: newObj, totalResults: results.length }));
+      res.status(200).send(ResponseObj('ok', null, { filters: newObj, totalResults: results.length, hasNextPage }));
     });
 };
 module.exports = {
