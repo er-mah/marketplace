@@ -27,7 +27,7 @@ const login = (req, res) => {
         return false;
       }
       if (password === user.password) {
-        const token = jsonwt.sign(
+        const MAHtoken = jsonwt.sign(
           {
             id: user.id,
             name: user.name,
@@ -38,7 +38,7 @@ const login = (req, res) => {
 
         res.status(200).send({
           status: 'ok',
-          message: token,
+          message: MAHtoken,
         });
 
         return false;
@@ -51,7 +51,7 @@ const login = (req, res) => {
 
         return false;
       }
-
+/* 
       if (user.isAdmin === false) {
         res.status(400).send({
           status: 'error',
@@ -59,7 +59,7 @@ const login = (req, res) => {
         });
         return false;
       }
-
+ */
       const token = jsonwt.sign(
         {
           id: user.id,

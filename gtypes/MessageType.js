@@ -1,7 +1,7 @@
 
 /* eslint camelcase: 0 */
 
-const { attributeFields } = require('graphql-sequelize');
+const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 const jwtDecode = require('jwt-decode');
@@ -9,6 +9,8 @@ const { PubSub, withFilter } = require('graphql-subscriptions');
 
 const graphql = require('graphql');
 const { Message, CommentThread, User } = require('../models').mah;
+const { UserType } = require('./UserType');
+
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -23,7 +25,12 @@ pubsub.publish('hola');
 const MessageType = new ObjectGraph({
   name: 'Message',
   description: 'Mensaje de un usuario a otro.',
-  fields: _.assign(attributeFields(Message)),
+  fields: _.assign(attributeFields(Message), {
+    User: {
+      type: UserType,
+      resolve: resolver(Message.User),
+    },
+  }),
 });
 
 const MessageMutations = {
@@ -43,6 +50,9 @@ const MessageMutations = {
           }
           if (from_id !== undefined && from_id !== cmt.participant1_id && from_id !== cmt.participant2_id) {
             throw new UserError('Usuario no perteneciente a esta conversación');
+          }
+          if (content === '') {
+            throw new UserError('El mensaje no puede esta vacío!');
           }
           return Message.create({
             from_id,
@@ -97,8 +107,8 @@ const MessageSubscriptions = {
     },
     subscribe: withFilter(
       () =>
-        pubsub.asyncIterator('messageAdded'),
-      (payload, variables) => payload.commentThread_id === variables.commentThread_id,
+        pubsub.asyncIterator(['messageAdded']),
+      (payload, args) => payload.commentThread_id === args.commentThread_id,
     ),
   },
 };

@@ -14,6 +14,7 @@ const { AdditionalsType } = require('../gtypes/AdditionalsType');
 const { PublicationType } = require('../gtypes/PublicationType');
 const { PublicationStateType } = require('../gtypes/PublicationStateType');
 const { CommentThreadType } = require('../gtypes/CommentThreadType');
+const { MessageType } = require('../gtypes/MessageType');
 
 const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
 const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMutations;
@@ -23,7 +24,7 @@ const { searchPublication } = require('../gtypes/PublicationType').PublicationMu
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
 
 const {
-  User, Publication, PublicationState, CommentThread, sequelize,
+  User, Publication, PublicationState, CommentThread, Message, sequelize,
 } = require('../models').mah;
 const {
   tautos30, grupos, extrad, extrad3,
@@ -372,14 +373,31 @@ const schema = new Schema({
           },
           publication_id: {
             description: 'id de la publicacion asociada',
-            type: Int,
+            type: new NotNull(Int),
           },
           user_id: {
-            description: 'Id del usuario (requerido)',
+            description: 'Id del usuario',
             type: Int,
           },
         },
-        resolve: resolver(CommentThread),
+        resolve: resolver(CommentThread, {
+          after: (result, args) => {
+            if (args.chatToken === undefined && args.user_id === undefined) {
+              result = null;
+              return result;
+            }
+            return result;
+          },
+        }),
+      },
+      Messages: {
+        type: new List(MessageType),
+        args: {
+          commentThread_id: {
+            type: Int,
+          },
+        },
+        resolve: resolver(Message),
       },
     },
   }),
