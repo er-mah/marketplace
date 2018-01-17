@@ -30,7 +30,8 @@ const login = (req, res) => {
         const MAHtoken = jsonwt.sign(
           {
             id: user.id,
-            name: user.name,
+            name: user.agencyName || user.name,
+            userType: user.agencyName ? 'Agencia' : 'Usuario',
           },
           'MAH2018!#',
           { expiresIn: '24h' },
@@ -51,7 +52,7 @@ const login = (req, res) => {
 
         return false;
       }
-/* 
+      /*
       if (user.isAdmin === false) {
         res.status(400).send({
           status: 'error',
