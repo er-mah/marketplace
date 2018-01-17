@@ -26,24 +26,6 @@ const login = (req, res) => {
         });
         return false;
       }
-      if (password === user.password) {
-        const MAHtoken = jsonwt.sign(
-          {
-            id: user.id,
-            name: user.agencyName || user.name,
-            userType: user.agencyName ? 'Agencia' : 'Usuario',
-          },
-          'MAH2018!#',
-          { expiresIn: '24h' },
-        );
-
-        res.status(200).send({
-          status: 'ok',
-          message: MAHtoken,
-        });
-
-        return false;
-      }
       if (!user.validPassword(password, user.password)) {
         res.status(401).send({
           status: 'error',
@@ -52,6 +34,22 @@ const login = (req, res) => {
 
         return false;
       }
+      const MAHtoken = jsonwt.sign(
+        {
+          id: user.id,
+          name: user.agencyName || user.name,
+          userType: user.agencyName ? 'Agencia' : 'Usuario',
+        },
+        'MAH2018!#',
+        { expiresIn: '24h' },
+      );
+
+      res.status(200).send({
+        status: 'ok',
+        message: MAHtoken,
+      });
+
+      return false;
       /*
       if (user.isAdmin === false) {
         res.status(400).send({
@@ -61,21 +59,6 @@ const login = (req, res) => {
         return false;
       }
  */
-      const token = jsonwt.sign(
-        {
-          id: user.id,
-          name: user.name,
-        },
-        'MAH2018!#',
-        { expiresIn: '24h' },
-      );
-
-      res.status(200).send({
-        status: 'ok',
-        message: token,
-      });
-
-      return false;
     })
     .catch(error =>
       res.status(400).send({
