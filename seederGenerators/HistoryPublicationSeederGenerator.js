@@ -9,8 +9,8 @@ for (let i = 1; i < 14001; i += 1) {
     publicationState_id: casual.random_value({
       a: 2, b: 3, c: 5, d: 9,
     }),
-    createdAt: moment().format('YYYY-MM-DD'),
-    updatedAt: moment().format('YYYY-MM-DD'),
+    createdAt: moment().add(casual.integer(from = 0, to = 1000) ,'days').format("YYYY-MM-DD hh:mm:ss"),
+    updatedAt: moment().add(casual.integer(from = 1001, to = 2000) ,'days').format("YYYY-MM-DD hh:mm:ss"),
   };
   array.push(casualObj);
 }

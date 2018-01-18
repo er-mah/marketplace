@@ -1,5 +1,7 @@
 const jsonwt = require('jsonwebtoken');
 const { split } = require('split-object');
+const decode = require('jwt-decode');
+const moment = require('moment');
 
 const {
   User,
@@ -7,6 +9,7 @@ const {
   ImageGroup,
   PublicationState,
   PublicationDetail,
+  HistoryState,
   sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
@@ -393,6 +396,34 @@ const getFiltersAndTotalResult = (req, res) => {
       res.status(200).send(ResponseObj('ok', null, { filters: newObj, totalResults: results.length, hasNextPage }));
     });
 };
+const getSoldPublications = (req, res) => {
+  const userId = decode(req.headers.authorization.slice(7)).id;
+
+  Publication.findAll({
+    attributes: [],
+    where: { user_id: userId },
+    include: [
+      {
+        model: PublicationState,
+        where: {
+          stateName: 'Vendida',
+        },
+      }],
+    order: [sequelize.col('`PublicationStates->HistoryState`.`createdAt`')],
+
+  }).then((results) => {
+    const vendidos = {};
+    results.map((result) => {
+      const date = moment(result.dataValues.PublicationStates[0].HistoryState.dataValues.createdAt).format('MM/YY');
+      vendidos[date] = 0;
+    });
+    results.map((result) => {
+      const date = moment(result.dataValues.PublicationStates[0].HistoryState.dataValues.createdAt).format('MM/YY');
+      vendidos[date] += 1;
+    });
+    res.status(200).send(ResponseObj('ok', undefined, vendidos));
+  });
+};
 module.exports = {
-  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult,
+  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
 };

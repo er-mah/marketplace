@@ -12,7 +12,7 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const cors = require('cors');
 const schema = require('./schema');
 const {
-  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult,
+  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
 } = require('./routes');
 const multer = require('multer');
 
@@ -44,12 +44,18 @@ ws.listen(process.env.PORT || 4000, () => {
     execute,
     subscribe,
     schema,
+    onConnect: (connectionParams) => {
+      if (connectionParams.authToken) {
+        return jwt({ secret: 'MAH2018!#' });
+      }
+
+      throw new Error('Missing auth token!');
+    },
   }, {
     server: ws,
     path: '/subscriptions',
   });
 });
-
 
 const httpGraphQLHandler = (req, res) => {
   const { query, variables, rootVals } = req.query;
@@ -130,6 +136,7 @@ io.of('/offerChat').on('connection', (socket) => {
 app.post('/login', login);
 app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
+app.get('/getSoldPublications', getSoldPublications);
 app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), uploadAgencyImages);
 // ===================================================================
 

@@ -18,7 +18,7 @@ for (let i = 0; i < 14000; i += 1) {
     carState: 'Usado',
     imageGroup_id: 1,
     createdAt: moment().format('YYYY-MM-DD'),
-    updatedAt: moment().format('YYYY-MM-DD'),
+    updatedAt: casual.moment,
     deletedAt: null,
     user_id: casual.integer(from = 1, to = 2),
     publicationDetail_id: casual.integer(from = 1, to = 15),

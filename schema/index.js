@@ -399,6 +399,9 @@ const schema = new Schema({
         },
         resolve: resolver(Message),
       },
+
+      // Admin
+
     },
   }),
   mutation: new ObjectGraph({
