@@ -1,8 +1,7 @@
 
 const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
-const { maskErrors } = require('graphql-errors');
-
+const decode = require('jwt-decode');
 const _ = require('lodash');
 
 const { UserType } = require('../gtypes/UserType');
@@ -38,6 +37,7 @@ const {
   GraphQLObjectType: ObjectGraph,
   GraphQLInt: Int,
   GraphQLString: Gstring,
+  GraphQLBoolean: GBoolean,
 } = graphql;
 
 const schema = new Schema({
@@ -398,6 +398,54 @@ const schema = new Schema({
           },
         },
         resolve: resolver(Message),
+      },
+      UnreadMessages: {
+        type: new List(MessageType),
+        args: {
+          MAHtoken: {
+            type: Gstring,
+          },
+        },
+        resolve: resolver(CommentThread, {
+          before: (options, args) => {
+            const userId = decode(args.MAHtoken).id;
+            options.where = { participant2_id: userId },
+            options.include = [{ model: Message, as: 'messages' }];
+            return options;
+          },
+          after: (results) => {
+            const arrayMessages = [];
+            results.map((result) => {
+              arrayMessages.push(result.dataValues.messages);
+            });
+
+            return _.flattenDeep(arrayMessages);
+          },
+        }),
+      },
+      CountUnreadMessages: {
+        type: List(Int),
+        args: {
+          MAHtoken: {
+            type: Gstring,
+          },
+        },
+        resolve: resolver(CommentThread, {
+          before: (options, args) => {
+            const userId = decode(args.MAHtoken).id;
+            options.where = { participant2_id: userId },
+            options.include = [{ model: Message, as: 'messages' }];
+            return options;
+          },
+          after: (results) => {
+            const arrayMessages = [];
+            results.map((result) => {
+              arrayMessages.push(result.dataValues.messages);
+            });
+
+            return ([arrayMessages.length]);
+          },
+        }),
       },
 
       // Admin

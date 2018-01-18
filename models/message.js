@@ -3,6 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Message = sequelize.define('Message', {
     content: DataTypes.TEXT,
+    read: DataTypes.DATE,
   }, {});
 
   Message.associate = (models) => {
