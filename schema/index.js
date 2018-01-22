@@ -324,10 +324,14 @@ const schema = new Schema({
           order: {
             type: Gstring,
           },
+          MAHtoken: { type: Gstring },
         },
         resolve: resolver(Publication, {
           before: (options, args) => {
             const { Op } = sequelize;
+            if (args.MAHtoken) {
+              options.where = { [Op.and]: { user_id: decode(args.MAHtoken).id } };
+            }
             if (args.stateName === 'Activas') {
               options.include = [{
                 model: PublicationState,
@@ -345,6 +349,7 @@ const schema = new Schema({
               }];
               return options;
             }
+            console.log(options);
             return options;
           },
         }),

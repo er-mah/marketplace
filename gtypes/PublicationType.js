@@ -1,5 +1,7 @@
 
+
 const { attributeFields, resolver } = require('graphql-sequelize');
+const decode = require('jwt-decode');
 const _ = require('lodash');
 const graphql = require('graphql');
 const { Publication, PublicationState, sequelize } = require('../models').mah;
@@ -100,6 +102,7 @@ const SearchResult = new ObjectGraph({
   fields: {
     hasNextPage: { type: Gboolean },
     Publications: { type: List(PublicationType) },
+    totalCount: { type: Int },
   },
 });
 
@@ -109,14 +112,16 @@ const PublicationMutation = {
     name: 'searchPublication',
     description: 'Búsqueda de una publicacion con cualquier parámetro',
     args: {
-      carState: { type: new NotNull(Gstring) },
-      text: { type: new NotNull(Gstring) },
+      MAHtoken: { type: Gstring },
+      carState: { type: Gstring },
+      text: { type: Gstring },
       page: { type: Int },
       limit: { type: Int },
       offset: { type: Int },
       fuel: { type: Gstring },
       year: { type: Int },
       state: { type: Gstring },
+      order: { type: Gstring },
     },
     resolve: resolver(Publication, {
       after: (result, args) => {
@@ -125,28 +130,29 @@ const PublicationMutation = {
         }
         const { Op } = sequelize;
         const options = {};
-        args.text += '%';
         const LIMIT = 9;
+        options.where = { [Op.and]: {} };
 
         if (args.page) {
           options.limit = LIMIT;
           options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
         }
-
-        options.where = {
-          [Op.or]: [
-            { brand: { [Op.like]: args.text } },
-            { group: { [Op.like]: args.text } },
-            { modelName: { [Op.like]: args.text } },
-            { kms: { [Op.like]: args.text } },
-            { price: { [Op.like]: args.text } },
-            { year: { [Op.like]: args.text } },
-            { fuel: { [Op.like]: args.text } },
-            { codia: { [Op.like]: args.text } },
-            { name: { [Op.like]: args.text } },
-          ],
-          [Op.and]: { carState: args.carState },
-        };
+        if (args.text) {
+          args.text += '%';
+          options.where = {
+            [Op.or]: [
+              { brand: { [Op.like]: args.text } },
+              { group: { [Op.like]: args.text } },
+              { modelName: { [Op.like]: args.text } },
+              { kms: { [Op.like]: args.text } },
+              { price: { [Op.like]: args.text } },
+              { year: { [Op.like]: args.text } },
+              { fuel: { [Op.like]: args.text } },
+              { codia: { [Op.like]: args.text } },
+              { name: { [Op.like]: args.text } },
+            ],
+          };
+        }
         if (args.fuel) {
           options.where[Op.and] = Object.assign(options.where[Op.and], { fuel: args.fuel });
         }
@@ -162,10 +168,25 @@ const PublicationMutation = {
               },
             }];
         }
-
-        return Publication.findAll(options)
+        if (args.MAHtoken) {
+          const user_id = decode(args.MAHtoken).id;
+          options.where[Op.and] = Object.assign(options.where[Op.and], { user_id });
+        }
+        if (args.carState) {
+          options.where[Op.and] = Object.assign(options.where[Op.and], { carState: args.carState });
+        }
+        if (args.state === 'Activas') {
+          options.include = [{
+            model: PublicationState,
+            where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
+          }];
+        }
+        
+        return Publication.findAndCountAll(options)
           .then((publications) => {
-            result.Publications = publications;
+            result.totalCount = publications.count;
+            result.hasNextPage = publications.count > publications.rows.length && publications.rows.length !== 0;
+            result.Publications = publications.rows;
             return result;
           });
       },

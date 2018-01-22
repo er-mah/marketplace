@@ -44,13 +44,6 @@ ws.listen(process.env.PORT || 4000, () => {
     execute,
     subscribe,
     schema,
-    onConnect: (connectionParams) => {
-      if (connectionParams.authToken) {
-        return jwt({ secret: 'MAH2018!#' });
-      }
-
-      throw new Error('Missing auth token!');
-    },
   }, {
     server: ws,
     path: '/subscriptions',

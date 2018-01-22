@@ -44,7 +44,6 @@ const login = (req, res) => {
           userType: user.agencyName ? 'Agencia' : 'Usuario',
         },
         'MAH2018!#',
-        { expiresIn: '24h' },
       );
 
       res.status(200).send({

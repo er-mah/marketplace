@@ -6,6 +6,7 @@ const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 const jwtDecode = require('jwt-decode');
 const { PubSub, withFilter } = require('graphql-subscriptions');
+const moment = require('moment');
 
 const graphql = require('graphql');
 const { Message, CommentThread, User } = require('../models').mah;
@@ -95,6 +96,25 @@ const MessageMutations = {
         .catch((e) => { throw new UserError(e); });
     },
 
+  },
+  readMessge: {
+    type: MessageType,
+    args: {
+      message_id: new NotNull(Int),
+    },
+    resolve: (value, { message_id }) => {
+      Message.findById(message_id)
+        .then((msg) => {
+          if (msg) {
+            msg.update({
+              read: moment().format('DD-MM-YYYY hh:mm:ss'),
+            })
+              .then(msgUp => msgUp);
+          } else {
+            throw new UserError('No existe el mensaje');
+          }
+        });
+    },
   },
 };
 
