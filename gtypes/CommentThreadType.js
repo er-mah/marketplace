@@ -6,6 +6,7 @@ const _ = require('lodash');
 const graphql = require('graphql');
 const jwtDecode = require('jwt-decode');
 const { MessageType } = require('./MessageType');
+const { PublicationType } = require('./PublicationType');
 const {
   CommentThread, User, Publication, Message,
 } = require('../models').mah;
@@ -26,6 +27,10 @@ const CommentThreadType = new ObjectGraph({
     messages: {
       type: List(MessageType),
       resolve: resolver(CommentThread.messages),
+    },
+    Publication: {
+      type: PublicationType,
+      resolve: resolver(CommentThread.publication),
     },
   }),
 });

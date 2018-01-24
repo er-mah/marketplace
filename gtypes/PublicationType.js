@@ -1,5 +1,4 @@
 
-
 const { attributeFields, resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
@@ -125,13 +124,11 @@ const PublicationMutation = {
     },
     resolve: resolver(Publication, {
       after: (result, args) => {
-        if (result === null) {
-          result = {};
-        }
+        result = {};
         const { Op } = sequelize;
         const options = {};
         const LIMIT = 9;
-        options.where = { [Op.and]: {} };
+        options.where = { [Op.or]: {}, [Op.and]: {} };
 
         if (args.page) {
           options.limit = LIMIT;
@@ -139,19 +136,17 @@ const PublicationMutation = {
         }
         if (args.text) {
           args.text += '%';
-          options.where = {
-            [Op.or]: [
-              { brand: { [Op.like]: args.text } },
-              { group: { [Op.like]: args.text } },
-              { modelName: { [Op.like]: args.text } },
-              { kms: { [Op.like]: args.text } },
-              { price: { [Op.like]: args.text } },
-              { year: { [Op.like]: args.text } },
-              { fuel: { [Op.like]: args.text } },
-              { codia: { [Op.like]: args.text } },
-              { name: { [Op.like]: args.text } },
-            ],
-          };
+          Object.assign(
+            options.where[Op.or], { brand: { [Op.like]: args.text } },
+            { group: { [Op.like]: args.text } },
+            { modelName: { [Op.like]: args.text } },
+            { kms: { [Op.like]: args.text } },
+            { price: { [Op.like]: args.text } },
+            { year: { [Op.like]: args.text } },
+            { fuel: { [Op.like]: args.text } },
+            { codia: { [Op.like]: args.text } },
+            { name: { [Op.like]: args.text } },
+          );
         }
         if (args.fuel) {
           options.where[Op.and] = Object.assign(options.where[Op.and], { fuel: args.fuel });
@@ -181,7 +176,30 @@ const PublicationMutation = {
             where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
           }];
         }
-        
+        /* if (args.order) {
+          switch (args.order) {
+            case 'Mas antiguas primero': {
+
+              options.order = ['createdAt'];
+              break;
+            }
+            case 'Mas nuevas primero': {
+              options.order = [['createdAt', 'DESC']];
+              break;
+            }
+            case 'Ultimas actualizadas primero': {
+              options.order = [['updatedAt', 'DESC']];
+              break;
+            }
+            case 'Primeras actualizadas primero': {
+              options.order = [['updatedAt']];
+              break;
+            }
+            default: options.order = [];
+          }
+        } */
+        console.log(options);
+
         return Publication.findAndCountAll(options)
           .then((publications) => {
             result.totalCount = publications.count;

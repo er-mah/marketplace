@@ -366,7 +366,7 @@ const schema = new Schema({
 
       },
       CommentThread: {
-        type: CommentThreadType,
+        type: List(CommentThreadType),
         args: {
           id: {
             description: 'id del grupo de mensajes',
@@ -378,20 +378,18 @@ const schema = new Schema({
           },
           publication_id: {
             description: 'id de la publicacion asociada',
-            type: new NotNull(Int),
-          },
-          user_id: {
-            description: 'Id del usuario',
             type: Int,
           },
+          MAHtoken: {
+            type: Gstring,
+        },
         },
         resolve: resolver(CommentThread, {
-          after: (result, args) => {
-            if (args.chatToken === undefined && args.user_id === undefined) {
-              result = null;
-              return result;
-            }
-            return result;
+          before: (options, args) => {
+            const userId = decode(args.MAHtoken).id;
+            options.where = { participant2_id: userId },
+            options.include = [{ model: Message, as: 'messages' }];
+            return options;
           },
         }),
       },
@@ -405,7 +403,7 @@ const schema = new Schema({
         resolve: resolver(Message),
       },
       UnreadMessages: {
-        type: new List(MessageType),
+        type: new List(CommentThreadType),
         args: {
           MAHtoken: {
             type: Gstring,
@@ -415,16 +413,8 @@ const schema = new Schema({
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
             options.where = { participant2_id: userId },
-            options.include = [{ model: Message, as: 'messages' }];
+            options.include = [{ model: Message, as: 'messages', where: { read: null } }];
             return options;
-          },
-          after: (results) => {
-            const arrayMessages = [];
-            results.map((result) => {
-              arrayMessages.push(result.dataValues.messages);
-            });
-
-            return _.flattenDeep(arrayMessages);
           },
         }),
       },
@@ -439,7 +429,7 @@ const schema = new Schema({
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
             options.where = { participant2_id: userId },
-            options.include = [{ model: Message, as: 'messages' }];
+            options.include = [{ model: Message, as: 'messages', where: { read: null } }];
             return options;
           },
           after: (results) => {
