@@ -381,21 +381,37 @@ const schema = new Schema({
             description: 'id de la publicacion asociada',
             type: Int,
           },
-          MAHtoken: {
+          MAHtokenP1: {
+            type: Gstring,
+          },
+          MAHtokenP2: {
             type: Gstring,
           },
         },
         resolve: resolver(CommentThread, {
           before: (options, args) => {
-            if (args.MAHtoken) {
-              const userId = decode(args.MAHtoken).id;
-              options.where = { participant2_id: userId };
+            if (args.MAHtokenP1) {
+              const userId = decode(args.MAHtokenP1).id;
+              if (!options.where) {
+                options.where = { participant1_id: userId };
+              } else {
+                Object.assign(options.where, { participant1_id: userId });
+              }
+            }
+            if (args.MAHtokenP2) {
+              const userId = decode(args.MAHtokenP2).id;
+              if (!options.where) {
+                options.where = { participant2_id: userId };
+              } else {
+                Object.assign(options.where, { participant2_id: userId });
+              }
             }
             options.include = [{ model: Message, as: 'messages' }];
+
             return options;
           },
           after: (result, args) => {
-            if (!args.MAHtoken && !args.chatToken) {
+            if ((!args.MAHtokenP2 && !args.chatToken) && (!args.MAHtokenP1 && !args.chatToken)) {
               result = [];
             }
             return result;
