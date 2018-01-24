@@ -21,6 +21,7 @@ const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMu
 const { searchPublication } = require('../gtypes/PublicationType').PublicationMutation;
 
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
+const { threadAdded } = require('../gtypes/CommentThreadType').CommentThreadSubscriptions;
 
 const {
   User, Publication, PublicationState, CommentThread, Message, sequelize,
@@ -382,14 +383,22 @@ const schema = new Schema({
           },
           MAHtoken: {
             type: Gstring,
-        },
+          },
         },
         resolve: resolver(CommentThread, {
           before: (options, args) => {
-            const userId = decode(args.MAHtoken).id;
-            options.where = { participant2_id: userId },
+            if (args.MAHtoken) {
+              const userId = decode(args.MAHtoken).id;
+              options.where = { participant2_id: userId };
+            }
             options.include = [{ model: Message, as: 'messages' }];
             return options;
+          },
+          after: (result, args) => {
+            if (!args.MAHtoken && !args.chatToken) {
+              result = [];
+            }
+            return result;
           },
         }),
       },
@@ -459,6 +468,7 @@ const schema = new Schema({
     description: 'Dónde las cosas se actualizan autómaticamente (como con sockets)',
     fields: {
       messageAdded,
+      threadAdded,
     },
   }),
 });

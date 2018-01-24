@@ -21,7 +21,6 @@ const {
 } = graphql;
 
 const pubsub = new PubSub();
-pubsub.publish('hola');
 
 const MessageType = new ObjectGraph({
   name: 'Message',

@@ -3,14 +3,17 @@
 const { attributeFields, resolver } = require('graphql-sequelize');
 const { UserError } = require('graphql-errors');
 const _ = require('lodash');
+const decode = require('jwt-decode');
 const graphql = require('graphql');
 const jwtDecode = require('jwt-decode');
 const { MessageType } = require('./MessageType');
+const { PubSub, withFilter } = require('graphql-subscriptions');
 const { PublicationType } = require('./PublicationType');
 const {
   CommentThread, User, Publication, Message,
 } = require('../models').mah;
 /* eslint camelcase: 0 */
+const pubsub = new PubSub();
 
 const {
   GraphQLString: Gstring,
@@ -75,7 +78,10 @@ const CommentThreadMutations = {
                     as: 'messages',
                   }],
                 })
-                  .then(cmt => cmt);
+                  .then((cmt) => {
+                    pubsub.publish('threadAdded', { threadAdded: cmt, user_id: cmt.participant2_id });
+                    return cmt;
+                  });
               });
           }
           if (!chatToken && !participant1_id) {
@@ -96,7 +102,10 @@ const CommentThreadMutations = {
               as: 'messages',
             }],
           })
-            .then(cmt => cmt);
+            .then((cmt) => {
+              pubsub.publish('threadAdded', { threadAdded: cmt, user_id: cmt.participant2_id });
+              return cmt;
+            });
         }),
   },
   deleteCommentThread: {
@@ -132,4 +141,21 @@ const CommentThreadMutations = {
   },
 };
 
-module.exports = { CommentThreadType, CommentThreadMutations };
+const CommentThreadSubscriptions = {
+  threadAdded: {
+    name: 'threadAdded',
+    type: CommentThreadType,
+    args: {
+      MAHtoken: { type: new NotNull(Gstring) },
+    },
+    subscribe: withFilter(
+      () =>
+        pubsub.asyncIterator(['threadAdded']),
+      (payload, args) => {
+        const userID = decode(args.MAHtoken).id;
+        return payload.user_id === userID;
+      },
+    ),
+  },
+};
+module.exports = { CommentThreadType, CommentThreadMutations, CommentThreadSubscriptions };
