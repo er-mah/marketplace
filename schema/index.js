@@ -16,7 +16,7 @@ const { CommentThreadType } = require('../gtypes/CommentThreadType');
 const { MessageType } = require('../gtypes/MessageType');
 
 const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
-const { addMessage, deleteMessage } = require('../gtypes/MessageType').MessageMutations;
+const { addMessage, deleteMessage, markThreadAsReaded } = require('../gtypes/MessageType').MessageMutations;
 
 const { searchPublication } = require('../gtypes/PublicationType').PublicationMutation;
 
@@ -350,7 +350,6 @@ const schema = new Schema({
               }];
               return options;
             }
-            console.log(options);
             return options;
           },
         }),
@@ -364,6 +363,22 @@ const schema = new Schema({
           },
         },
         resolve: resolver(PublicationState),
+
+      },
+      GetThreadForInbox: {
+        type: CommentThreadType,
+        args: {
+          id: { type: new NotNull(Int) },
+          MAHtoken: { type: new NotNull(Gstring) },
+        },
+        resolve: resolver(CommentThread, {
+          before: (options, args) => {
+            const userId = decode(args.MAHtoken).id;
+            args.participant2_id = userId;
+            Object.assign(options.where, { participant2_id: userId });
+            return options;
+          },
+        }),
 
       },
       CommentThread: {
@@ -476,7 +491,7 @@ const schema = new Schema({
     name: 'Mutations',
     description: 'Donde las cosas mutan',
     fields: {
-      createCommentThread, deleteCommentThread, addMessage, deleteMessage, searchPublication,
+      createCommentThread, deleteCommentThread, addMessage, deleteMessage, searchPublication, markThreadAsReaded,
     },
   }),
   subscription: new ObjectGraph({

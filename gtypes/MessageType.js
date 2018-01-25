@@ -18,6 +18,7 @@ const {
   GraphQLInt: Int,
   GraphQLNonNull: NotNull,
   GraphQLString: Gstring,
+  GraphQLBoolean: Gboolean,
 } = graphql;
 
 const pubsub = new PubSub();
@@ -41,8 +42,11 @@ const MessageMutations = {
       from_id: { type: Int },
       content: { type: new NotNull(Gstring) },
       commentThread_id: { type: new NotNull(Int) },
+      read: { type: Gstring },
     },
-    resolve: (value, { from_id, content, commentThread_id }) =>
+    resolve: (value, {
+      from_id, content, commentThread_id, read,
+    }) =>
       CommentThread.findById(commentThread_id)
         .then((cmt) => {
           if (!cmt) {
@@ -58,6 +62,7 @@ const MessageMutations = {
             from_id,
             content,
             commentThread_id,
+            read,
           })
             .then((msg) => {
               pubsub.publish('messageAdded', { messageAdded: msg, commentThread_id: msg.commentThread_id });
@@ -96,23 +101,25 @@ const MessageMutations = {
     },
 
   },
-  readMessge: {
-    type: MessageType,
+  markThreadAsReaded: {
+    name: 'readMessage',
+    type: Gboolean,
     args: {
-      message_id: new NotNull(Int),
+      commentThread_id: { type: new NotNull(Int) },
     },
-    resolve: (value, { message_id }) => {
-      Message.findById(message_id)
-        .then((msg) => {
-          if (msg) {
-            msg.update({
-              read: moment().format('DD-MM-YYYY hh:mm:ss'),
-            })
-              .then(msgUp => msgUp);
-          } else {
-            throw new UserError('No existe el mensaje');
-          }
+    resolve: (value, { commentThread_id }) => {
+      CommentThread.findById(commentThread_id, { include: [{ model: Message, as: 'messages' }] })
+        .then((cmt) => {
+          cmt.messages.map((msg) => {
+            if (msg.dataValues.read === null) {
+              msg.update({
+                read: moment(),
+              });
+            }
+          });
+          return true;
         });
+      return true;
     },
   },
 };

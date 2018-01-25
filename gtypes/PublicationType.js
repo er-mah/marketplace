@@ -123,6 +123,7 @@ const PublicationMutation = {
       order: { type: Gstring },
     },
     resolve: resolver(Publication, {
+      before: (options) => {},
       after: (result, args) => {
         result = {};
         const { Op } = sequelize;
@@ -135,8 +136,9 @@ const PublicationMutation = {
           options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
         }
         if (args.text) {
+          options.where = { [Op.or]: {}, [Op.and]: {} };
           args.text += '%';
-          Object.assign(
+          options.where[Op.or] = Object.assign(
             options.where[Op.or], { brand: { [Op.like]: args.text } },
             { group: { [Op.like]: args.text } },
             { modelName: { [Op.like]: args.text } },
@@ -164,41 +166,21 @@ const PublicationMutation = {
             }];
         }
         if (args.MAHtoken) {
+          options.where = { [Op.and]: {} };
           const user_id = decode(args.MAHtoken).id;
           options.where[Op.and] = Object.assign(options.where[Op.and], { user_id });
         }
+
         if (args.carState) {
           options.where[Op.and] = Object.assign(options.where[Op.and], { carState: args.carState });
         }
+
         if (args.state === 'Activas') {
           options.include = [{
             model: PublicationState,
             where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
           }];
         }
-        /* if (args.order) {
-          switch (args.order) {
-            case 'Mas antiguas primero': {
-
-              options.order = ['createdAt'];
-              break;
-            }
-            case 'Mas nuevas primero': {
-              options.order = [['createdAt', 'DESC']];
-              break;
-            }
-            case 'Ultimas actualizadas primero': {
-              options.order = [['updatedAt', 'DESC']];
-              break;
-            }
-            case 'Primeras actualizadas primero': {
-              options.order = [['updatedAt']];
-              break;
-            }
-            default: options.order = [];
-          }
-        } */
-        console.log(options);
 
         return Publication.findAndCountAll(options)
           .then((publications) => {
