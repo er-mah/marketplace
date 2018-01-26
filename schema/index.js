@@ -1,4 +1,3 @@
-
 const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
@@ -15,19 +14,42 @@ const { PublicationStateType } = require('../gtypes/PublicationStateType');
 const { CommentThreadType } = require('../gtypes/CommentThreadType');
 const { MessageType } = require('../gtypes/MessageType');
 
-const { createCommentThread, deleteCommentThread } = require('../gtypes/CommentThreadType').CommentThreadMutations;
-const { addMessage, deleteMessage, markThreadAsReaded } = require('../gtypes/MessageType').MessageMutations;
+const {
+  createCommentThread,
+  deleteCommentThread,
+} = require('../gtypes/CommentThreadType').CommentThreadMutations;
+const {
+  addMessage,
+  deleteMessage,
+  markThreadAsReaded,
+} = require('../gtypes/MessageType').MessageMutations;
+const {
+  modifyUserData,
+  updatePassword,
+} = require('../gtypes/UserType').UserMutations;
 
-const { searchPublication } = require('../gtypes/PublicationType').PublicationMutation;
+const {
+  searchPublication,
+} = require('../gtypes/PublicationType').PublicationMutation;
 
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
-const { threadAdded } = require('../gtypes/CommentThreadType').CommentThreadSubscriptions;
+const {
+  threadAdded,
+} = require('../gtypes/CommentThreadType').CommentThreadSubscriptions;
 
 const {
-  User, Publication, PublicationState, CommentThread, Message, sequelize,
+  User,
+  Publication,
+  PublicationState,
+  CommentThread,
+  Message,
+  sequelize,
 } = require('../models').mah;
 const {
-  tautos30, grupos, extrad, extrad3,
+  tautos30,
+  grupos,
+  extrad,
+  extrad3,
   extrad2,
 } = require('../models').tauto;
 
@@ -45,7 +67,6 @@ const schema = new Schema({
   query: new ObjectGraph({
     name: 'Root',
     fields: {
-
       // BD TAUTO
       AllBrands: {
         description: 'Los valores que importan son ta3_marca y ta3_nmarc',
@@ -80,10 +101,9 @@ const schema = new Schema({
               }
               return false;
             });
-            return (_.uniqBy(brand, 'ta3_marca'));
+            return _.uniqBy(brand, 'ta3_marca');
           },
         }),
-
       },
       Group: {
         description: 'Se busca con el id de la marca, es ta3_nmarc = gru_nmarc',
@@ -123,6 +143,7 @@ const schema = new Schema({
       Price: {
         type: List(new ObjectGraph({
           name: 'precios',
+          description: 'Devuelve un array de precios',
           fields: {
             anio: { type: graphql.GraphQLInt },
             precio: { type: graphql.GraphQLInt },
@@ -142,7 +163,10 @@ const schema = new Schema({
               if (row.startsWith('ta3_pre')) {
                 const priceRow = {};
                 priceRow.anio = actualYear;
-                priceRow.precio = parseInt(`${result[0].dataValues[row]}000`, 10);
+                priceRow.precio = parseInt(
+                  `${result[0].dataValues[row]}000`,
+                  10,
+                );
                 actualYear -= 1;
                 precios.push(priceRow);
               }
@@ -157,18 +181,17 @@ const schema = new Schema({
                 }
               }
             }
-            return (precios);
+            return precios;
           },
         }),
       },
       Caracteristics: {
         type: CaracteristicType,
         args: {
-          ext_codia:
-            {
-              description: 'El id del auto',
-              type: new NotNull(Int),
-            },
+          ext_codia: {
+            description: 'El id del auto',
+            type: new NotNull(Int),
+          },
         },
         resolve: resolver(extrad, {
           after(result) {
@@ -201,11 +224,10 @@ const schema = new Schema({
       TecnicalData: {
         type: TechnicalDataType,
         args: {
-          ex2_codia:
-            {
-              description: 'El id del auto',
-              type: new NotNull(Int),
-            },
+          ex2_codia: {
+            description: 'El id del auto',
+            type: new NotNull(Int),
+          },
         },
         resolve: resolver(extrad2, {
           after(result) {
@@ -242,11 +264,10 @@ const schema = new Schema({
       Additionals: {
         type: AdditionalsType,
         args: {
-          ex3_codia:
-            {
-              description: 'Atributos adicionales del auto',
-              type: new NotNull(Int),
-            },
+          ex3_codia: {
+            description: 'Atributos adicionales del auto',
+            type: new NotNull(Int),
+          },
         },
         resolve: resolver(extrad3, {
           after(result) {
@@ -306,7 +327,6 @@ const schema = new Schema({
           },
         },
         resolve: resolver(Publication),
-
       },
       AllPublications: {
         type: new List(PublicationType),
@@ -331,23 +351,36 @@ const schema = new Schema({
           before: (options, args) => {
             const { Op } = sequelize;
             if (args.MAHtoken) {
-              options.where = { [Op.and]: { user_id: decode(args.MAHtoken).id } };
+              options.where = {
+                [Op.and]: { user_id: decode(args.MAHtoken).id },
+              };
             }
             if (args.stateName === 'Activas') {
-              options.include = [{
-                model: PublicationState,
-                where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
-              }];
+              options.include = [
+                {
+                  model: PublicationState,
+                  where: {
+                    [Op.or]: [
+                      { stateName: 'Publicada' },
+                      { stateName: 'Destacada' },
+                      { stateName: 'Vendida' },
+                      { stateName: 'Apto para garantía' },
+                    ],
+                  },
+                },
+              ];
               options.order = [
                 sequelize.fn('RAND'), // en postgres es RANDOM
               ];
               return options;
             }
             if (args.stateName && args.stateName !== 'Activas') {
-              options.include = [{
-                model: PublicationState,
-                where: { stateName: args.stateName },
-              }];
+              options.include = [
+                {
+                  model: PublicationState,
+                  where: { stateName: args.stateName },
+                },
+              ];
               return options;
             }
             return options;
@@ -363,7 +396,6 @@ const schema = new Schema({
           },
         },
         resolve: resolver(PublicationState),
-
       },
       GetThreadForInbox: {
         type: CommentThreadType,
@@ -379,7 +411,6 @@ const schema = new Schema({
             return options;
           },
         }),
-
       },
       CommentThread: {
         type: List(CommentThreadType),
@@ -426,7 +457,11 @@ const schema = new Schema({
             return options;
           },
           after: (result, args) => {
-            if ((!args.MAHtokenP2 && !args.chatToken) && (!args.MAHtokenP1 && !args.chatToken)) {
+            if (
+              !args.MAHtokenP2 &&
+              !args.chatToken &&
+              (!args.MAHtokenP1 && !args.chatToken)
+            ) {
               result = [];
             }
             return result;
@@ -452,8 +487,10 @@ const schema = new Schema({
         resolve: resolver(CommentThread, {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
-            options.where = { participant2_id: userId },
-            options.include = [{ model: Message, as: 'messages', where: { read: null } }];
+            (options.where = { participant2_id: userId }),
+            (options.include = [
+              { model: Message, as: 'messages', where: { read: null } },
+            ]);
             return options;
           },
         }),
@@ -468,8 +505,10 @@ const schema = new Schema({
         resolve: resolver(CommentThread, {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
-            options.where = { participant2_id: userId },
-            options.include = [{ model: Message, as: 'messages', where: { read: null } }];
+            (options.where = { participant2_id: userId }),
+            (options.include = [
+              { model: Message, as: 'messages', where: { read: null } },
+            ]);
             return options;
           },
           after: (results) => {
@@ -478,25 +517,32 @@ const schema = new Schema({
               arrayMessages.push(result.dataValues.messages);
             });
 
-            return ([arrayMessages.length]);
+            return [arrayMessages.length];
           },
         }),
       },
 
       // Admin
-
     },
   }),
   mutation: new ObjectGraph({
     name: 'Mutations',
     description: 'Donde las cosas mutan',
     fields: {
-      createCommentThread, deleteCommentThread, addMessage, deleteMessage, searchPublication, markThreadAsReaded,
+      createCommentThread,
+      deleteCommentThread,
+      addMessage,
+      deleteMessage,
+      searchPublication,
+      markThreadAsReaded,
+      modifyUserData,
+      updatePassword,
     },
   }),
   subscription: new ObjectGraph({
     name: 'Subscription',
-    description: 'Dónde las cosas se actualizan autómaticamente (como con sockets)',
+    description:
+      'Dónde las cosas se actualizan autómaticamente (como con sockets)',
     fields: {
       messageAdded,
       threadAdded,

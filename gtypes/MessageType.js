@@ -74,11 +74,11 @@ const MessageMutations = {
     type: Gstring,
     description: '(admin) Elimina un mensaje',
     args: {
-      AuthToken: { type: new NotNull(Gstring) },
+      MAHtoken: { type: new NotNull(Gstring) },
       message_id: { type: new NotNull(Int) },
     },
-    resolve: (value, { AuthToken, message_id }) => {
-      const user_id = jwtDecode(AuthToken).id;
+    resolve: (value, { MAHtoken, message_id }) => {
+      const user_id = jwtDecode(MAHtoken).id;
       return User.findById(user_id)
         .then((user) => {
           if (!user) {
