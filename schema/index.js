@@ -315,8 +315,20 @@ const schema = new Schema({
           order: {
             type: Gstring,
           },
+          page: {
+            type: Int,
+          },
         },
-        resolve: resolver(User),
+        resolve: resolver(User, {
+          before: (options, args) => {
+            const LIMIT = 9;
+            if (args.page) {
+              options.limit = LIMIT;
+              options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+            }
+            return options;
+          },
+        }),
       },
       Publication: {
         type: PublicationType,

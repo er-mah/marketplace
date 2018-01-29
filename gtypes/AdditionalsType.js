@@ -12,7 +12,7 @@ const AdditionalsType = new ObjectGraph({
     TapizadoCuero: { type: Gstring },
     AsientosElectronicos: { type: Gstring },
     ComputadoraABordo: { type: Gstring },
-    FarosDeXenon: { type: graphql.GraphQLInt },
+    FarosDeXenon: { type: Gstring },
     LlantasDeAleacion: { type: Gstring },
     TechoPanoramico: { type: Gstring },
     SensorDeLluvia: { type: Gstring },
