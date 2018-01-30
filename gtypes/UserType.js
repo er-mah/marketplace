@@ -12,12 +12,23 @@ const {
   GraphQLString: Gstring,
   GraphQLNonNull: NotNull,
   GraphQLBoolean: Gboolean,
+  GraphQLList: List,
+  GraphQLInt: Int,
 } = graphql;
 
 const UserType = new ObjectGraph({
   name: 'User',
   description: 'Usuario que puede ser agencia o un usuario común',
   fields: _.assign(attributeFields(User)),
+});
+
+const SearchUserResultType = new ObjectGraph({
+  name: 'SearchUserResult',
+  fields: {
+    Users: { type: List(UserType) },
+    totalCount: { type: Int },
+    hasNextPage: { type: Gboolean },
+  },
 });
 
 const UserMutations = {
@@ -57,7 +68,7 @@ const UserMutations = {
       newPassword: { type: new NotNull(Gstring) },
     },
     resolve: (value, { MAHtoken, oldPassword, newPassword }) => {
-      const userId = jwtDecode(MAHtoken).id;      
+      const userId = jwtDecode(MAHtoken).id;
       return User.findById(userId)
         .then((us) => {
           if (!us) {
@@ -75,4 +86,4 @@ const UserMutations = {
   },
 };
 
-module.exports = { UserType, UserMutations };
+module.exports = { UserType, UserMutations, SearchUserResultType };

@@ -267,14 +267,14 @@ const createPublication = (req, res) => {
     });
 };
 const uploadAgencyImages = (req, res) => {
-  const { avatar, banner } = req.files;
+  const { profileImage, bannerImage } = req.files;
   const { id } = req.params;
   const imageData = {};
-  if (avatar) {
-    imageData.profileImage = avatar[0].filename;
+  if (profileImage) {
+    imageData.profileImage = profileImage[0].filename;
   }
-  if (banner) {
-    imageData.bannerImage = banner[0].filename;
+  if (bannerImage) {
+    imageData.bannerImage = bannerImage[0].filename;
   }
   User.findById(id).then((user) => {
     if (!user) {
@@ -287,7 +287,7 @@ const uploadAgencyImages = (req, res) => {
       .then(() => {
         res.status(200).send({
           status: 'ok',
-          message: 'Cambios guardados con éxito',
+          message: 'Cambios guardados con éxito.',
         });
       })
       .catch((e) => {

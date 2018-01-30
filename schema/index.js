@@ -3,7 +3,7 @@ const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
 
-const { UserType } = require('../gtypes/UserType');
+const { UserType, SearchUserResultType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
 const { Tautos30type } = require('../gtypes/Tautos30type');
 const { CaracteristicType } = require('../gtypes/CaracteristicType');
@@ -299,15 +299,18 @@ const schema = new Schema({
         type: UserType,
         // args will automatically be mapped to `where`
         args: {
-          id: {
-            description: 'id of the user',
-            type: new NotNull(Int),
+          MAHtoken: {
+            type: new NotNull(Gstring),
           },
         },
-        resolve: resolver(User),
+        resolve: (_, args) => {
+          const userId = decode(args.MAHtoken).id;
+          return User.findById(userId)
+            .then(us => us);
+        },
       },
       AllUsers: {
-        type: new List(UserType),
+        type: SearchUserResultType,
         args: {
           limit: {
             type: Int,
@@ -319,7 +322,22 @@ const schema = new Schema({
             type: Int,
           },
         },
-        resolve: resolver(User, {
+        resolve: (_, args) => {
+          const options = {};
+          const LIMIT = 9;
+          if (args.page) {
+            options.limit = LIMIT;
+            options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+          }
+          return User.findAndCountAll(options)
+            .then((res) => {
+              const result = {};
+              result.hasNextPage = res.count > res.rows.length && res.rows.length !== 0;
+              result.totalCount = res.count;
+              result.Users = res.rows;
+              return result;
+            });
+        }, /* resolver(User, {
           before: (options, args) => {
             const LIMIT = 9;
             if (args.page) {
@@ -328,7 +346,7 @@ const schema = new Schema({
             }
             return options;
           },
-        }),
+        }), */
       },
       Publication: {
         type: PublicationType,

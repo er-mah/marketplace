@@ -130,6 +130,6 @@ app.post('/login', login);
 app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
-app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), uploadAgencyImages);
+app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'bannerImage', maxCount: 1 }]), uploadAgencyImages);
 // ===================================================================
 
