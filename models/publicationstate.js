@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       through: models.mah.HistoryState, // this can be string or a model,
       foreignKey: 'publicationState_id',
       onDelete: 'CASCADE',
-      otherKey: 'createdAt',
     });
   };
   return PublicationState;

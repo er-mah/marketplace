@@ -1,10 +1,15 @@
-
 const { attributeFields, resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { Publication, PublicationState, sequelize } = require('../models').mah;
+const {
+  Publication,
+  PublicationState,
+  HistoryState,
+  sequelize,
+} = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
+const { HistoryStateType } = require('./HistoryStateType');
 const { PublicationStateType } = require('./PublicationStateType');
 const { PublicationDetailType } = require('./PublicationDetailType');
 const { UserType } = require('./UserType');
@@ -31,59 +36,40 @@ const PublicationType = new ObjectGraph({
     },
     {
       HistoryState: {
-        type: List(PublicationStateType),
-        resolve: resolver(Publication.state, {
-          before: (options) => {
-            options.include = [
-              {
-                model: Publication,
-                attributes: {
-                  exclude: [
-                    'kms',
-                    'brand',
-                    'group',
-                    'modelName',
-                    'price',
-                    'year',
-                    'fuel',
-                    'observation',
-                    'imageGroup_id',
-                    'carState',
-                    'codia',
-                    'name',
-                    'email',
-                    'phone',
-                    'createdAt',
-                    'updatedAt',
-                    'deletedAt',
-                  ],
-                },
-                through: {
-                  attributes: ['createdAt'],
-                },
-              },
-            ];
-            return options;
-          },
-          after(result) {
-            const resultWithDate = [];
-            result.map((row) => {
-              row.createdAt = row.HistoryState.dataValues.createdAt;
-              resultWithDate.push(row);
-            });
-            return resultWithDate;
-          },
-        }),
+        type: List(HistoryStateType),
+        resolve: (args) => {
+          const result = [];
+          return HistoryState.findAll({
+            where: { publication_id: args.dataValues.id },
+          }).then(hs =>
+            Promise.all(hs.map((h) => {
+              const row = {};
+              row.createdAt = h.createdAt;
+              return PublicationState.findById(
+                h.dataValues.publicationState_id,
+                { attributes: ['stateName'] },
+              ).then((ps) => {
+                row.stateName = ps.dataValues.stateName;
+                return row;
+              });
+            })).then(res => res));
+        },
       },
       CurrentState: {
         type: PublicationStateType,
-        resolve: resolver(Publication.state, {
-          after(result) {
-            result = _.last(result);
-            return result;
-          },
-        }),
+        resolve: args =>
+          HistoryState.findAll({
+            where: { publication_id: args.dataValues.id },
+          })
+            .then(hs =>
+              Promise.all(hs.map(h =>
+                PublicationState.findById(h.dataValues.publicationState_id, {
+                  attributes: ['stateName'],
+                })
+                  .then(ps => ps)))
+                .then(res => _.last(res))),
       },
+
       Specifications: {
         type: PublicationDetailType,
         resolve: resolver(Publication.PublicationDetail),
@@ -137,7 +123,8 @@ const PublicationMutation = {
         options.where = { [Op.or]: {}, [Op.and]: {} };
         args.text += '%';
         options.where[Op.or] = Object.assign(
-          options.where[Op.or], { brand: { [Op.like]: args.text } },
+          options.where[Op.or],
+          { brand: { [Op.like]: args.text } },
           { group: { [Op.like]: args.text } },
           { modelName: { [Op.like]: args.text } },
           { kms: { [Op.like]: args.text } },
@@ -149,10 +136,14 @@ const PublicationMutation = {
         );
       }
       if (args.fuel) {
-        options.where[Op.and] = Object.assign(options.where[Op.and], { fuel: args.fuel });
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          fuel: args.fuel,
+        });
       }
       if (args.year) {
-        options.where[Op.and] = Object.assign(options.where[Op.and], { year: args.year });
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          year: args.year,
+        });
       }
       if (args.state) {
         options.include = [
@@ -161,34 +152,50 @@ const PublicationMutation = {
             where: {
               stateName: args.state,
             },
-          }];
+          },
+        ];
       }
       if (args.MAHtoken) {
         options.where = { [Op.and]: {} };
         const user_id = decode(args.MAHtoken).id;
-        options.where[Op.and] = Object.assign(options.where[Op.and], { user_id });
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          user_id,
+        });
       }
 
       if (args.carState) {
-        options.where[Op.and] = Object.assign(options.where[Op.and], { carState: args.carState });
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          carState: args.carState,
+        });
       }
 
       if (args.state === 'Activas') {
-        options.include = [{
-          model: PublicationState,
-          where: { [Op.or]: [{ stateName: 'Publicada' }, { stateName: 'Destacada' }, { stateName: 'Vendida' }, { stateName: 'Apto para garantía' }] },
-        }];
+        options.include = [
+          {
+            model: PublicationState,
+            where: {
+              [Op.or]: [
+                { stateName: 'Publicada' },
+                { stateName: 'Destacada' },
+                { stateName: 'Vendida' },
+                { stateName: 'Apto para garantía' },
+              ],
+            },
+          },
+        ];
       }
 
-      return Publication.findAndCountAll(options)
-        .then((publications) => {
-          result.totalCount = publications.count;
-          result.hasNextPage = publications.count > publications.rows.length && publications.rows.length !== 0;
-          result.Publications = publications.rows;
-          return result;
-        });
+      return Publication.findAndCountAll(options).then((publications) => {
+        result.totalCount = publications.count;
+        result.hasNextPage =
+          publications.count > publications.rows.length &&
+          publications.rows.length !== 0;
+        result.Publications = publications.rows;
+        return result;
+      });
     },
   },
+  markAsRead: {},
 };
 
 module.exports = { PublicationType, PublicationMutation };
