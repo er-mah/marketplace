@@ -23,6 +23,21 @@ const { SubscriptionServer } = require('subscriptions-transport-ws');
 const upload = multer({ dest: './images' });
 const app = express();
 
+// ************* PLAYGROUND ****************\
+/* const {
+  User,
+  Publication,
+  PublicationState,
+  CommentThread,
+  Message,
+  HistoryState,
+  sequelize,
+} = require('./models').mah;
+
+  .then(res => console.log('RESP', JSON.stringify(res))); */
+
+// ***************************************** */
+
 // SERVER CONFIGURATION ----------------------------------------------
 app.use(cors());
 app.use(bodyParser.json()); // for parsing application/json

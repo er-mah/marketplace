@@ -11,6 +11,7 @@ for (let i = 1; i < 14001; i += 1) {
     }),
     createdAt: moment().add(casual.integer(from = 0, to = 1000) ,'days').format("YYYY-MM-DD hh:mm:ss"),
     updatedAt: moment().add(casual.integer(from = 1001, to = 2000) ,'days').format("YYYY-MM-DD hh:mm:ss"),
+    active: true,
   };
   array.push(casualObj);
 }

@@ -22,6 +22,7 @@ const {
   GraphQLBoolean: Gboolean,
   GraphQLString: Gstring,
 } = graphql;
+const { Op } = sequelize;
 
 const PublicationType = new ObjectGraph({
   name: 'Publicacion',
@@ -37,39 +38,30 @@ const PublicationType = new ObjectGraph({
     {
       HistoryState: {
         type: List(HistoryStateType),
-        resolve: (args) => {
-          const result = [];
-          return HistoryState.findAll({
-            where: { publication_id: args.dataValues.id },
-          }).then(hs =>
-            Promise.all(hs.map((h) => {
-              const row = {};
-              row.createdAt = h.createdAt;
-              return PublicationState.findById(
-                h.dataValues.publicationState_id,
-                { attributes: ['stateName'] },
-              ).then((ps) => {
-                row.stateName = ps.dataValues.stateName;
-                return row;
-              });
-            })).then(res => res));
-        },
+        resolve: args =>
+          HistoryState.findAll({
+            where: { publication_id: args.id },
+            include: [PublicationState],
+            order: [['createdAt', 'ASC']],
+          })
+            .then((res) => {
+              const result = [];
+              res.map(hs => result.push({ createdAt: hs.dataValues.createdAt, stateName: hs.dataValues.PublicationState.stateName }));
+              return result;
+            }),
       },
       CurrentState: {
         type: PublicationStateType,
         resolve: args =>
-          HistoryState.findAll({
-            where: { publication_id: args.dataValues.id },
+          HistoryState.findOne({
+            where: { publication_id: args.id, active: true },
+            include: [PublicationState],
           })
-            .then(hs =>
-              Promise.all(hs.map(h =>
-                PublicationState.findById(h.dataValues.publicationState_id, {
-                  attributes: ['stateName'],
-                })
-                  .then(ps => ps)))
-                .then(res => _.last(res))),
+            .then((res) => {
+              res.stateName = res.PublicationState.stateName;
+              return res;
+            }),
       },
-
       Specifications: {
         type: PublicationDetailType,
         resolve: resolver(Publication.PublicationDetail),
@@ -152,6 +144,7 @@ const PublicationMutation = {
             where: {
               stateName: args.state,
             },
+            through: { where: { active: true } },
           },
         ];
       }
@@ -180,6 +173,7 @@ const PublicationMutation = {
                 { stateName: 'Vendida' },
                 { stateName: 'Apto para garantía' },
               ],
+              active: true,
             },
           },
         ];

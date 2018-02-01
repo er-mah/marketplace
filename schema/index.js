@@ -43,6 +43,7 @@ const {
   PublicationState,
   CommentThread,
   Message,
+  HistoryState,
   sequelize,
 } = require('../models').mah;
 const {
@@ -550,6 +551,42 @@ const schema = new Schema({
             return [arrayMessages.length];
           },
         }),
+      },
+      CountActivePublications: {
+        type: Int,
+        args: {
+          MAHtoken: { type: Gstring },
+        },
+        resolve: (_, args) => {
+          const userId = decode(args.MAHtoken).id;
+          const { Op } = sequelize;
+          return Publication.count({
+            where: { user_id: 1 },
+            include: [{
+              model: PublicationState,
+              where: { [Op.or]: { stateName: ['Publicada', 'Pendiente', 'Destacada', 'Vendida'] } },
+            }],
+          })
+            .then(res => res);
+        },
+      },
+      CountHighLighPublications: {
+        type: Int,
+        args: {
+          MAHtoken: { type: Gstring },
+        },
+        resolve: (_, args) => {
+          const userId = decode(args.MAHtoken).id;
+          const { Op } = sequelize;
+          return Publication.count({
+            where: { user_id: 1 },
+            include: [{
+              model: PublicationState,
+              where: { [Op.or]: { stateName: ['Destacada'] } },
+            }],
+          })
+            .then(res => res);
+        },
       },
 
       // Admin

@@ -26,6 +26,7 @@ module.exports = {
           publicationState_id: 2,
           createdAt: '2018-01-16 22:08:24',
           updatedAt: '2018-01-16 22:08:24',
+          active: true,
         },
         /* {
           publication_id: 836,
