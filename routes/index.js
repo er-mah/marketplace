@@ -36,6 +36,9 @@ const login = (req, res) => {
 
         return false;
       }
+      let userType;
+      if (user.agencyName) { userType = 'Agencia'; } else { userType = 'Usuario'; }
+      if (user.isAdmin) { userType = 'Admin'; }
       const MAHtoken = jsonwt.sign(
         {
           id: user.id,
