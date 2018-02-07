@@ -104,7 +104,7 @@ const PublicationMutation = {
       order: { type: Gstring },
     },
     resolve: (_, args) => {
-      result = {};
+      const result = {};
       const { Op } = sequelize;
       const options = {};
       const LIMIT = 9;
@@ -181,15 +181,21 @@ const PublicationMutation = {
           },
         ];
       }
-
-      return Publication.findAndCountAll(options).then((publications) => {
-        result.totalCount = publications.count;
-        result.hasNextPage =
-          publications.count > publications.rows.length &&
-          publications.rows.length !== 0;
-        result.Publications = publications.rows;
-        return result;
-      });
+      return Publication.count(options)
+        .then((count) => {
+          if (count < 9) {
+            delete options.limit;
+            delete options.offset;
+          }
+          return Publication.findAll(options).then((publications) => {
+            result.totalCount = count;
+            result.hasNextPage =
+              count > publications.length &&
+              publications.length !== 0;
+            result.Publications = publications;
+            return result;
+          });
+        });
     },
   },
   markAsSold: {
@@ -210,7 +216,7 @@ const PublicationMutation = {
         return pub.getPublicationStates({ through: { where: { active: true } } })
           .then((oldPs) => {
             if (
-            oldPs[0].dataValues.stateName === 'Vendida' ||
+              oldPs[0].dataValues.stateName === 'Vendida' ||
             oldPs[0].dataValues.stateName === 'Pendiente' ||
             oldPs[0].dataValues.stateName === 'Suspendida' ||
             oldPs[0].dataValues.stateName === 'Eliminada' ||
@@ -245,7 +251,7 @@ const PublicationMutation = {
         return pub.getPublicationStates({ through: { where: { active: true } } })
           .then((oldPs) => {
             if (
-            oldPs[0].dataValues.stateName === 'Destacada' ||
+              oldPs[0].dataValues.stateName === 'Destacada' ||
             oldPs[0].dataValues.stateName === 'Pendiente' ||
             oldPs[0].dataValues.stateName === 'Suspendida' ||
             oldPs[0].dataValues.stateName === 'Eliminada' ||
