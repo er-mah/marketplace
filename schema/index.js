@@ -30,6 +30,8 @@ const {
 
 const {
   searchPublication,
+  markAsSold,
+  highlightPublication,
 } = require('../gtypes/PublicationType').PublicationMutation;
 
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
@@ -217,7 +219,7 @@ const schema = new Schema({
               Importado: result.dataValues.ext_impor,
               Caja: result.dataValues.ext_cajav,
               FrenosAbs: result.dataValues.ext_frabs,
-              AirBag: result.dataValues.ext_airba,
+              Airbag: result.dataValues.ext_airba,
             };
           },
         }),
@@ -604,6 +606,8 @@ const schema = new Schema({
       markThreadAsReaded,
       modifyUserData,
       updatePassword,
+      markAsSold,
+      highlightPublication,
     },
   }),
   subscription: new ObjectGraph({

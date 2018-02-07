@@ -9,7 +9,6 @@ const {
   ImageGroup,
   PublicationState,
   PublicationDetail,
-  HistoryState,
   sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
@@ -69,6 +68,12 @@ const login = (req, res) => {
       }));
 };
 const createPublication = (req, res) => {
+  req.body.dataPublication = JSON.parse(req.body.dataPublication);
+  split(req.body.dataPublication).map((row) => {
+    if (req.body.dataPublication[row.key] === 'SI') req.body.dataPublication[row.key] = true;
+    if (req.body.dataPublication[row.key] === 'NO') req.body.dataPublication[row.key] = false;
+  });
+
   const {
     brand,
     group,
@@ -76,14 +81,13 @@ const createPublication = (req, res) => {
     kms,
     price,
     year,
-    fuel,
+    Combustible,
     observation,
     carState,
     codia,
     name,
     email,
     phone,
-    user_id,
     Alimentacion,
     Motor,
     Puertas,
@@ -134,21 +138,33 @@ const createPublication = (req, res) => {
     Bluetooth,
     AsientosTermicos,
     RunFlat,
-  } = req.body;
+  } = req.body.dataPublication;
   const imageGroup = req.files;
   const imageData = {};
+  const userId = decode(req.headers.authorization.slice(7)).id;
+  let fuel;
+  switch (Combustible) {
+    case 'NAF': fuel = 'Nafta';
+      break;
+    case 'DSL': fuel = 'Diesel';
+      break;
+    case 'GNC': fuel = 'GNC';
+      break;
+    default: fuel = 'No especificado';
+  }
+
   for (let i = 0; i < imageGroup.length; i += 1) {
     const objectName = `image${i + 1}`;
     imageData[objectName] = imageGroup[i].filename;
   }
-  if (!email && !user_id) {
+  if (!email && !userId) {
     res.status(400).send({
       status: 'error',
       message: 'Datos incompletos (faltan datos de contacto)',
     });
     return false;
   }
-  return User.findById(user_id)
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
         return Promise.reject();
@@ -174,9 +190,8 @@ const createPublication = (req, res) => {
               name,
               email,
               phone,
-              user_id,
+              user_id: userId,
               publicationDetail: {
-                hasDetails,
                 Alimentacion,
                 Motor,
                 Puertas,
@@ -241,7 +256,7 @@ const createPublication = (req, res) => {
             PublicationState.findOne({
               where: { stateName: 'Pendiente' },
             }).then((ps) => {
-              publication.setPublicationStates(ps);
+              publication.setPublicationStates(ps, { through: { active: true } });
               res.status(200).send({
                 status: 'ok',
                 message:

@@ -67,7 +67,7 @@ module.exports = {
       type: Sequelize.BOOLEAN,
     },
     Climatizador: {
-      type: Sequelize.BOOLEAN,
+      type: Sequelize.STRING,
     },
     FarosAntiniebla: {
       type: Sequelize.BOOLEAN,
@@ -76,7 +76,7 @@ module.exports = {
       type: Sequelize.BOOLEAN,
     },
     SensorEstacionamiento: {
-      type: Sequelize.BOOLEAN,
+      type: Sequelize.STRING,
     },
     AirbagLateral: {
       type: Sequelize.BOOLEAN,

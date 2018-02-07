@@ -24,7 +24,7 @@ const CaracteristicType = new ObjectGraph({
     Importado: { type: Gstring },
     Caja: { type: Gstring },
     FrenosAbs: { type: Gstring },
-    AirBag: { type: Gstring },
+    Airbag: { type: Gstring },
   },
 });
 

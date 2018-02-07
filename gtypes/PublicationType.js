@@ -2,6 +2,7 @@ const { attributeFields, resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
 const graphql = require('graphql');
+const { UserError } = require('graphql-errors');
 const {
   Publication,
   PublicationState,
@@ -43,12 +44,15 @@ const PublicationType = new ObjectGraph({
             where: { publication_id: args.id },
             include: [PublicationState],
             order: [['createdAt', 'ASC']],
-          })
-            .then((res) => {
-              const result = [];
-              res.map(hs => result.push({ createdAt: hs.dataValues.createdAt, stateName: hs.dataValues.PublicationState.stateName }));
-              return result;
-            }),
+          }).then((res) => {
+            const result = [];
+            res.map(hs =>
+              result.push({
+                createdAt: hs.dataValues.createdAt,
+                stateName: hs.dataValues.PublicationState.stateName,
+              }));
+            return result;
+          }),
       },
       CurrentState: {
         type: PublicationStateType,
@@ -56,11 +60,10 @@ const PublicationType = new ObjectGraph({
           HistoryState.findOne({
             where: { publication_id: args.id, active: true },
             include: [PublicationState],
-          })
-            .then((res) => {
-              res.stateName = res.PublicationState.stateName;
-              return res;
-            }),
+          }).then((res) => {
+            res.stateName = res.PublicationState.stateName;
+            return res;
+          }),
       },
       Specifications: {
         type: PublicationDetailType,
@@ -189,7 +192,76 @@ const PublicationMutation = {
       });
     },
   },
-  markAsRead: {},
+  markAsSold: {
+    type: PublicationType,
+    name: 'markPublicationAsSold',
+    args: {
+      publication_id: { type: Int },
+      MAHtoken: { type: Gstring },
+    },
+    resolve: (_, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return Publication.findOne({
+        where: { id: args.publication_id, user_id: userID },
+      }).then((pub) => {
+        if (!pub) {
+          throw new UserError('Esta publicación no corresponde al usuario.');
+        }
+        return pub.getPublicationStates({ through: { where: { active: true } } })
+          .then((oldPs) => {
+            if (
+            oldPs[0].dataValues.stateName === 'Vendida' ||
+            oldPs[0].dataValues.stateName === 'Pendiente' ||
+            oldPs[0].dataValues.stateName === 'Suspendida' ||
+            oldPs[0].dataValues.stateName === 'Eliminada' ||
+            oldPs[0].dataValues.stateName === 'Vencida') {
+              throw new UserError('Esta publicación ya está vendida o no se ecuentra activa actualmente.');
+            }
+            oldPs[0].HistoryState = {
+              active: false,
+            };
+            return PublicationState.findOne({ where: { stateName: 'Vendida' } })
+              .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+              .then(() => pub);
+          });
+      });
+    },
+  },
+  highlightPublication: {
+    type: PublicationType,
+    name: 'highlightPublication',
+    args: {
+      publication_id: { type: Int },
+      MAHtoken: { type: Gstring },
+    },
+    resolve: (_, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return Publication.findOne({
+        where: { id: args.publication_id, user_id: userID },
+      }).then((pub) => {
+        if (!pub) {
+          throw new UserError('Esta publicación no corresponde al usuario.');
+        }
+        return pub.getPublicationStates({ through: { where: { active: true } } })
+          .then((oldPs) => {
+            if (
+            oldPs[0].dataValues.stateName === 'Destacada' ||
+            oldPs[0].dataValues.stateName === 'Pendiente' ||
+            oldPs[0].dataValues.stateName === 'Suspendida' ||
+            oldPs[0].dataValues.stateName === 'Eliminada' ||
+            oldPs[0].dataValues.stateName === 'Vencida') {
+              throw new UserError('Esta publicación ya está destacada o no se ecuentra activa actualmente.');
+            }
+            oldPs[0].HistoryState = {
+              active: false,
+            };
+            return PublicationState.findOne({ where: { stateName: 'Destacada' } })
+              .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+              .then(() => pub);
+          });
+      });
+    },
+  },
 };
 
 module.exports = { PublicationType, PublicationMutation };
