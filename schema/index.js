@@ -563,7 +563,7 @@ const schema = new Schema({
           const userId = decode(args.MAHtoken).id;
           const { Op } = sequelize;
           return Publication.count({
-            where: { user_id: 1 },
+            where: { user_id: userId },
             include: [{
               model: PublicationState,
               where: { [Op.or]: { stateName: ['Publicada', 'Pendiente', 'Destacada', 'Vendida'] } },
@@ -581,7 +581,7 @@ const schema = new Schema({
           const userId = decode(args.MAHtoken).id;
           const { Op } = sequelize;
           return Publication.count({
-            where: { user_id: 1 },
+            where: { user_id: userId },
             include: [{
               model: PublicationState,
               where: { [Op.or]: { stateName: ['Destacada'] } },
