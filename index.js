@@ -12,7 +12,7 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const cors = require('cors');
 const schema = require('./schema');
 const {
-  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
+  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
 } = require('./routes');
 const multer = require('multer');
 
@@ -80,6 +80,8 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/subscriptions',
     '/graphql',
     '/login',
+    '/loginAdmin',
+    '/createPublication',
     '/getFiltersAndTotalResult',
     /^\/images/,
   ],
@@ -142,6 +144,7 @@ io.of('/offerChat').on('connection', (socket) => {
 
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
+app.post('/loginAdmin', loginAdmin);
 app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);

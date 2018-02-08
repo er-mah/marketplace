@@ -412,6 +412,7 @@ const schema = new Schema({
                 {
                   model: PublicationState,
                   where: { stateName: args.stateName },
+                  through: { where: { active: true } },
                 },
               ];
               return options;

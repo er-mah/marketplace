@@ -43,7 +43,7 @@ const login = (req, res) => {
         {
           id: user.id,
           name: user.agencyName || user.name,
-          userType: user.agencyName ? 'Agencia' : 'Usuario',
+          userType,
         },
         'MAH2018!#',
       );
@@ -63,6 +63,57 @@ const login = (req, res) => {
         return false;
       }
  */
+    })
+    .catch(error =>
+      res.status(400).send({
+        status: 'error',
+        message: error,
+      }));
+};
+const loginAdmin = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ where: { email } })
+    .then((user) => {
+      console.log(user.dataValues);
+      if (_.isNull(user)) {
+        console.log('usuario inexistente');
+        res.status(400).send({
+          status: 'error',
+          message: 'Usuario inexistente o contraseña incorrecta.',
+        });
+        return false;
+      }
+      if (!user.validPassword(password, user.password)) {
+        res.status(401).send({
+          status: 'error',
+          message: 'Usuario inexistente o contraseña incorrecta.',
+        });
+
+        return false;
+      }
+      let userType;
+      if (user.agencyName) { userType = 'Agencia'; } else { userType = 'Usuario'; }
+      if (user.isAdmin) { userType = 'Admin'; }
+      const MAHtoken = jsonwt.sign(
+        {
+          id: user.id,
+          name: user.agencyName || user.name,
+          userType,
+        },
+        'MAH2018!#',
+      );
+      if (user.isAdmin === false) {
+        res.status(400).send({
+          status: 'error',
+          message: 'No tienes permisos para acceder aquí.',
+        });
+        return false;
+      }
+
+      res.status(200).send({
+        status: 'ok',
+        message: MAHtoken,
+      });
     })
     .catch(error =>
       res.status(400).send({
@@ -442,5 +493,5 @@ const getSoldPublications = (req, res) => {
   });
 };
 module.exports = {
-  login, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
+  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
 };
