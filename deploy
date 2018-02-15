@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+set -eu
+
+USER=deployer
+SERVER=api.miautohoy.com
+APP_PATH=/var/www/miautohoyapi/current
+
+echo "Deploying, please wait..."
+
+ssh $USER@$SERVER "mkdir -p $APP_PATH"
+rsync -az --delete --exclude .git --exclude .gitignore \
+  --exclude deploy --exclude node_modules \
+  -e ssh . $USER@$SERVER:$APP_PATH
+ssh $USER@$SERVER "cd $APP_PATH && npm install"
+ssh root@$SERVER "systemctl restart miautohoyapi"
+
+echo "Deploy finished"
