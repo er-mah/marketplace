@@ -11,6 +11,7 @@ module.exports = {
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
       isAdmin: true,
+      isAgency: false,
     },
     {
       email: 'usuario@yopmail.com',
@@ -22,6 +23,8 @@ module.exports = {
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
       isAdmin: false,
+      isAgency: false,
+
     },
     {
       email: 'encargado@yopmail.com',
@@ -36,6 +39,7 @@ module.exports = {
       profileImage: 'agencia.jpg',
       bannerImage: 'banner.jpg',
       isAdmin: false,
+      isAgency: true,
       createdAt: moment().format('YYYY-MM-DD'),
       updatedAt: moment().format('YYYY-MM-DD'),
     },

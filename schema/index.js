@@ -600,6 +600,11 @@ const schema = new Schema({
             .then(res => res);
         },
       },
+      GetAllAgencies: {
+        type: List(UserType),
+        resolve: () => User.findAll({ where: { isAgency: true } })
+          .then(usr => usr),
+      },
 
       // Admin
       AdminCommentThread: {
@@ -621,7 +626,6 @@ const schema = new Schema({
             });
         },
       },
-
     },
   }),
   mutation: new ObjectGraph({
