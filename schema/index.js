@@ -1,7 +1,10 @@
+
 const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
+const { UserError } = require('graphql-errors');
+
 
 const { UserType, SearchUserResultType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
@@ -63,7 +66,6 @@ const {
   GraphQLObjectType: ObjectGraph,
   GraphQLInt: Int,
   GraphQLString: Gstring,
-  GraphQLBoolean: GBoolean,
 } = graphql;
 
 const schema = new Schema({
@@ -440,9 +442,16 @@ const schema = new Schema({
         resolve: resolver(CommentThread, {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
-            args.participant2_id = userId;
-            Object.assign(options.where, { participant2_id: userId });
-            return options;
+            User.findById(userId)
+              .then((usr) => {
+                if (usr.isAdmin) {
+                  Object.assign(options.where, { id: args.id });
+                  return options;
+                }
+                args.participant2_id = userId;
+                Object.assign(options.where, { participant2_id: userId });
+                return options;
+              });
           },
         }),
       },
@@ -593,6 +602,26 @@ const schema = new Schema({
       },
 
       // Admin
+      AdminCommentThread: {
+        name: 'AdminCommentThread',
+        type: List(CommentThreadType),
+        args: {
+          MAHtoken: { type: new NotNull(Gstring) },
+          page: { type: Int },
+        },
+        resolve: (_, args) => {
+          const userId = decode(args.MAHtoken).id;
+          return User.findById(userId)
+            .then((usr) => {
+              if (usr && usr.isAdmin) {
+                return CommentThread.findAll()
+                  .then(ct => ct);
+              }
+              throw new UserError('Solo los administradores pueden acceder');
+            });
+        },
+      },
+
     },
   }),
   mutation: new ObjectGraph({

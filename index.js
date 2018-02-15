@@ -5,6 +5,7 @@ const express = require('express');
 const Graphql = require('graphql').graphql;
 const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
+const moment = require('moment');
 
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 
@@ -34,7 +35,20 @@ const app = express();
   sequelize,
 } = require('./models').mah;
 
-  .then(res => console.log('RESP', JSON.stringify(res))); */
+CommentThread.findById(1)
+  .then(ct =>
+    Message.create({
+      commentThread_id: 1,
+      content: 'Hola!!!',
+      createdAt: moment(),
+      updatedAt: moment(),
+    })
+      .then((msg) => {
+        ct.setMessages(msg.id);
+      })
+
+      .then(() => ct.getMessages())
+      .then(res => console.log('RESP', JSON.stringify(res)))); */
 
 // ***************************************** */
 

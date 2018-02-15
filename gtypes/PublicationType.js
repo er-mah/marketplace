@@ -108,7 +108,7 @@ const PublicationMutation = {
       const { Op } = sequelize;
       const options = {};
       const LIMIT = 9;
-      options.where = { [Op.or]: {}, [Op.and]: {} };
+      options.where = { [Op.and]: {} };
 
       if (args.page) {
         options.limit = LIMIT;
@@ -188,10 +188,9 @@ const PublicationMutation = {
             delete options.offset;
           }
           return Publication.findAll(options).then((publications) => {
+            const totalPages = parseInt(count / 9, 10);
             result.totalCount = count;
-            result.hasNextPage =
-              count > publications.length &&
-              publications.length !== 0;
+            result.hasNextPage = args.page < totalPages;
             result.Publications = publications;
             return result;
           });

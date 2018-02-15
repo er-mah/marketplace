@@ -130,9 +130,7 @@ const CommentThreadMutations = {
               if (!cmt) {
                 throw new UserError('Esta cadena de mensajes ya ha sido eliminada');
               }
-              cmt.destroy();
-
-              /* return cmt.destroy(); */
+              return cmt.destroy();
             })
             .then(() => 'Cadena de comentarios eliminada con éxito');
         });
