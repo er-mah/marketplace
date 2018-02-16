@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrateDev": "node_modules/.bin/sequelize db:create --env test && node_modules/.bin/sequelize db:migrate --env test && node_modules/.bin/sequelize db:seed:all --env test && yarn run dev",
-    "migrateProd": "node_modules/.bin/sequelize db:migrate && node_modules/.bin/sequelize db:seed:all",
+    "migratePG": "node_modules/.bin/sequelize db:create --env testpsql && node_modules/.bin/sequelize db:migrate --env testpsql && node_modules/.bin/sequelize db:seed:all --env testpsql && yarn run dev",
+    "migrateProd": "node_modules/.bin/sequelize db:create --env production node_modules/.bin/sequelize db:migrate --env production && node_modules/.bin/sequelize db:seed:all --env production tautos30/convert",
     "dev": "nodemon index.js"
   },
   "repository": {
