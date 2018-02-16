@@ -41,12 +41,27 @@ module.exports = {
     bannerImage: {
       type: Sequelize.STRING,
     },
+    ownerName: {
+      type: Sequelize.STRING,
+    },
+    ownerAddress: {
+      type: Sequelize.STRING,
+    },
+    ownerDNI: {
+      type: Sequelize.STRING,
+    },
+    ownerEmail: {
+      type: Sequelize.STRING,
+    },
+    ownerPhone: {
+      type: Sequelize.STRING,
+    },
     isAdmin: {
       type: Sequelize.BOOLEAN,
     },
-    isAgency:{
+    isAgency: {
       type: Sequelize.BOOLEAN,
-    }
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,

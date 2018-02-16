@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     agencyPhone: DataTypes.STRING,
     profileImage: DataTypes.STRING,
     bannerImage: DataTypes.STRING,
+    ownerName: DataTypes.STRING,
+    ownerAddress: DataTypes.STRING,
+    ownerDNI: DataTypes.STRING,
+    ownerEmail: DataTypes.STRING,
+    ownerPhone: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
     isAgency: DataTypes.BOOLEAN,
   });

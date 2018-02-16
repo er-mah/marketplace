@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -13,7 +12,14 @@ const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const cors = require('cors');
 const schema = require('./schema');
 const {
-  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
+  login,
+  loginAdmin,
+  createPublication,
+  uploadAgencyImages,
+  getFiltersAndTotalResult,
+  getSoldPublications,
+  registerAgency,
+  registerUser,
 } = require('./routes');
 const multer = require('multer');
 
@@ -58,25 +64,32 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-app.use('/graphiql', graphiqlExpress({
-  endpointURL: '/graphql',
-  subscriptionsEndpoint: 'ws://localhost:4000/subscriptions',
-}));
+app.use(
+  '/graphiql',
+  graphiqlExpress({
+    endpointURL: '/graphql',
+    subscriptionsEndpoint: 'ws://localhost:4000/subscriptions',
+  }),
+);
 
 const ws = createServer(app);
 
 // Set up the WebSocket for handling GraphQL subscriptions
 ws.listen(process.env.PORT || 4000, () => {
-  console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT || 4000}/graphiql`);
+  console.log(`Running a GraphQL API server at http://localhost:${process.env.PORT ||
+      4000}/graphiql`);
 
-  SubscriptionServer.create({
-    execute,
-    subscribe,
-    schema,
-  }, {
-    server: ws,
-    path: '/subscriptions',
-  });
+  SubscriptionServer.create(
+    {
+      execute,
+      subscribe,
+      schema,
+    },
+    {
+      server: ws,
+      path: '/subscriptions',
+    },
+  );
 });
 
 const httpGraphQLHandler = (req, res) => {
@@ -96,6 +109,8 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/login',
     '/loginAdmin',
     '/createPublication',
+    '/registerAgency',
+    '/registerUser',
     '/getFiltersAndTotalResult',
     /^\/images/,
   ],
@@ -103,7 +118,10 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  );
   next();
 });
 
@@ -159,9 +177,21 @@ io.of('/offerChat').on('connection', (socket) => {
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
 app.post('/loginAdmin', loginAdmin);
-app.post('/createPublication', upload.array('imageGroup', 8), createPublication);
+app.post(
+  '/createPublication',
+  upload.array('imageGroup', 8),
+  createPublication,
+);
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
-app.post('/uploadAgencyImages/:id', upload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'bannerImage', maxCount: 1 }]), uploadAgencyImages);
+app.get('/registerAgency', registerAgency);
+app.get('/registerUser', registerUser);
+app.post(
+  '/uploadAgencyImages/:id',
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'bannerImage', maxCount: 1 },
+  ]),
+  uploadAgencyImages,
+);
 // ===================================================================
-

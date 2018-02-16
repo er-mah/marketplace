@@ -329,7 +329,26 @@ const createPublication = (req, res) => {
       });
     });
 };
-
+const registerAgency = (req, res) => {
+  const data = req.body;
+  User.create(data)
+    .then((usr) => {
+      res.status(200).send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
+    })
+    .catch((err) => {
+      res.status(400).send(ResponseObj('error', err));
+    });
+};
+const registerUser = (req, res) => {
+  const data = req.body;
+  User.create(data)
+    .then((usr) => {
+      res.status(200).send(ResponseObj('ok', 'Usuario registrado con éxito', usr));
+    })
+    .catch((err) => {
+      res.status(400).send(ResponseObj('error', err));
+    });
+};
 const uploadAgencyImages = (req, res) => {
   const { profileImage, bannerImage } = req.files;
   const { id } = req.params;
@@ -488,5 +507,5 @@ const getSoldPublications = (req, res) => {
   });
 };
 module.exports = {
-  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications,
+  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications, registerAgency, registerUser,
 };
