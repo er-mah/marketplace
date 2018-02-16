@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo Empezando con la conversion de la base de datos, aguarde...
+echo Asimil:
+pgdbf -pdnqce asimil.dbf asi_codia | iconv -c -f UTF-8 -t UTF-8 > asimil.sql 
+echo extrad:
+pgdbf -pdnqce extrad.dbf ext_codia | iconv -c -f UTF-8 -t UTF-8 > extrad.sql
+echo extrad2:
+pgdbf -pdnqce extrad2.dbf ex2_codia | iconv -c -f UTF-8 -t UTF-8 > extrad2.sql
+echo extrad3:
+pgdbf -pdnqce extrad3.dbf ex3_codia | iconv -c -f UTF-8 -t UTF-8 > extrad3.sql
+echo tautos:
+pgdbf -pdnqce tautos30.dbf ta3_codia | iconv -c -f UTF-8 -t UTF-8 > tautos30.sql
+echo grupos:
+pgdbf -pdnqce grupos.dbf gru_ngrup | iconv -c -f UTF-8 -t UTF-8 > grupos.sql
+echo usados:
+pgdbf -pdnqce usados.dbf usa_codia | iconv -c -f UTF-8 -t UTF-8  > usados.sql
+
+
+echo Comenzando migracion...
+
+cat asimil.sql extrad.sql extrad2.sql extrad3.sql tautos30.sql grupos.sql usados.sql | psql -U postgres --password tautos
+
+
+
+echo Listo!

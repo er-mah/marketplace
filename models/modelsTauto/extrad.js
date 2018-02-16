@@ -79,5 +79,7 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: false,
 
   });
+  extrad.removeAttribute('id');
+  
   return extrad;
 };

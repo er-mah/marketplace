@@ -18,5 +18,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'usados',
     timestamps: false,
   });
+  usados.removeAttribute('id');
   return usados;
 };

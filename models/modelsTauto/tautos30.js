@@ -158,5 +158,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'tautos30',
     timestamps: false,
   });
+  tautos30.removeAttribute('id');
   return tautos30;
 };

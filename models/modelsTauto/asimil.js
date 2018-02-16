@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'asimil',
     timestamps: false,
   });
+  asimil.removeAttribute('id');
+  
   return asimil;
 };
 

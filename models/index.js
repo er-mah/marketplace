@@ -10,14 +10,15 @@ const config = require(`${__dirname}/../config/config.js`)[env];
 const db = {};
 db.mah = {};
 db.tauto = {};
+let sequelizeMah;
+let sequelizeTauto;
 
 if (config.mah_db && config.tauto_db) {
-  var sequelizeMah = new Sequelize(config.mah_db.url, config.mah_db);
-  var sequelizeTauto = new Sequelize(config.tauto_db.url, config.tauto_db);
+  sequelizeMah = new Sequelize(config.mah_db.url, config.mah_db);
+  sequelizeTauto = new Sequelize(config.tauto_db.url, config.tauto_db);
 } else {
-  var sequelizeMah = new Sequelize(config.databases.mah_test, config.username, config.password, config);
-  var sequelizeTauto = new Sequelize(config.databases.tauto, config.username, config.password, config);
-
+  sequelizeMah = new Sequelize(config.databases.mah_test, config.username, config.password, config);
+  sequelizeTauto = new Sequelize(config.databases.tauto, config.username, config.password, config);
 }
 
 

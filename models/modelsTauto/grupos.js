@@ -18,5 +18,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'grupos',
     timestamps: false,
   });
+  grupos.removeAttribute('id');
   return grupos;
 };

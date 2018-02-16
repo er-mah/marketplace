@@ -10,7 +10,7 @@ module.exports = {
       url: process.env.TAUTO_DATABASE_URL,
       dialect: 'postgres',
       operatorsAliases: false
-    }
+    },
   },
   test: {
     username: 'root',
@@ -18,6 +18,19 @@ module.exports = {
     database: 'mah_test',
     host: '127.0.0.1',
     dialect: 'mysql',
+    seederStorage: 'sequelize',
+    operatorsAliases: false,
+    databases: {
+      tauto: 'tautos',
+      mah_test: 'mah_test',
+    },
+  },
+  testpsql: {
+    username: 'postgres',
+    password: 'root',
+    database: 'mah_test',
+    host: '127.0.0.1',
+    dialect: 'postgres',
     seederStorage: 'sequelize',
     operatorsAliases: false,
     databases: {
