@@ -11,11 +11,12 @@ const db = {};
 db.mah = {};
 db.tauto = {};
 
-if (config.use_env_variable) {
-  var sequelize = new Sequelize(process.env[config.use_env_variable], config);
+if (config.mah_db && config.tauto_db) {
+  var sequelizeMah = new Sequelize(config.mah_db.url, config.mah_db);
+  var sequelizeTauto = new Sequelize(config.tauto_db.url, config.tauto_db);
 } else {
   var sequelizeMah = new Sequelize(config.databases.mah_test, config.username, config.password, config);
-  var sequeliseTauto = new Sequelize(config.databases.tauto, config.username, config.password, config);
+  var sequelizeTauto = new Sequelize(config.databases.tauto, config.username, config.password, config);
 
 }
 
@@ -41,7 +42,7 @@ fs
   .readdirSync(`${__dirname}/modelsTauto`)
   .filter(file => (file.indexOf('./modelsTauto') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
   .forEach((file) => {
-    const model = sequeliseTauto.import(path.join(`${__dirname}/modelsTauto`, file));
+    const model = sequelizeTauto.import(path.join(`${__dirname}/modelsTauto`, file));
     db.tauto[model.name] = model;
   });
 
@@ -51,7 +52,7 @@ Object.keys(db.tauto).forEach((modelName) => {
   }
 });
 
-db.tauto.sequelize = sequeliseTauto;
+db.tauto.sequelize = sequelizeTauto;
 db.Sequelize = Sequelize;
 
 module.exports = db;

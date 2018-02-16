@@ -1,10 +1,16 @@
 
 module.exports = {
   production: {
-    url: process.env.DATABASE_URL,
-    use_env_variable: 'DATABASE_URL',
-    dialect: 'postgres',
-    operatorsAliases: false,
+    mah_db: {
+      url: process.env.DATABASE_URL,
+      dialect: 'postgres',
+      operatorsAliases: false
+    },
+    tauto_db: {
+      url: process.env.TAUTO_DATABASE_URL,
+      dialect: 'postgres',
+      operatorsAliases: false
+    }
   },
   test: {
     username: 'root',
