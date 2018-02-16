@@ -603,7 +603,15 @@ const schema = new Schema({
       GetAllAgencies: {
         type: List(UserType),
         resolve: () => User.findAll({ where: { isAgency: true } })
-          .then(usr => usr),
+          .then(agen => agen),
+      },
+      GetAgencyDetail: {
+        type: UserType,
+        args: {
+          id: { type: new NotNull(Int) },
+        },
+        resolve: (_, args) => User.findOne({ where: { isAgency: true, id: args.id } })
+          .then(agen => agen),
       },
 
       // Admin

@@ -94,6 +94,5 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'extrad2',
     timestamps: false,
   });
-  extrad2.removeAttribute('id');
   return extrad2;
 };
