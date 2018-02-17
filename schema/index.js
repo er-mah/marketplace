@@ -405,7 +405,7 @@ const schema = new Schema({
                 },
               ];
               options.order = [
-                sequelize.fn('RAND'), // en postgres es RANDOM
+                sequelize.options.dialect === 'mysql' ? sequelize.fn('RAND') : sequelize.fn('RANDOM'), // en postgres es RANDOM
               ];
               return options;
             }
