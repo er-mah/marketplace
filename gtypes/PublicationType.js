@@ -123,7 +123,6 @@ const PublicationMutation = {
           { group: { [Op.like]: args.text } },
           { modelName: { [Op.like]: args.text } },
           { kms: { [Op.like]: args.text } },
-          { price: { [Op.like]: args.text } },
           { year: { [Op.like]: args.text } },
           { fuel: { [Op.like]: args.text } },
           { codia: { [Op.like]: args.text } },

@@ -399,7 +399,6 @@ const getFiltersAndTotalResult = (req, res) => {
       { group: { [Op.like]: text } },
       { modelName: { [Op.like]: text } },
       { kms: { [Op.like]: text } },
-      { price: { [Op.like]: text } },
       { year: { [Op.like]: text } },
       { fuel: { [Op.like]: text } },
       { codia: { [Op.like]: text } },
