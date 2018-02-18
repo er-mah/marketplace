@@ -389,6 +389,7 @@ const getFiltersAndTotalResult = (req, res) => {
     carState, fuel, year, state,
   } = req.body;
   const { Op } = sequelize;
+  text = _.upperFirst(_.lowerCase(text));
   text += '%';
   const LIMIT = 9;
   let hasNextPage = true;
@@ -399,9 +400,7 @@ const getFiltersAndTotalResult = (req, res) => {
       { group: { [Op.like]: text } },
       { modelName: { [Op.like]: text } },
       { kms: { [Op.like]: text } },
-      { year: { [Op.like]: text } },
       { fuel: { [Op.like]: text } },
-      { codia: { [Op.like]: text } },
       { name: { [Op.like]: text } },
     ],
     [Op.and]: { carState },

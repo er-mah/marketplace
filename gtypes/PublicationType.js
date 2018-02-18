@@ -116,16 +116,16 @@ const PublicationMutation = {
       }
       if (args.text) {
         options.where = { [Op.or]: {}, [Op.and]: {} };
+        args.text = _.upperFirst(_.lowerCase(args.text));
         args.text += '%';
+
         options.where[Op.or] = Object.assign(
           options.where[Op.or],
           { brand: { [Op.like]: args.text } },
           { group: { [Op.like]: args.text } },
           { modelName: { [Op.like]: args.text } },
           { kms: { [Op.like]: args.text } },
-          { year: { [Op.like]: args.text } },
           { fuel: { [Op.like]: args.text } },
-          { codia: { [Op.like]: args.text } },
           { name: { [Op.like]: args.text } },
         );
       }
