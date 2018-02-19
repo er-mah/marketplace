@@ -308,7 +308,7 @@ const schema = new Schema({
             type: new NotNull(Gstring),
           },
         },
-        resolve: (_, args) => {
+        resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
           return User.findById(userId)
             .then(us => us);
@@ -327,7 +327,7 @@ const schema = new Schema({
             type: Int,
           },
         },
-        resolve: (_, args) => {
+        resolve: (_nada, args) => {
           const options = {};
           const LIMIT = 9;
           if (args.page) {
@@ -569,7 +569,7 @@ const schema = new Schema({
         args: {
           MAHtoken: { type: Gstring },
         },
-        resolve: (_, args) => {
+        resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
           const { Op } = sequelize;
           return Publication.count({
@@ -587,7 +587,7 @@ const schema = new Schema({
         args: {
           MAHtoken: { type: Gstring },
         },
-        resolve: (_, args) => {
+        resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
           const { Op } = sequelize;
           return Publication.count({
@@ -610,7 +610,7 @@ const schema = new Schema({
         args: {
           id: { type: new NotNull(Int) },
         },
-        resolve: (_, args) => User.findOne({ where: { isAgency: true, id: args.id } })
+        resolve: (_nada, args) => User.findOne({ where: { isAgency: true, id: args.id } })
           .then(agen => agen),
       },
 
@@ -622,7 +622,7 @@ const schema = new Schema({
           MAHtoken: { type: new NotNull(Gstring) },
           page: { type: Int },
         },
-        resolve: (_, args) => {
+        resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
           return User.findById(userId)
             .then((usr) => {

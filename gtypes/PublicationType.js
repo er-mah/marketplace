@@ -102,8 +102,9 @@ const PublicationMutation = {
       year: { type: Int },
       state: { type: Gstring },
       order: { type: Gstring },
+      user_id: { type: Int },
     },
-    resolve: (_, args) => {
+    resolve: (_nada, args) => {
       const result = {};
       const { Op } = sequelize;
       const options = {};
@@ -128,6 +129,11 @@ const PublicationMutation = {
           { fuel: { [Op.like]: args.text } },
           { name: { [Op.like]: args.text } },
         );
+      }
+      if (args.user_id) {
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          user_id: args.user_id,
+        });
       }
       if (args.fuel) {
         options.where[Op.and] = Object.assign(options.where[Op.and], {
@@ -203,7 +209,7 @@ const PublicationMutation = {
       publication_id: { type: Int },
       MAHtoken: { type: Gstring },
     },
-    resolve: (_, args) => {
+    resolve: (_nada, args) => {
       const userID = decode(args.MAHtoken).id;
       return Publication.findOne({
         where: { id: args.publication_id, user_id: userID },
@@ -238,7 +244,7 @@ const PublicationMutation = {
       publication_id: { type: Int },
       MAHtoken: { type: Gstring },
     },
-    resolve: (_, args) => {
+    resolve: (_nada, args) => {
       const userID = decode(args.MAHtoken).id;
       return Publication.findOne({
         where: { id: args.publication_id, user_id: userID },
