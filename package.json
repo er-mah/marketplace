@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrateDev": "node_modules/.bin/sequelize db:create --env test && node_modules/.bin/sequelize db:migrate --env test && node_modules/.bin/sequelize db:seed:all --env test && yarn run dev",
     "migratePG": "node_modules/.bin/sequelize db:migrate --env testpsql && node_modules/.bin/sequelize db:seed:all --env testpsql && yarn run dev",
-    "migrateProd": "node_modules/.bin/sequelize db:migrate --env production && node_modules/.bin/sequelize db:seed:all --env production",
+    "migrateProd": "node_modules/.bin/sequelize db:migrate --env production",
     "dev": "nodemon index.js"
   },
   "repository": {
@@ -36,6 +36,7 @@
     "dotenv": "^4.0.0",
     "eslint": "^4.12.1",
     "express": "^4.16.2",
+    "express-graphql": "^0.6.12",
     "express-jwt": "^5.3.0",
     "graphql": "^0.12.3",
     "graphql-errors": "^2.1.0",

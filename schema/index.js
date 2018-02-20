@@ -35,6 +35,8 @@ const {
   searchPublication,
   markAsSold,
   highlightPublication,
+  aprovePublication,
+  disaprovePublication,
 } = require('../gtypes/PublicationType').PublicationMutation;
 
 const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
@@ -645,6 +647,8 @@ const schema = new Schema({
       addMessage,
       deleteMessage,
       searchPublication,
+      aprovePublication,
+      disaprovePublication,
       markThreadAsReaded,
       modifyUserData,
       updatePassword,

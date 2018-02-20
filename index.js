@@ -4,10 +4,8 @@ const express = require('express');
 const Graphql = require('graphql').graphql;
 const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
-const moment = require('moment');
 
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-
+const { graphiqlExpress } = require('apollo-server-express');
 /* const socketioJwt = require('socketio-jwt'); */
 const cors = require('cors');
 const schema = require('./schema');
@@ -24,6 +22,7 @@ const {
 const multer = require('multer');
 
 const { execute, subscribe } = require('graphql');
+const graphqlHTTP = require('express-graphql');
 const { createServer } = require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 
@@ -63,12 +62,15 @@ app.use(cors());
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+// app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+app.use('/graphql', graphqlHTTP({
+  schema,
+}));
 app.use(
   '/graphiql',
   graphiqlExpress({
     endpointURL: '/graphql',
-    subscriptionsEndpoint: 'ws://localhost:4000/subscriptions',
+    subscriptionsEndpoint: 'wss://api.miautohoy.com/subscriptions',
   }),
 );
 

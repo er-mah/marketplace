@@ -7,6 +7,7 @@ const {
   Publication,
   PublicationState,
   HistoryState,
+  User,
   sequelize,
 } = require('../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
@@ -272,6 +273,99 @@ const PublicationMutation = {
       });
     },
   },
+  aprovePublication: {
+    type: PublicationType,
+    name: 'AprovePublication',
+    args: {
+      MAHtoken: { type: new NotNull(Gstring) },
+      publication_id: { type: new NotNull(Int) },
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return User.findById(userID)
+        .then((usr) => {
+          if (!usr.isAdmin) {
+            throw new UserError('Solo los administradores pueden realizar esta acción.');
+          } else {
+            return Publication.findOne({
+              where: { id: args.publication_id },
+            })
+              .then((pub) => {
+                if (!pub) {
+                  throw new UserError('Esta publicación no existe.');
+                } else {
+                  return pub.getPublicationStates({ through: { where: { active: true } } })
+                    .then((oldPs) => {
+                      if (
+                      oldPs[0].dataValues.stateName === 'Publicada' ||
+                      oldPs[0].dataValues.stateName === 'Destacada' ||
+                      oldPs[0].dataValues.stateName === 'Vendida' ||
+                      oldPs[0].dataValues.stateName === 'Archivada' ||
+                      oldPs[0].dataValues.stateName === 'Vencida' ||
+                      oldPs[0].dataValues.stateName === 'Eliminada' ||
+                      oldPs[0].dataValues.stateName === 'Apto para garantía'
+                      ) {
+                        throw new UserError('Esta publicación ya está activa.');
+                      }
+                      oldPs[0].HistoryState = {
+                        active: false,
+                      };
+                      return PublicationState.findOne({ where: { stateName: 'Publicada' } })
+                        .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                        .then(() => pub);
+                    });
+                }
+              });
+          }
+        });
+    },
+  },
+  disaprovePublication: {
+    type: PublicationType,
+    name: 'AprovePublication',
+    args: {
+      MAHtoken: { type: new NotNull(Gstring) },
+      publication_id: { type: new NotNull(Int) },
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return User.findById(userID)
+        .then((usr) => {
+          if (!usr.isAdmin) {
+            throw new UserError('Solo los administradores pueden realizar esta acción.');
+          } else {
+            return Publication.findOne({
+              where: { id: args.publication_id },
+            })
+              .then((pub) => {
+                if (!pub) {
+                  throw new UserError('Esta publicación no existe.');
+                } else {
+                  return pub.getPublicationStates({ through: { where: { active: true } } })
+                    .then((oldPs) => {
+                      if (oldPs[0].dataValues.stateName === 'Suspendida') {
+                        throw new UserError('Esta publicación ya está suspendida.');
+                      }
+                      if (oldPs[0].dataValues.stateName === 'Vendida') {
+                        throw new UserError('Esta publicación ya ha sido vendida.');
+                      }
+                      if (oldPs[0].dataValues.stateName === 'Vencida') {
+                        throw new UserError('Esta publicación ya está vencida.');
+                      }
+                      oldPs[0].HistoryState = {
+                        active: false,
+                      };
+                      return PublicationState.findOne({ where: { stateName: 'Suspendida' } })
+                        .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                        .then(() => pub);
+                    });
+                }
+              });
+          }
+        });
+    },
+  },
+
 };
 
 module.exports = { PublicationType, PublicationMutation };
