@@ -330,13 +330,23 @@ const createPublication = (req, res) => {
     });
 };
 const registerAgency = (req, res) => {
-  const data = req.body;
-  User.create(data)
-    .then((usr) => {
-      res.status(200).send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
-    })
-    .catch((err) => {
-      res.status(400).send(ResponseObj('error', err));
+  const { data } = req.body;
+  data.isAdmin = false;
+  data.isAgency = true;
+  data.password = User.generateHash(data.password);
+  User.findOne({ where: { email: data.email } })
+    .then((user) => {
+      if (user) {
+        res.status(400).send(ResponseObj('error', 'Ya existe una agencia registrada con ese email.'));
+      } else {
+        User.create(data)
+          .then((usr) => {
+            res.status(200).send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
+          })
+          .catch((err) => {
+            res.status(400).send(ResponseObj('error', err));
+          });
+      }
     });
 };
 const registerUser = (req, res) => {
