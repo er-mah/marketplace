@@ -186,8 +186,8 @@ app.post(
 );
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
-app.get('/registerAgency', registerAgency);
-app.get('/registerUser', registerUser);
+app.post('/registerAgency', registerAgency);
+app.post('/registerUser', registerUser);
 app.post(
   '/uploadAgencyImages/:id',
   upload.fields([

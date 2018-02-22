@@ -340,13 +340,41 @@ const registerAgency = (req, res) => {
     });
 };
 const registerUser = (req, res) => {
-  const data = req.body;
-  User.create(data)
+  const { data } = req.body;
+  data.isAdmin = false;
+  data.isAgency = false;
+  data.password = User.generateHash(data.password);
+  split(data).map((obj) => {
+    if (obj.value === '' || obj.value === null || obj.value === undefined) {
+      let field = '';
+      switch (obj.key) {
+        case 'name': field = 'Nombre y apellido';
+          break;
+        case 'phone': field = 'Teléfono';
+          break;
+        case 'address': field = 'Dirección';
+          break;
+        case 'password': field = 'Contraseña';
+          break;
+        default: field = obj.key;
+      }
+      res.status(400).send(ResponseObj('error', `Por favor complete el campo ${field}.`));
+      return false;
+    }
+  });
+  User.findOne({ where: { email: data.email } })
     .then((usr) => {
-      res.status(200).send(ResponseObj('ok', 'Usuario registrado con éxito', usr));
-    })
-    .catch((err) => {
-      res.status(400).send(ResponseObj('error', err));
+      if (usr) {
+        res.status(400).send(ResponseObj('error', 'Ya existe un usuario registrado con ese email.'));
+      } else {
+        User.create(data)
+          .then((user) => {
+            res.status(200).send(ResponseObj('ok', 'Usuario registrado con éxito', user));
+          })
+          .catch((err) => {
+            res.status(400).send(ResponseObj('error', err));
+          });
+      }
     });
 };
 const uploadAgencyImages = (req, res) => {
@@ -419,6 +447,7 @@ const getFiltersAndTotalResult = (req, res) => {
         where: {
           stateName: state,
         },
+        through: { where: { active: true } },
       },
       { model: User }];
   }
@@ -488,8 +517,8 @@ const getSoldPublications = (req, res) => {
         where: {
           stateName: 'Vendida',
         },
+        through: { where: { active: true } },
       }],
-    order: [sequelize.col('`PublicationStates->HistoryState`.`createdAt`')],
 
   }).then((results) => {
     const vendidos = {};
