@@ -104,6 +104,7 @@ const PublicationMutation = {
       state: { type: Gstring },
       order: { type: Gstring },
       user_id: { type: Int },
+      userType: { type: Gstring },
     },
     resolve: (_nada, args) => {
       const result = {};
@@ -170,7 +171,6 @@ const PublicationMutation = {
           carState: args.carState,
         });
       }
-
       if (args.state === 'Activas') {
         options.include = [
           {
@@ -187,6 +187,24 @@ const PublicationMutation = {
           },
         ];
       }
+      if (args.userType) {
+        if (args.userType === 'Agencia') {
+          options.include = [
+            {
+              model: User,
+              where: { isAgency: true, isAdmin: false },
+            },
+          ];
+        } else {
+          options.include = [
+            {
+              model: User,
+              where: { isAgency: false, isAdmin: false },
+            },
+          ];
+        }
+      }
+
       return Publication.count(options)
         .then((count) => {
           if (count < 9) {
@@ -297,7 +315,7 @@ const PublicationMutation = {
                   return pub.getPublicationStates({ through: { where: { active: true } } })
                     .then((oldPs) => {
                       if (
-                      oldPs[0].dataValues.stateName === 'Publicada' ||
+                        oldPs[0].dataValues.stateName === 'Publicada' ||
                       oldPs[0].dataValues.stateName === 'Destacada' ||
                       oldPs[0].dataValues.stateName === 'Vendida' ||
                       oldPs[0].dataValues.stateName === 'Archivada' ||
