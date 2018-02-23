@@ -355,6 +355,46 @@ const schema = new Schema({
           },
         }), */
       },
+      AllUsersMails: {
+        type: SearchUserResultType,
+        args: {
+          limit: {
+            type: Int,
+          },
+          order: {
+            type: Gstring,
+          },
+          page: {
+            type: Int,
+          },
+        },
+        resolve: (_nada, args) => {
+          const options = {};
+          const LIMIT = 9;
+          options.attributes=['email', 'id', 'isAdmin'];
+          if (args.page) {
+            options.limit = LIMIT;
+            options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+          }
+          return User.findAndCountAll(options)
+            .then((res) => {
+              const result = {};
+              result.hasNextPage = res.count > res.rows.length && res.rows.length !== 0;
+              result.totalCount = res.count;
+              result.Users = res.rows;
+              return result;
+            });
+        }, /* resolver(User, {
+          before: (options, args) => {
+            const LIMIT = 9;
+            if (args.page) {
+              options.limit = LIMIT;
+              options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+            }
+            return options;
+          },
+        }), */
+      },
       Publication: {
         type: PublicationType,
         args: {

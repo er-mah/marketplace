@@ -196,8 +196,16 @@ const createPublication = (req, res) => {
   const imageGroup = req.files;
   const imageData = {};
   let userId = null;
+  let isAdmin = false;
   if (req.headers.authorization) {
     userId = decode(req.headers.authorization.slice(7)).id;
+    User.findById(userId)
+      .then((usr) => {
+        if (usr.isAdmin) {
+          isAdmin = true;
+          userId = req.body.dataPublication.userId;
+        }
+      });
   }
   let fuel;
   switch (Combustible) {
@@ -303,7 +311,7 @@ const createPublication = (req, res) => {
         },
       ).then((publication) => {
         PublicationState.findOne({
-          where: { stateName: 'Pendiente' },
+          where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
         }).then((ps) => {
           publication.setPublicationStates(ps, { through: { active: true } });
           res.status(200).send({
@@ -424,7 +432,7 @@ const getFiltersAndTotalResult = (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state,
+    carState, fuel, year, state, userType,
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -461,6 +469,23 @@ const getFiltersAndTotalResult = (req, res) => {
       },
       { model: User }];
   }
+  if (userType) {
+    if (userType === 'Agencia') {
+      options.include = [
+        {
+          model: User,
+          where: { isAgency: true, isAdmin: false },
+        },
+      ];
+    } else {
+      options.include = [
+        {
+          model: User,
+          where: { isAgency: false, isAdmin: false },
+        },
+      ];
+    }
+  }
 
   Publication.findAll(options)
     .then((results) => {
@@ -471,6 +496,7 @@ const getFiltersAndTotalResult = (req, res) => {
       newObj.fuel = {};
       newObj.year = {};
       newObj.state = {};
+      newObj.userType = {};
       results.map(({ dataValues }) => {
         split(dataValues).map((row) => {
           if (
@@ -483,6 +509,11 @@ const getFiltersAndTotalResult = (req, res) => {
           if (row.key === 'PublicationStates') {
             row.key = 'state';
             row.value = _.last(row.value).dataValues.stateName;
+            newObj[row.key][row.value] = 0;
+          }
+          if (row.key === 'User') {
+            row.key = 'userType';
+            row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
             newObj[row.key][row.value] = 0;
           }
           return newObj;
@@ -498,6 +529,11 @@ const getFiltersAndTotalResult = (req, res) => {
           if (row.key === 'PublicationStates') {
             row.key = 'state';
             row.value = _.last(row.value).dataValues.stateName;
+            newObj[row.key][row.value] += 1;
+          }
+          if (row.key === 'User') {
+            row.key = 'userType';
+            row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
             newObj[row.key][row.value] += 1;
           }
           switch (row.key) {
