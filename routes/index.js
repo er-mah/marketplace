@@ -2,7 +2,7 @@ const jsonwt = require('jsonwebtoken');
 const { split } = require('split-object');
 const decode = require('jwt-decode');
 const moment = require('moment');
-
+const sharp = require('sharp');
 const {
   User,
   Publication,
@@ -12,6 +12,7 @@ const {
   sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
+const fs = require('fs');
 // Helper
 const ResponseObj = (status, message, data) => ({ status, message, data });
 //-----------------
@@ -37,8 +38,14 @@ const login = (req, res) => {
         return false;
       }
       let userType;
-      if (user.agencyName) { userType = 'Agencia'; } else { userType = 'Usuario'; }
-      if (user.isAdmin) { userType = 'Admin'; }
+      if (user.agencyName) {
+        userType = 'Agencia';
+      } else {
+        userType = 'Usuario';
+      }
+      if (user.isAdmin) {
+        userType = 'Admin';
+      }
       const MAHtoken = jsonwt.sign(
         {
           id: user.id,
@@ -92,8 +99,14 @@ const loginAdmin = (req, res) => {
         return false;
       }
       let userType;
-      if (user.agencyName) { userType = 'Agencia'; } else { userType = 'Usuario'; }
-      if (user.isAdmin) { userType = 'Admin'; }
+      if (user.agencyName) {
+        userType = 'Agencia';
+      } else {
+        userType = 'Usuario';
+      }
+      if (user.isAdmin) {
+        userType = 'Admin';
+      }
       const MAHtoken = jsonwt.sign(
         {
           id: user.id,
@@ -121,13 +134,27 @@ const loginAdmin = (req, res) => {
         message: error,
       }));
 };
-const createPublication = (req, res) => {
-  req.body.dataPublication = JSON.parse(req.body.dataPublication);
-  split(req.body.dataPublication).map((row) => {
-    if (req.body.dataPublication[row.key] === 'SI') req.body.dataPublication[row.key] = true;
-    if (req.body.dataPublication[row.key] === 'NO') req.body.dataPublication[row.key] = false;
-  });
 
+const removeOldFile = (file) => {
+  fs.unlinkSync(`./images/${file.filename}`);
+};
+
+const optimizeImage = file => sharp(`./images/${file.filename}`)
+  .resize(752, 500)
+  .toFile(`./images/opt-${file.filename}`)
+  .then(() => removeOldFile(file));
+
+const prepareArrayToSharp = (imageGroup) => {
+  const promiseArray = imageGroup.map(file => optimizeImage(file));
+  return promiseArray;
+};
+
+const createPublication = (req, res) => {
+  split(req.body).map((row) => {
+    if (req.body[row.key] === 'SI') req.body[row.key] = true;
+    if (req.body[row.key] === 'NO') req.body[row.key] = false;
+    if (req.body[row.key] === '.') req.body[row.key] = false;
+  });
   const {
     brand,
     group,
@@ -192,149 +219,150 @@ const createPublication = (req, res) => {
     Bluetooth,
     AsientosTermicos,
     RunFlat,
-  } = req.body.dataPublication;
+  } = req.body;
   const imageGroup = req.files;
+  if (imageGroup.length === 0) {
+    res.status(400).send('Por favor elija aunque sea una imágen');
+    return false;
+  }
   const imageData = {};
   let userId = null;
   let isAdmin = false;
   if (req.headers.authorization) {
     userId = decode(req.headers.authorization.slice(7)).id;
-    User.findById(userId)
-      .then((usr) => {
-        if (usr.isAdmin) {
-          isAdmin = true;
-          userId = req.body.dataPublication.userId;
-        }
-      });
+    User.findById(userId).then((usr) => {
+      if (usr.isAdmin) {
+        isAdmin = true;
+        userId = req.body.userId;
+      }
+    });
   }
   let fuel;
   switch (Combustible) {
-    case 'NAF': fuel = 'Nafta';
+    case 'NAF':
+      fuel = 'Nafta';
       break;
-    case 'DSL': fuel = 'Diesel';
+    case 'DSL':
+      fuel = 'Diesel';
       break;
-    case 'GNC': fuel = 'GNC';
+    case 'GNC':
+      fuel = 'GNC';
       break;
-    default: fuel = 'No especificado';
+    default:
+      fuel = 'No especificado';
   }
-
-  for (let i = 0; i < imageGroup.length; i += 1) {
-    const objectName = `image${i + 1}`;
-    imageData[objectName] = imageGroup[i].filename;
-  }
-  if (!email && !userId) {
-    res.status(400).send({
-      status: 'error',
-      message: 'Datos incompletos (faltan datos de contacto)',
-    });
-    return false;
-  }
-  return ImageGroup.create(imageData)
-    .then((resp) => {
-      Publication.create(
-        {
-          brand,
-          group,
-          modelName,
-          kms,
-          price,
-          year,
-          fuel,
-          observation,
-          carState,
-          codia,
-          imageGroup_id: resp.id,
-          name,
-          email,
-          phone,
-          user_id: userId,
-          publicationDetail: {
-            Alimentacion,
-            Motor,
-            Puertas,
-            Clasificacion,
-            Cabina,
-            Carga,
-            PesoTotal,
-            VelocidadMax,
-            Potencia,
-            Direccion,
-            AireAcondicionado,
-            Traccion,
-            Importado,
-            Caja,
-            FrenosAbs,
-            Airbag,
-            Climatizador,
-            FarosAntiniebla,
-            TechoCorredizo,
-            SensorEstacionamiento,
-            AirbagLateral,
-            AirbagCabezaConductor,
-            AirbagCortina,
-            AirbagRodilla,
-            FijacionISOFIX,
-            ControlDeTraccion,
-            ControlDeEstabilidad,
-            ControlDeDescenso,
-            SistemaArranqueEnPendiente,
-            ControlDinamicoConduccion,
-            BloqueoDiferencial,
-            RepartidorElectronicoDeFrenado,
-            AsistenteDeFrenadoEmergencia,
-            ReguladorParFrenado,
-            Largo,
-            Ancho,
-            Alto,
-            TapizadoCuero,
-            AsientosElectronicos,
-            ComputadoraABordo,
-            FarosDeXenon,
-            LLantasDeAleacion,
-            TechoPanoramico,
-            SensorDeLluvia,
-            SensorCrepuscular,
-            IndicadorPresionNeumaticos,
-            VolanteConLevas,
-            Bluetooth,
-            AsientosTermicos,
-            RunFlat,
-          },
-        },
-        {
-          include: [
+  Promise.all(prepareArrayToSharp(imageGroup))
+    .then(() => {
+      for (let i = 0; i < imageGroup.length; i += 1) {
+        const objectName = `image${i + 1}`;
+        imageData[objectName] = `opt-${imageGroup[i].filename}`;
+      }
+      if (!email && !userId) {
+        res.status(400).send('Datos incompletos (faltan datos de contacto)');
+        return false;
+      }
+      return ImageGroup.create(imageData)
+        .then((resp) => {
+          Publication.create(
             {
-              model: PublicationDetail,
-              as: 'publicationDetail',
+              brand,
+              group,
+              modelName,
+              kms,
+              price,
+              year,
+              fuel,
+              observation,
+              carState,
+              codia,
+              imageGroup_id: resp.id,
+              name,
+              email,
+              phone,
+              user_id: userId,
+              publicationDetail: {
+                Alimentacion,
+                Motor,
+                Puertas,
+                Clasificacion,
+                Cabina,
+                Carga,
+                PesoTotal,
+                VelocidadMax,
+                Potencia,
+                Direccion,
+                AireAcondicionado,
+                Traccion,
+                Importado,
+                Caja,
+                FrenosAbs,
+                Airbag,
+                Climatizador,
+                FarosAntiniebla,
+                TechoCorredizo,
+                SensorEstacionamiento,
+                AirbagLateral,
+                AirbagCabezaConductor,
+                AirbagCortina,
+                AirbagRodilla,
+                FijacionISOFIX,
+                ControlDeTraccion,
+                ControlDeEstabilidad,
+                ControlDeDescenso,
+                SistemaArranqueEnPendiente,
+                ControlDinamicoConduccion,
+                BloqueoDiferencial,
+                RepartidorElectronicoDeFrenado,
+                AsistenteDeFrenadoEmergencia,
+                ReguladorParFrenado,
+                Largo,
+                Ancho,
+                Alto,
+                TapizadoCuero,
+                AsientosElectronicos,
+                ComputadoraABordo,
+                FarosDeXenon,
+                LLantasDeAleacion,
+                TechoPanoramico,
+                SensorDeLluvia,
+                SensorCrepuscular,
+                IndicadorPresionNeumaticos,
+                VolanteConLevas,
+                Bluetooth,
+                AsientosTermicos,
+                RunFlat,
+              },
             },
-          ],
-        },
-      ).then((publication) => {
-        PublicationState.findOne({
-          where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
-        }).then((ps) => {
-          publication.setPublicationStates(ps, { through: { active: true } });
-          res.status(200).send({
-            status: 'ok',
-            message:
-                  'Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy',
-            data: publication,
+            {
+              include: [
+                {
+                  model: PublicationDetail,
+                  as: 'publicationDetail',
+                },
+              ],
+            },
+          ).then((publication) => {
+            PublicationState.findOne({
+              where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+            }).then((ps) => {
+              publication.setPublicationStates(ps, { through: { active: true } });
+              res
+                .status(200)
+                .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
+            });
           });
+        })
+        .catch((e) => {
+          res.status(400).send(e);
+          console.log(e);
+        })
+        .catch(() => {
+          res.status(400).send('No existe un usuario con ese id');
         });
-      });
     })
-    .catch((e) => {
-      res.status(400).send({
-        status: 'error',
-        e,
-      });
-      console.log(e);
-    })
-    .catch(() => {
-      res.status(400).send({
-        status: 'error',
-        error: 'No existe un usuario con ese id',
-      });
+    .catch((err) => {
+      res.status(400).send(`Ocurrio un error al subir las imágenes. ${err}`);
+      return false;
     });
 };
 const registerAgency = (req, res) => {
@@ -342,20 +370,26 @@ const registerAgency = (req, res) => {
   data.isAdmin = false;
   data.isAgency = true;
   data.password = User.generateHash(data.password);
-  User.findOne({ where: { email: data.email } })
-    .then((user) => {
-      if (user) {
-        res.status(400).send(ResponseObj('error', 'Ya existe una agencia registrada con ese email.'));
-      } else {
-        User.create(data)
-          .then((usr) => {
-            res.status(200).send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
-          })
-          .catch((err) => {
-            res.status(400).send(ResponseObj('error', err));
-          });
-      }
-    });
+  User.findOne({ where: { email: data.email } }).then((user) => {
+    if (user) {
+      res
+        .status(400)
+        .send(ResponseObj(
+          'error',
+          'Ya existe una agencia registrada con ese email.',
+        ));
+    } else {
+      User.create(data)
+        .then((usr) => {
+          res
+            .status(200)
+            .send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
+        })
+        .catch((err) => {
+          res.status(400).send(ResponseObj('error', err));
+        });
+    }
+  });
 };
 const registerUser = (req, res) => {
   const { data } = req.body;
@@ -366,34 +400,44 @@ const registerUser = (req, res) => {
     if (obj.value === '' || obj.value === null || obj.value === undefined) {
       let field = '';
       switch (obj.key) {
-        case 'name': field = 'Nombre y apellido';
+        case 'name':
+          field = 'Nombre y apellido';
           break;
-        case 'phone': field = 'Teléfono';
+        case 'phone':
+          field = 'Teléfono';
           break;
-        case 'address': field = 'Dirección';
+        case 'address':
+          field = 'Dirección';
           break;
-        case 'password': field = 'Contraseña';
+        case 'password':
+          field = 'Contraseña';
           break;
-        default: field = obj.key;
+        default:
+          field = obj.key;
       }
-      res.status(400).send(ResponseObj('error', `Por favor complete el campo ${field}.`));
+      res
+        .status(400)
+        .send(ResponseObj('error', `Por favor complete el campo ${field}.`));
       return false;
     }
   });
-  User.findOne({ where: { email: data.email } })
-    .then((usr) => {
-      if (usr) {
-        res.status(400).send(ResponseObj('error', 'Ya existe un usuario registrado con ese email.'));
-      } else {
-        User.create(data)
-          .then((user) => {
-            res.status(200).send(ResponseObj('ok', 'Usuario registrado con éxito', user));
-          })
-          .catch((err) => {
-            res.status(400).send(ResponseObj('error', err));
-          });
-      }
-    });
+  User.findOne({ where: { email: data.email } }).then((usr) => {
+    if (usr) {
+      res
+        .status(400)
+        .send(ResponseObj('error', 'Ya existe un usuario registrado con ese email.'));
+    } else {
+      User.create(data)
+        .then((user) => {
+          res
+            .status(200)
+            .send(ResponseObj('ok', 'Usuario registrado con éxito', user));
+        })
+        .catch((err) => {
+          res.status(400).send(ResponseObj('error', err));
+        });
+    }
+  });
 };
 const uploadAgencyImages = (req, res) => {
   const { profileImage, bannerImage } = req.files;
@@ -467,7 +511,8 @@ const getFiltersAndTotalResult = (req, res) => {
         },
         through: { where: { active: true } },
       },
-      { model: User }];
+      { model: User },
+    ];
   }
   if (userType) {
     if (userType === 'Agencia') {
@@ -487,69 +532,70 @@ const getFiltersAndTotalResult = (req, res) => {
     }
   }
 
-  Publication.findAll(options)
-    .then((results) => {
-      if (results === null) {
-        results = {};
-      }
-      const newObj = {};
-      newObj.fuel = {};
-      newObj.year = {};
-      newObj.state = {};
-      newObj.userType = {};
-      results.map(({ dataValues }) => {
-        split(dataValues).map((row) => {
-          if (
-            row.key === 'fuel' ||
-                row.key === 'year' ||
-                row.key === 'state'
-          ) {
-            newObj[row.key][row.value] = 0;
-          }
-          if (row.key === 'PublicationStates') {
-            row.key = 'state';
-            row.value = _.last(row.value).dataValues.stateName;
-            newObj[row.key][row.value] = 0;
-          }
-          if (row.key === 'User') {
-            row.key = 'userType';
-            row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
-            newObj[row.key][row.value] = 0;
-          }
-          return newObj;
-        });
+  Publication.findAll(options).then((results) => {
+    if (results === null) {
+      results = {};
+    }
+    const newObj = {};
+    newObj.fuel = {};
+    newObj.year = {};
+    newObj.state = {};
+    newObj.userType = {};
+    results.map(({ dataValues }) => {
+      split(dataValues).map((row) => {
+        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state') {
+          newObj[row.key][row.value] = 0;
+        }
+        if (row.key === 'PublicationStates') {
+          row.key = 'state';
+          row.value = _.last(row.value).dataValues.stateName;
+          newObj[row.key][row.value] = 0;
+        }
+        if (row.key === 'User') {
+          row.key = 'userType';
+          row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
+          newObj[row.key][row.value] = 0;
+        }
+        return newObj;
       });
-      if (results.length < LIMIT) {
-        hasNextPage = false;
-      } else {
-        hasNextPage = true;
-      }
-      results.map(({ dataValues }) => {
-        split(dataValues).map((row) => {
-          if (row.key === 'PublicationStates') {
-            row.key = 'state';
-            row.value = _.last(row.value).dataValues.stateName;
-            newObj[row.key][row.value] += 1;
-          }
-          if (row.key === 'User') {
-            row.key = 'userType';
-            row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
-            newObj[row.key][row.value] += 1;
-          }
-          switch (row.key) {
-            case 'fuel':
-              newObj[row.key][row.value] += 1;
-              break;
-            case 'year':
-              newObj[row.key][row.value] += 1;
-              break;
-            default:
-              return '';
-          }
-        });
-      });
-      res.status(200).send(ResponseObj('ok', null, { filters: newObj, totalResults: results.length, hasNextPage }));
     });
+    if (results.length < LIMIT) {
+      hasNextPage = false;
+    } else {
+      hasNextPage = true;
+    }
+    results.map(({ dataValues }) => {
+      split(dataValues).map((row) => {
+        if (row.key === 'PublicationStates') {
+          row.key = 'state';
+          row.value = _.last(row.value).dataValues.stateName;
+          newObj[row.key][row.value] += 1;
+        }
+        if (row.key === 'User') {
+          row.key = 'userType';
+          row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
+          newObj[row.key][row.value] += 1;
+        }
+        switch (row.key) {
+          case 'fuel':
+            newObj[row.key][row.value] += 1;
+            break;
+          case 'year':
+            newObj[row.key][row.value] += 1;
+            break;
+          default:
+            return '';
+        }
+      });
+    });
+    res
+      .status(200)
+      .send(ResponseObj('ok', null, {
+        filters: newObj,
+        totalResults: results.length,
+        hasNextPage,
+      }));
+  });
 };
 const getSoldPublications = (req, res) => {
   const userId = decode(req.headers.authorization.slice(7)).id;
@@ -564,8 +610,8 @@ const getSoldPublications = (req, res) => {
           stateName: 'Vendida',
         },
         through: { where: { active: true } },
-      }],
-
+      },
+    ],
   }).then((results) => {
     const vendidos = {};
     results.map((result) => {
@@ -580,5 +626,12 @@ const getSoldPublications = (req, res) => {
   });
 };
 module.exports = {
-  login, loginAdmin, createPublication, uploadAgencyImages, getFiltersAndTotalResult, getSoldPublications, registerAgency, registerUser,
+  login,
+  loginAdmin,
+  createPublication,
+  uploadAgencyImages,
+  getFiltersAndTotalResult,
+  getSoldPublications,
+  registerAgency,
+  registerUser,
 };

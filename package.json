@@ -54,6 +54,7 @@
     "sequelize": "^4.23.4",
     "sequelize-auto": "^0.4.29",
     "sequelize-cli": "^3.1.0",
+    "sharp": "^0.19.1",
     "socket.io": "^2.0.4",
     "socketio-jwt": "^4.5.0",
     "split-object": "^2.1.1",

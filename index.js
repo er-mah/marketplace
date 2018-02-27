@@ -26,7 +26,31 @@ const graphqlHTTP = require('express-graphql');
 const { createServer } = require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 
-const upload = multer({ dest: './images' });
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, './images');
+  },
+  filename: (req, file, cb) => {
+    let ext;
+    // Mimetype stores the file type, set extensions according to filetype
+    switch (file.mimetype) {
+      case 'image/jpeg':
+        ext = '.jpg';
+        break;
+      case 'image/png':
+        ext = '.png';
+        break;
+      case 'image/gif':
+        ext = '.gif';
+        break;
+      default: ext = '';
+    }
+    cb(null, file.originalname.slice(0, 9) + Date.now() + ext);
+  },
+});
+const upload = multer({
+  storage,
+});
 const app = express();
 
 // ************* PLAYGROUND ****************\
