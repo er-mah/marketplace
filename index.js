@@ -127,9 +127,11 @@ const httpGraphQLHandler = (req, res) => {
 };
 app.post('/', httpGraphQLHandler);
 app.use('/images', express.static(`${__dirname}/images`));
+app.use('/logo', express.static(`${__dirname}/mails/logo.png`));
 
 app.use(jwt({ secret: 'MAH2018!#' }).unless({
   path: [
+    '/logo',
     '/subscriptions',
     '/graphql',
     '/login',

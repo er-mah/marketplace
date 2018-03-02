@@ -28,6 +28,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/mfliri_ao/apicinesis#readme",
   "dependencies": {
+    "@sendgrid/mail": "^6.2.1",
     "apollo-server-express": "^1.3.2",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.18.2",

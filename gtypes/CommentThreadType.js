@@ -14,6 +14,11 @@ const {
 } = require('../models').mah;
 /* eslint camelcase: 0 */
 const pubsub = new PubSub();
+const { generateMailAgenciaoParticular, generateSinRegistro } = require('../mails');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const miautoEmail = 'contacto@miautohoy.com';
 
 const {
   GraphQLString: Gstring,
@@ -79,6 +84,40 @@ const CommentThreadMutations = {
                   }],
                 })
                   .then((cmt) => {
+                    if (!pub.user_id) {
+                      const data = {
+                        name: usr.name,
+                        email: usr.email,
+                        brand: pub.brand,
+                        modelName: pub.modelName,
+                        content,
+                        id: pub.id,
+                      };
+                      const msg = {
+                        to: pub.email,
+                        from: miautoEmail,
+                        subject: `${usr.name} te ha consultado!`,
+                        html: generateSinRegistro(data, 'newCT'),
+                      };
+                      sgMail.send(msg);
+                    } else {
+                      User.findById(pub.user_id, { attributes: ['email'] })
+                        .then((pubUser) => {
+                          const data = {
+                            name: usr.name,
+                            brand: pub.brand,
+                            modelName: pub.modelName,
+                            ct_id: cmt.id,
+                          };
+                          const msg = {
+                            to: pubUser.email,
+                            from: miautoEmail,
+                            subject: `${usr.name} te ha consultado!`,
+                            html: generateMailAgenciaoParticular(data, 'newCT'),
+                          };
+                          sgMail.send(msg);
+                        });
+                    }
                     pubsub.publish('threadAdded', { threadAdded: cmt, user_id: cmt.participant2_id });
                     return cmt;
                   });
@@ -103,8 +142,44 @@ const CommentThreadMutations = {
             }],
           })
             .then((cmt) => {
-              pubsub.publish('threadAdded', { threadAdded: cmt, user_id: cmt.participant2_id });
-              return cmt;
+              User.findById(pub.user_id, { attributes: ['email'] })
+                .then((pubUser) => {
+                  if (!pubUser) {
+                    const data = {
+                      name: jwtDecode(chatToken).name,
+                      email: jwtDecode(chatToken).email,
+                      brand: pub.brand,
+                      modelName: pub.modelName,
+                      content,
+                      id: pub.id,
+                    };
+                    const msg = {
+                      to: pub.email,
+                      from: miautoEmail,
+                      subject: `${jwtDecode(chatToken).name} te ha consultado!`,
+                      html: generateSinRegistro(data, 'newCT'),
+                    };
+                    sgMail.send(msg);
+                  } else {
+                    const data = {
+                      name: jwtDecode(chatToken).name,
+                      email: jwtDecode(chatToken).email,
+                      brand: pub.brand,
+                      modelName: pub.modelName,
+                      ct_id: cmt.id,
+                    };
+                    const msg = {
+                      to: pubUser.email,
+                      from: miautoEmail,
+                      subject: `${jwtDecode(chatToken).name} te ha consultado!`,
+                      html: generateMailAgenciaoParticular(data, 'newCT'),
+                    };
+                    sgMail.send(msg)
+                      .catch(err => console.log(err));
+                  }
+                  pubsub.publish('threadAdded', { threadAdded: cmt, user_id: cmt.participant2_id });
+                  return cmt;
+                });
             });
         }),
   },

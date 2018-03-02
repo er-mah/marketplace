@@ -13,9 +13,19 @@ const {
 } = require('../models').mah;
 const _ = require('lodash');
 const fs = require('fs');
+
+const { generateMailAgenciaoParticular } = require('../mails');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const miautoEmail = 'contacto@miautohoy.com';
 // Helper
 const ResponseObj = (status, message, data) => ({ status, message, data });
 //-----------------
+
+
+// using SendGrid's v3 Node.js Library
+// https://github.com/sendgrid/sendgrid-nodejs
 
 const login = (req, res) => {
   const { email, password } = req.body;
@@ -384,6 +394,13 @@ const registerAgency = (req, res) => {
           res
             .status(200)
             .send(ResponseObj('ok', 'Agencia registrada con éxito', usr));
+          const msg = {
+            to: data.email,
+            from: miautoEmail,
+            subject: 'Bienvenido a Mi auto hoy!',
+            html: generateMailAgenciaoParticular(data, 'newAccount'),
+          };
+          sgMail.send(msg);
         })
         .catch((err) => {
           res.status(400).send(ResponseObj('error', err));
@@ -432,6 +449,13 @@ const registerUser = (req, res) => {
           res
             .status(200)
             .send(ResponseObj('ok', 'Usuario registrado con éxito', user));
+          const msg = {
+            to: data.email,
+            from: miautoEmail,
+            subject: 'Bienvenido a Mi auto hoy!',
+            html: generateMailAgenciaoParticular(data, 'newAccount'),
+          };
+          sgMail.send(msg);
         })
         .catch((err) => {
           res.status(400).send(ResponseObj('error', err));
