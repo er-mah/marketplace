@@ -53,6 +53,12 @@ const generateMailAgenciaoParticular = (data, tipoMail) => {
       body = 'Te avisaremos cuando un comprador quiera comunicarse con vos mediante una pregunta.<br /> Es importante que estés atento a dar tu respuesta para alcanzar una compra.';
       break;
     }
+    case 'disapprovedPublication': {
+      saludo = `Hola ${data.name}`;
+      intro = `Lamentablemente tu publicación: ${data.brand} - ${data.modelName} ha sido rechazada.`;
+      body = `La publicación de ${data.brand} ha sido rechazada y pasada a estado Suspendida por el siguiente motivo: <br> <strong>${data.reason}</strong>`;
+      break;
+    }
     default: return '';
   }
   return `
@@ -161,6 +167,12 @@ const generateSinRegistro = (data, tipoMail) => {
       saludo = `Hola ${data.name}`;
       intro = `<strong>¡Felicitaciones!</strong> tu vehículo ${data.brand} - ${data.modelName} ha sido publicado.`;
       body = 'Te avisaremos cuando un comprador quiera comunicarse con vos mediante una pregunta.<br /> Es importante que estés atento a dar tu respuesta para alcanzar una compra. <br /> <p>Registrate en <strong> Mi auto hoy </strong> y podras disfrutar el beneficio de poder administrar y llevar cuenta de todas las consultas que recibas.</p>';
+      break;
+    }
+    case 'disapprovedPublication': {
+      saludo = `Hola ${data.name}`;
+      intro = `Lamentablemente tu publicación: ${data.brand} - ${data.modelName} ha sido rechazada.`;
+      body = `La publicación de ${data.brand} ha sido rechazada y eliminada por el siguiente motivo: <br> <strong>${data.reason}</strong>`;
       break;
     }
     default: { return ''; }

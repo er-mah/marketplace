@@ -379,6 +379,7 @@ const PublicationMutation = {
     args: {
       MAHtoken: { type: new NotNull(Gstring) },
       publication_id: { type: new NotNull(Int) },
+      reason: { type: new NotNull(Gstring) },
     },
     resolve: (_nada, args) => {
       const userID = decode(args.MAHtoken).id;
@@ -408,6 +409,38 @@ const PublicationMutation = {
                       oldPs[0].HistoryState = {
                         active: false,
                       };
+                      if (pub.email && pub.name) {
+                        const data = {
+                          name: pub.name,
+                          brand: pub.brand,
+                          modelName: pub.modelName,
+                          reason: args.reason,
+                        };
+                        const msg = {
+                          to: pub.email,
+                          from: miautoEmail,
+                          subject: 'Publicación desaprobada',
+                          html: generateSinRegistro(data, 'disapprovedPublication'),
+                        };
+                        sgMail.send(msg);
+                      } else {
+                        User.findById(pub.user_id)
+                          .then((us) => {
+                            const data = {
+                              name: us.name,
+                              brand: pub.brand,
+                              modelName: pub.modelName,
+                              reason: args.reason,
+                            };
+                            const msg = {
+                              to: us.email,
+                              from: miautoEmail,
+                              subject: 'Publicación desaprobada',
+                              html: generateMailAgenciaoParticular(data, 'disapprovedPublication'),
+                            };
+                            sgMail.send(msg);
+                          });
+                      }
                       return PublicationState.findOne({ where: { stateName: 'Suspendida' } })
                         .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
                         .then(() => pub);
