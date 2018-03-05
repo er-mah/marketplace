@@ -14,7 +14,7 @@ const {
 const _ = require('lodash');
 const fs = require('fs');
 
-const { generateMailAgenciaoParticular } = require('../mails');
+const { generateMailAgenciaoParticular, generateSinRegistro } = require('../mails');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -144,11 +144,9 @@ const loginAdmin = (req, res) => {
         message: error,
       }));
 };
-
 const removeOldFile = (file) => {
   fs.unlinkSync(`./images/${file.filename}`);
 };
-
 const optimizeImage = file => sharp(`./images/${file.filename}`)
   .resize(752, 500)
   .toFile(`./images/opt-${file.filename}`)
@@ -238,12 +236,18 @@ const createPublication = (req, res) => {
   const imageData = {};
   let userId = null;
   let isAdmin = false;
+  let userMail = '';
   if (req.headers.authorization) {
     userId = decode(req.headers.authorization.slice(7)).id;
     User.findById(userId).then((usr) => {
       if (usr.isAdmin) {
         isAdmin = true;
         userId = req.body.userId;
+        User.findById(userId)
+          .then((us) => { userMail = us.dataValues.email; });
+      } else {
+        User.findById(userId)
+          .then((us) => { userMail = us.dataValues.email; });
       }
     });
   }
@@ -271,105 +275,230 @@ const createPublication = (req, res) => {
         res.status(400).send('Datos incompletos (faltan datos de contacto)');
         return false;
       }
-      return ImageGroup.create(imageData)
-        .then((resp) => {
-          Publication.create(
-            {
-              brand,
-              group,
-              modelName,
-              kms,
-              price,
-              year,
-              fuel,
-              observation,
-              carState,
-              codia,
-              imageGroup_id: resp.id,
-              name,
-              email,
-              phone,
-              user_id: userId,
-              publicationDetail: {
-                Alimentacion,
-                Motor,
-                Puertas,
-                Clasificacion,
-                Cabina,
-                Carga,
-                PesoTotal,
-                VelocidadMax,
-                Potencia,
-                Direccion,
-                AireAcondicionado,
-                Traccion,
-                Importado,
-                Caja,
-                FrenosAbs,
-                Airbag,
-                Climatizador,
-                FarosAntiniebla,
-                TechoCorredizo,
-                SensorEstacionamiento,
-                AirbagLateral,
-                AirbagCabezaConductor,
-                AirbagCortina,
-                AirbagRodilla,
-                FijacionISOFIX,
-                ControlDeTraccion,
-                ControlDeEstabilidad,
-                ControlDeDescenso,
-                SistemaArranqueEnPendiente,
-                ControlDinamicoConduccion,
-                BloqueoDiferencial,
-                RepartidorElectronicoDeFrenado,
-                AsistenteDeFrenadoEmergencia,
-                ReguladorParFrenado,
-                Largo,
-                Ancho,
-                Alto,
-                TapizadoCuero,
-                AsientosElectronicos,
-                ComputadoraABordo,
-                FarosDeXenon,
-                LLantasDeAleacion,
-                TechoPanoramico,
-                SensorDeLluvia,
-                SensorCrepuscular,
-                IndicadorPresionNeumaticos,
-                VolanteConLevas,
-                Bluetooth,
-                AsientosTermicos,
-                RunFlat,
-              },
-            },
-            {
-              include: [
+      if (email) {
+        Publication.findOne({ where: { email } })
+          .then((pub) => {
+            if (pub) {
+              throw new Error('Solo le permitimos una publicación a los usuarios no registrados.');
+            }
+          })
+          .then(() => ImageGroup.create(imageData)
+            .then((resp) => {
+              Publication.create(
                 {
-                  model: PublicationDetail,
-                  as: 'publicationDetail',
+                  brand,
+                  group,
+                  modelName,
+                  kms,
+                  price,
+                  year,
+                  fuel,
+                  observation,
+                  carState,
+                  codia,
+                  imageGroup_id: resp.id,
+                  name,
+                  email,
+                  phone,
+                  user_id: userId,
+                  publicationDetail: {
+                    Alimentacion,
+                    Motor,
+                    Puertas,
+                    Clasificacion,
+                    Cabina,
+                    Carga,
+                    PesoTotal,
+                    VelocidadMax,
+                    Potencia,
+                    Direccion,
+                    AireAcondicionado,
+                    Traccion,
+                    Importado,
+                    Caja,
+                    FrenosAbs,
+                    Airbag,
+                    Climatizador,
+                    FarosAntiniebla,
+                    TechoCorredizo,
+                    SensorEstacionamiento,
+                    AirbagLateral,
+                    AirbagCabezaConductor,
+                    AirbagCortina,
+                    AirbagRodilla,
+                    FijacionISOFIX,
+                    ControlDeTraccion,
+                    ControlDeEstabilidad,
+                    ControlDeDescenso,
+                    SistemaArranqueEnPendiente,
+                    ControlDinamicoConduccion,
+                    BloqueoDiferencial,
+                    RepartidorElectronicoDeFrenado,
+                    AsistenteDeFrenadoEmergencia,
+                    ReguladorParFrenado,
+                    Largo,
+                    Ancho,
+                    Alto,
+                    TapizadoCuero,
+                    AsientosElectronicos,
+                    ComputadoraABordo,
+                    FarosDeXenon,
+                    LLantasDeAleacion,
+                    TechoPanoramico,
+                    SensorDeLluvia,
+                    SensorCrepuscular,
+                    IndicadorPresionNeumaticos,
+                    VolanteConLevas,
+                    Bluetooth,
+                    AsientosTermicos,
+                    RunFlat,
+                  },
                 },
-              ],
-            },
-          ).then((publication) => {
-            PublicationState.findOne({
-              where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
-            }).then((ps) => {
-              publication.setPublicationStates(ps, { through: { active: true } });
-              res
-                .status(200)
-                .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
-            });
+                {
+                  include: [
+                    {
+                      model: PublicationDetail,
+                      as: 'publicationDetail',
+                    },
+                  ],
+                },
+              ).then((publication) => {
+                PublicationState.findOne({
+                  where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+                }).then((ps) => {
+                  publication.setPublicationStates(ps, { through: { active: true } });
+                  res
+                    .status(200)
+                    .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
+                  const msg = {
+                    to: publication.email,
+                    from: miautoEmail,
+                    subject: 'Publicación creada!',
+                    html: generateSinRegistro(publication, 'newPublication'),
+                  };
+                  sgMail.send(msg);
+                });
+              });
+            })
+            .catch((e) => {
+              res.status(400).send(e.message);
+              console.log(e);
+            })
+            .catch(() => {
+              res.status(400).send('No existe un usuario con ese id');
+            }))
+          .catch((e) => {
+            res.status(400).send(e.message);
           });
-        })
-        .catch((e) => {
-          res.status(400).send(e);
-          console.log(e);
-        })
-        .catch(() => {
-          res.status(400).send('No existe un usuario con ese id');
-        });
+      } else {
+        return ImageGroup.create(imageData)
+          .then((resp) => {
+            Publication.create(
+              {
+                brand,
+                group,
+                modelName,
+                kms,
+                price,
+                year,
+                fuel,
+                observation,
+                carState,
+                codia,
+                imageGroup_id: resp.id,
+                name,
+                email,
+                phone,
+                user_id: userId,
+                publicationDetail: {
+                  Alimentacion,
+                  Motor,
+                  Puertas,
+                  Clasificacion,
+                  Cabina,
+                  Carga,
+                  PesoTotal,
+                  VelocidadMax,
+                  Potencia,
+                  Direccion,
+                  AireAcondicionado,
+                  Traccion,
+                  Importado,
+                  Caja,
+                  FrenosAbs,
+                  Airbag,
+                  Climatizador,
+                  FarosAntiniebla,
+                  TechoCorredizo,
+                  SensorEstacionamiento,
+                  AirbagLateral,
+                  AirbagCabezaConductor,
+                  AirbagCortina,
+                  AirbagRodilla,
+                  FijacionISOFIX,
+                  ControlDeTraccion,
+                  ControlDeEstabilidad,
+                  ControlDeDescenso,
+                  SistemaArranqueEnPendiente,
+                  ControlDinamicoConduccion,
+                  BloqueoDiferencial,
+                  RepartidorElectronicoDeFrenado,
+                  AsistenteDeFrenadoEmergencia,
+                  ReguladorParFrenado,
+                  Largo,
+                  Ancho,
+                  Alto,
+                  TapizadoCuero,
+                  AsientosElectronicos,
+                  ComputadoraABordo,
+                  FarosDeXenon,
+                  LLantasDeAleacion,
+                  TechoPanoramico,
+                  SensorDeLluvia,
+                  SensorCrepuscular,
+                  IndicadorPresionNeumaticos,
+                  VolanteConLevas,
+                  Bluetooth,
+                  AsientosTermicos,
+                  RunFlat,
+                },
+              },
+              {
+                include: [
+                  {
+                    model: PublicationDetail,
+                    as: 'publicationDetail',
+                  },
+                ],
+              },
+            ).then((publication) => {
+              PublicationState.findOne({
+                where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+              }).then((ps) => {
+                publication.setPublicationStates(ps, { through: { active: true } });
+                res
+                  .status(200)
+                  .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
+                const msg = {
+                  to: userMail,
+                  from: miautoEmail,
+                  subject: 'Publicación creada!',
+                  html: generateMailAgenciaoParticular(publication, 'newPublication'),
+                };
+                sgMail.send(msg);
+              });
+            });
+          })
+          .catch((e) => {
+            res.status(400).send(e);
+            console.log(e);
+          })
+          .catch(() => {
+            res.status(400).send('No existe un usuario con ese id');
+          });
+      }
     })
+
     .catch((err) => {
       res.status(400).send(`Ocurrio un error al subir las imágenes. ${err}`);
       return false;

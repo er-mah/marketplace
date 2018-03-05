@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     Direccion: DataTypes.STRING(30),
     AireAcondicionado: DataTypes.BOOLEAN,
     Traccion: DataTypes.STRING(30),
-    Importado: DataTypes.BOOLEAN,
+    Importado: DataTypes.STRING(30),
     Caja: DataTypes.STRING(30),
     FrenosAbs: DataTypes.BOOLEAN,
     Airbag: DataTypes.BOOLEAN,

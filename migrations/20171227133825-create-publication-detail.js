@@ -55,7 +55,7 @@ module.exports = {
       type: Sequelize.STRING,
     },
     Importado: {
-      type: Sequelize.BOOLEAN,
+      type: Sequelize.STRING,
     },
     Caja: {
       type: Sequelize.STRING,

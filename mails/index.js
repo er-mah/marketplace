@@ -44,12 +44,12 @@ const generateMailAgenciaoParticular = (data, tipoMail) => {
     case 'newPublication': {
       saludo = `Hola ${data.name}`;
       intro = 'Tu publicación se encuentra en estado Pendiente';
-      body = 'El Equipo de Mi Auto Hoy está verificando tu publicación, si esta es correcta a la brevedad será publicada y visible para todos.';
+      body = `El Equipo de Mi Auto Hoy está verificando tu publicación ${data.brand} - ${data.modelName}. Si esta es correcta a la brevedad será publicada y visible para todos.`;
       break;
     }
     case 'approvedPublication': {
-      saludo = `Hola @${data.name}`;
-      intro = '<strong>¡Felicitaciones!</strong> tu vehículo ha sido publicado.';
+      saludo = `Hola ${data.name}`;
+      intro = `<strong>¡Felicitaciones!</strong> tu vehículo ${data.brand} - ${data.modelName} ha sido publicado.`;
       body = 'Te avisaremos cuando un comprador quiera comunicarse con vos mediante una pregunta.<br /> Es importante que estés atento a dar tu respuesta para alcanzar una compra.';
       break;
     }
@@ -98,7 +98,7 @@ line-height: 22px;
 
 <body style="-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box; width:600px; font-family:'Lato', sans-serif; ">
     <div style="background-color: #EEEEEE; width:100%; height:80px">
-        <img src="https://api.miautohoy.com/logo.png" style="display: block;margin-left: auto;margin-right: auto;height: 70px; width:auto;"> 
+        <img src="https://api.miautohoy.com/logo" style="display: block;margin-left: auto;margin-right: auto;height: 70px; width:auto;"> 
     </div>
     <div style="height:50px;"></div>
     <div class="text-block">
@@ -114,7 +114,9 @@ line-height: 22px;
     <div style="height:17;"></div>
     <div class="footer">
     <p class='mas-autos'>¿Tienes más autos por vender?</p>
-    <a href="${host}/createPublication" style="width:178px; height:50px" class="button-style">PUBLICÁ GRATIS</a>
+    <form style="display: inline;" action="${host}/createPublication">
+        <input style="width:178px; height:50px"type="submit" class="button-style" value="PUBLICÁ GRATIS" />
+    </form>
     </div>          
 </body>
 
@@ -140,8 +142,10 @@ const generateSinRegistro = (data, tipoMail) => {
             <ul>
             <li>Una publicación gratis</li>
             <li>Tiempo de la publicación: 60 días.</li>
-            <li>Y contacto con los interesados.</li>
-            </ul>`;
+            <li>Contacto con los interesados solo por email.</li>
+            </ul><br /> El Equipo de Mi Auto Hoy está verificando tu publicación:<br />
+            <strong>${data.brand} - ${data.modelName}</strong>.<br/>
+            Si esta es correcta a la brevedad será publicada y visible para todos.`;
       break;
     }
     case 'newCT': {
@@ -151,6 +155,12 @@ const generateSinRegistro = (data, tipoMail) => {
             <h5>${data.content}</h5><br /><br />
             <p>Registrate en <strong> Mi auto hoy </strong> y podras disfrutar el beneficio de poder administrar y llevar cuenta de todas las consultas que recibas.</p>
             `;
+      break;
+    }
+    case 'approvedPublication': {
+      saludo = `Hola ${data.name}`;
+      intro = `<strong>¡Felicitaciones!</strong> tu vehículo ${data.brand} - ${data.modelName} ha sido publicado.`;
+      body = 'Te avisaremos cuando un comprador quiera comunicarse con vos mediante una pregunta.<br /> Es importante que estés atento a dar tu respuesta para alcanzar una compra. <br /> <p>Registrate en <strong> Mi auto hoy </strong> y podras disfrutar el beneficio de poder administrar y llevar cuenta de todas las consultas que recibas.</p>';
       break;
     }
     default: { return ''; }
@@ -198,7 +208,7 @@ const generateSinRegistro = (data, tipoMail) => {
   
   <body style="-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box; width:600px; font-family:'Lato', sans-serif; ">
       <div style="background-color: #EEEEEE; width:100%; height:80px">
-          <img src="https://api.miautohoy.com/logo.png" style="display: block;margin-left: auto;margin-right: auto;height: 70px; width:auto;"> 
+          <img src="https://api.miautohoy.com/logo" style="display: block;margin-left: auto;margin-right: auto;height: 70px; width:auto;"> 
       </div>
       <div style="height:50px;"></div>
       <div class="text-block">
@@ -214,7 +224,9 @@ const generateSinRegistro = (data, tipoMail) => {
       <div style="height:17;"></div>
       <div class="footer">
       <p class='mas-autos'>¿Quieres cambiar tu auto?</p>
-      <a href="${host}/pledgeCredits" style="width:206px; height:50px" class="button-style">SOLICITÁ TU CRÉDITO</a>
+      <form style="display: inline;" action="${host}/pledgeCredits">
+        <input style="width:206px; height:50px" type="submit" class="button-style" value="SOLICITÁ TU CRÉDITO" />
+      </form>
       </div>          
   </body>
   </html>`;

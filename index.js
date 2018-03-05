@@ -64,20 +64,19 @@ const app = express();
   sequelize,
 } = require('./models').mah;
 
-CommentThread.findById(1)
-  .then(ct =>
-    Message.create({
-      commentThread_id: 1,
-      content: 'Hola!!!',
-      createdAt: moment(),
-      updatedAt: moment(),
+const a = 1;
+if (a === 1) {
+  Publication.findById(1)
+    .then((pub) => {
+      if (!pub.jorge) {
+        throw new Error('Buen dia');
+      }
     })
-      .then((msg) => {
-        ct.setMessages(msg.id);
-      })
-
-      .then(() => ct.getMessages())
-      .then(res => console.log('RESP', JSON.stringify(res)))); */
+    .then(() =>
+      console.log('buen dia'))
+    .catch(e => console.log(e));
+}
+console.log('esto sigue'); */
 
 // ***************************************** */
 

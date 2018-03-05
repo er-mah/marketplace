@@ -15,6 +15,11 @@ const { HistoryStateType } = require('./HistoryStateType');
 const { PublicationStateType } = require('./PublicationStateType');
 const { PublicationDetailType } = require('./PublicationDetailType');
 const { UserType } = require('./UserType');
+const { generateMailAgenciaoParticular, generateSinRegistro } = require('../mails');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const miautoEmail = 'contacto@miautohoy.com';
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -328,6 +333,36 @@ const PublicationMutation = {
                       oldPs[0].HistoryState = {
                         active: false,
                       };
+                      if (pub.user_id) {
+                        User.findById(pub.user_id)
+                          .then((us) => {
+                            const data = {
+                              name: us.name,
+                              brand: pub.brand,
+                              modelName: pub.modelName,
+                            };
+                            const msg = {
+                              to: us.email,
+                              from: miautoEmail,
+                              subject: 'Publicación aprobada!',
+                              html: generateMailAgenciaoParticular(data, 'approvedPublication'),
+                            };
+                            sgMail.send(msg);
+                          });
+                      } else {
+                        const data = {
+                          name: pub.name,
+                          brand: pub.brand,
+                          modelName: pub.modelName,
+                        };
+                        const msg = {
+                          to: pub.email,
+                          from: miautoEmail,
+                          subject: 'Publicación aprobada!',
+                          html: generateSinRegistro(data, 'approvedPublication'),
+                        };
+                        sgMail.send(msg);
+                      }
                       return PublicationState.findOne({ where: { stateName: 'Publicada' } })
                         .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
                         .then(() => pub);
