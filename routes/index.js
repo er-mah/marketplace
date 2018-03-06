@@ -504,6 +504,311 @@ const createPublication = (req, res) => {
       return false;
     });
 };
+const editPublication = (req, res) => {
+  split(req.body).map((row) => {
+    if (req.body[row.key] === 'SI') req.body[row.key] = true;
+    if (req.body[row.key] === 'NO') req.body[row.key] = false;
+    if (req.body[row.key] === '.') req.body[row.key] = false;
+  });
+  const {
+    publication_id,
+    brand,
+    group,
+    modelName,
+    kms,
+    price,
+    year,
+    Combustible,
+    observation,
+    carState,
+    codia,
+    name,
+    email,
+    phone,
+    Alimentacion,
+    Motor,
+    Puertas,
+    Clasificacion,
+    Cabina,
+    Carga,
+    PesoTotal,
+    VelocidadMax,
+    Potencia,
+    Direccion,
+    AireAcondicionado,
+    Traccion,
+    Importado,
+    Caja,
+    FrenosAbs,
+    Airbag,
+    Climatizador,
+    FarosAntiniebla,
+    TechoCorredizo,
+    SensorEstacionamiento,
+    AirbagLateral,
+    AirbagCabezaConductor,
+    AirbagCortina,
+    AirbagRodilla,
+    FijacionISOFIX,
+    ControlDeTraccion,
+    ControlDeEstabilidad,
+    ControlDeDescenso,
+    SistemaArranqueEnPendiente,
+    ControlDinamicoConduccion,
+    BloqueoDiferencial,
+    RepartidorElectronicoDeFrenado,
+    AsistenteDeFrenadoEmergencia,
+    ReguladorParFrenado,
+    Largo,
+    Ancho,
+    Alto,
+    TapizadoCuero,
+    AsientosElectronicos,
+    ComputadoraABordo,
+    FarosDeXenon,
+    LLantasDeAleacion,
+    TechoPanoramico,
+    SensorDeLluvia,
+    SensorCrepuscular,
+    IndicadorPresionNeumaticos,
+    VolanteConLevas,
+    Bluetooth,
+    AsientosTermicos,
+    RunFlat,
+  } = req.body;
+  const imageGroup = req.files;
+  const imageData = {};
+  let userId = null;
+  let isAdmin = false;
+  let userMail = '';
+  if (req.headers.authorization) {
+    userId = decode(req.headers.authorization.slice(7)).id;
+    User.findById(userId).then((usr) => {
+      if (usr.isAdmin) {
+        isAdmin = true;
+        userId = req.body.userId;
+        User.findById(userId)
+          .then((us) => { userMail = us.dataValues.email; });
+      } else {
+        User.findById(userId)
+          .then((us) => { userMail = us.dataValues.email; });
+      }
+    });
+  }
+  let fuel;
+  switch (Combustible) {
+    case 'NAF':
+      fuel = 'Nafta';
+      break;
+    case 'DSL':
+      fuel = 'Diesel';
+      break;
+    case 'GNC':
+      fuel = 'GNC';
+      break;
+    default:
+      fuel = 'No especificado';
+  }
+  Publication.findById(publication_id)
+    .then((pub) => {
+      if (imageGroup.length === 0) {
+        pub.update(
+          {
+            brand,
+            group,
+            modelName,
+            kms,
+            price,
+            year,
+            fuel,
+            observation,
+            carState,
+            codia,
+            name,
+            email,
+            phone,
+            user_id: userId,
+            publicationDetail: {
+              Alimentacion,
+              Motor,
+              Puertas,
+              Clasificacion,
+              Cabina,
+              Carga,
+              PesoTotal,
+              VelocidadMax,
+              Potencia,
+              Direccion,
+              AireAcondicionado,
+              Traccion,
+              Importado,
+              Caja,
+              FrenosAbs,
+              Airbag,
+              Climatizador,
+              FarosAntiniebla,
+              TechoCorredizo,
+              SensorEstacionamiento,
+              AirbagLateral,
+              AirbagCabezaConductor,
+              AirbagCortina,
+              AirbagRodilla,
+              FijacionISOFIX,
+              ControlDeTraccion,
+              ControlDeEstabilidad,
+              ControlDeDescenso,
+              SistemaArranqueEnPendiente,
+              ControlDinamicoConduccion,
+              BloqueoDiferencial,
+              RepartidorElectronicoDeFrenado,
+              AsistenteDeFrenadoEmergencia,
+              ReguladorParFrenado,
+              Largo,
+              Ancho,
+              Alto,
+              TapizadoCuero,
+              AsientosElectronicos,
+              ComputadoraABordo,
+              FarosDeXenon,
+              LLantasDeAleacion,
+              TechoPanoramico,
+              SensorDeLluvia,
+              SensorCrepuscular,
+              IndicadorPresionNeumaticos,
+              VolanteConLevas,
+              Bluetooth,
+              AsientosTermicos,
+              RunFlat,
+            },
+          },
+          {
+            include: [
+              {
+                model: PublicationDetail,
+                as: 'publicationDetail',
+              },
+            ],
+          },
+        )
+          .then((editedPub) => {
+            PublicationState.findOne({
+              where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+            }).then((ps) => {
+              editedPub.setPublicationStates(ps, { through: { active: true } });
+              res
+                .status(200)
+                .send(ResponseObj('ok', 'Publicación editada con éxito. Nuevamente en estado Pendiente para su revisión.'));
+            });
+          });
+        return false;
+      }Promise.all(prepareArrayToSharp(imageGroup))
+        .then(() => {
+          for (let i = 0; i < 9; i += 1) {
+            const objectName = `image${i + 1}`;
+            if (imageGroup[i]) {
+              imageData[objectName] = `opt-${imageGroup[i].filename}`;
+            } else {
+              imageData[objectName] = null;
+            }
+          }
+          ImageGroup.findById(pub.imageGroup_id)
+            .then((ig) => {
+              ig.update(imageData)
+                .then((resp) => {
+                  pub.update(
+                    {
+                      brand,
+                      group,
+                      modelName,
+                      kms,
+                      price,
+                      year,
+                      fuel,
+                      observation,
+                      carState,
+                      codia,
+                      imageGroup_id: resp.id,
+                      name,
+                      email,
+                      phone,
+                      user_id: userId,
+                      publicationDetail: {
+                        Alimentacion,
+                        Motor,
+                        Puertas,
+                        Clasificacion,
+                        Cabina,
+                        Carga,
+                        PesoTotal,
+                        VelocidadMax,
+                        Potencia,
+                        Direccion,
+                        AireAcondicionado,
+                        Traccion,
+                        Importado,
+                        Caja,
+                        FrenosAbs,
+                        Airbag,
+                        Climatizador,
+                        FarosAntiniebla,
+                        TechoCorredizo,
+                        SensorEstacionamiento,
+                        AirbagLateral,
+                        AirbagCabezaConductor,
+                        AirbagCortina,
+                        AirbagRodilla,
+                        FijacionISOFIX,
+                        ControlDeTraccion,
+                        ControlDeEstabilidad,
+                        ControlDeDescenso,
+                        SistemaArranqueEnPendiente,
+                        ControlDinamicoConduccion,
+                        BloqueoDiferencial,
+                        RepartidorElectronicoDeFrenado,
+                        AsistenteDeFrenadoEmergencia,
+                        ReguladorParFrenado,
+                        Largo,
+                        Ancho,
+                        Alto,
+                        TapizadoCuero,
+                        AsientosElectronicos,
+                        ComputadoraABordo,
+                        FarosDeXenon,
+                        LLantasDeAleacion,
+                        TechoPanoramico,
+                        SensorDeLluvia,
+                        SensorCrepuscular,
+                        IndicadorPresionNeumaticos,
+                        VolanteConLevas,
+                        Bluetooth,
+                        AsientosTermicos,
+                        RunFlat,
+                      },
+                    },
+                    {
+                      include: [
+                        {
+                          model: PublicationDetail,
+                          as: 'publicationDetail',
+                        },
+                      ],
+                    },
+                  )
+                    .then((editedPub) => {
+                      PublicationState.findOne({
+                        where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+                      }).then((ps) => {
+                        editedPub.setPublicationStates(ps, { through: { active: true } });
+                        res
+                          .status(200)
+                          .send('Publicación editada con éxito. Nuevamente en estado Pendiente para su revisión.');
+                      });
+                    });
+                });
+            });
+        });
+    });
+};
 const registerAgency = (req, res) => {
   const { data } = req.body;
   data.isAdmin = false;
@@ -778,6 +1083,22 @@ const getSoldPublications = (req, res) => {
     res.status(200).send(ResponseObj('ok', undefined, vendidos));
   });
 };
+const getImages = (req, res) => {
+  const { publication_id } = req.params;
+  Publication.findOne({ where: { id: publication_id } })
+    .then((pub) => {
+      ImageGroup.findById(pub.imageGroup_id)
+        .then((ig) => {
+          const imageArray = [];
+          split(ig.dataValues).map((row) => {
+            if (row.value !== null && row.key !== 'id') {
+              imageArray.push(row.value);
+            }
+          });
+          res.status(200).send(ResponseObj('ok', undefined, imageArray));
+        });
+    });
+};
 module.exports = {
   login,
   loginAdmin,
@@ -787,4 +1108,6 @@ module.exports = {
   getSoldPublications,
   registerAgency,
   registerUser,
+  getImages,
+  editPublication,
 };

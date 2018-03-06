@@ -13,8 +13,10 @@ const {
   login,
   loginAdmin,
   createPublication,
+  editPublication,
   uploadAgencyImages,
   getFiltersAndTotalResult,
+  getImages,
   getSoldPublications,
   registerAgency,
   registerUser,
@@ -209,8 +211,14 @@ app.post(
   upload.array('imageGroup', 8),
   createPublication,
 );
+app.post(
+  '/editPublication',
+  upload.array('imageGroup', 8),
+  editPublication,
+);
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
+app.get('/getImages/:publication_id', getImages);
 app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
 app.post(
