@@ -1099,9 +1099,41 @@ const getImages = (req, res) => {
         });
     });
 };
+const recoverPassword = (req, res) => {
+  const { email } = req.body;
+  User.findOne({ where: { email } })
+    .then((us) => {
+      if (!us) {
+        res.status(400).send(ResponseObj('error', 'No existe un usuario registrado con ese email.'));
+        return false;
+      }
+      const hash = User.generateHash(Math.random().toString());
+      us.update({
+        password: hash,
+      })
+        .then(() => {
+          const data = {
+            name: us.name,
+            hash,
+          };
+          const msg = {
+            to: us.email,
+            from: miautoEmail,
+            subject: 'Recupero de contraseña',
+            html: generateMailAgenciaoParticular(data, 'recoverPassword'),
+          };
+          res.send(ResponseObj('ok', 'Se envió un link a tu correo para recuperar la contraseña'));
+          sgMail.send(msg)
+            .catch((err) => {
+              console.log(err);
+            });
+        });
+    });
+};
 module.exports = {
   login,
   loginAdmin,
+  recoverPassword,
   createPublication,
   uploadAgencyImages,
   getFiltersAndTotalResult,

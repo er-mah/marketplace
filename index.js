@@ -12,6 +12,7 @@ const schema = require('./schema');
 const {
   login,
   loginAdmin,
+  recoverPassword,
   createPublication,
   editPublication,
   uploadAgencyImages,
@@ -137,6 +138,7 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/graphql',
     '/login',
     '/loginAdmin',
+    '/recoverPassword',
     '/createPublication',
     '/registerAgency',
     '/registerUser',
@@ -206,6 +208,7 @@ io.of('/offerChat').on('connection', (socket) => {
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
 app.post('/loginAdmin', loginAdmin);
+app.post('/recoverPassword', recoverPassword);
 app.post(
   '/createPublication',
   upload.array('imageGroup', 8),

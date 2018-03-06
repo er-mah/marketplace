@@ -25,11 +25,11 @@ const generateMailAgenciaoParticular = (data, tipoMail) => {
         </ul>
         `;
       break; }
-    case 'recoverPass': {
+    case 'recoverPassword': {
       saludo = 'Olvidaste tu contraseña';
       intro = `Hola ${data.name}`;
       body = `Olvidaste tu contraseña, no te preocupes es muy fácil recuperarla.<br />
-      Haz click en el siguiente <a href="${host}/recoverpass">link</a> y podrás podrás reestablecer tu contraseña.
+      Haz click en el siguiente <a href="${host}/recoverPassword?hash=${data.hash}">link</a> y podrás podrás reestablecer tu contraseña.
       `;
       break;
     }

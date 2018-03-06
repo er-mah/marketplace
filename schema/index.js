@@ -29,6 +29,7 @@ const {
 const {
   modifyUserData,
   updatePassword,
+  resetPassword,
 } = require('../gtypes/UserType').UserMutations;
 
 const {
@@ -371,7 +372,7 @@ const schema = new Schema({
         resolve: (_nada, args) => {
           const options = {};
           const LIMIT = 9;
-          options.attributes=['email', 'id', 'isAdmin'];
+          options.attributes = ['email', 'id', 'isAdmin'];
           if (args.page) {
             options.limit = LIMIT;
             options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
@@ -692,6 +693,7 @@ const schema = new Schema({
       markThreadAsReaded,
       modifyUserData,
       updatePassword,
+      resetPassword,
       markAsSold,
       highlightPublication,
     },

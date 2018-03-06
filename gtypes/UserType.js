@@ -84,6 +84,24 @@ const UserMutations = {
         });
     },
   },
+  resetPassword: {
+    type: Gstring,
+    args: {
+      oldPassword: { type: new NotNull(Gstring) },
+      newPassword: { type: new NotNull(Gstring) },
+    },
+    resolve: (value, { oldPassword, newPassword }) => User.findOne({ where: { password: oldPassword } })
+      .then((us) => {
+        if (!us) {
+          throw new UserError('Este link ya no es válido.');
+        } else {
+          const newPass = bcrypt.hashSync(newPassword, bcrypt.genSaltSync(8), null);
+          return us.update({
+            password: newPass,
+          }).then(() => 'Contraseña actualizada con éxito.');
+        }
+      }),
+  },
 };
 
 module.exports = { UserType, UserMutations, SearchUserResultType };
