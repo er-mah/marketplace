@@ -6,7 +6,7 @@ const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 
 
-const { UserType, SearchUserResultType } = require('../gtypes/UserType');
+const { UserType, SearchUserResultType, SearchResumeType } = require('../gtypes/UserType');
 const { GruposType } = require('../gtypes/GruposType');
 const { Tautos30type } = require('../gtypes/Tautos30type');
 const { CaracteristicType } = require('../gtypes/CaracteristicType');
@@ -30,6 +30,7 @@ const {
   modifyUserData,
   updatePassword,
   resetPassword,
+  deleteUser,
 } = require('../gtypes/UserType').UserMutations;
 
 const {
@@ -69,6 +70,7 @@ const {
   GraphQLObjectType: ObjectGraph,
   GraphQLInt: Int,
   GraphQLString: Gstring,
+  GraphQLBoolean: Gboolean,
 } = graphql;
 
 const schema = new Schema({
@@ -77,6 +79,7 @@ const schema = new Schema({
     fields: {
       // BD TAUTO
       AllBrands: {
+        name: 'Allbrands',
         description: 'Los valores que importan son ta3_marca y ta3_nmarc',
         type: new List(Tautos30type),
         args: {
@@ -356,6 +359,56 @@ const schema = new Schema({
           },
         }), */
       },
+      AllUsersResume: {
+        name: 'AllUsersResume',
+        type: SearchResumeType,
+        args: {
+          page: {
+            type: Int,
+          },
+          resume: {
+            type: Gboolean,
+          },
+        },
+        resolve: (_nada, args) => {
+          const options = {};
+          const LIMIT = 9;
+          if (args.page) {
+            options.limit = LIMIT;
+            options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+          }
+          return User.findAndCountAll(options)
+            .then((res) => {
+              const result = {};
+
+              const getStatics = (stateName, user) => Publication.count({
+                where: { user_id: user.id },
+                include: [
+                  {
+                    model: PublicationState,
+                    where: {
+                      stateName,
+                    },
+                    through: { where: { active: true } },
+                  },
+                ],
+              })
+                .then(t => user[stateName] = t);
+              const PromiseArray = res.rows.map(user =>
+                getStatics('Pendiente', user)
+                  .then(() => getStatics('Suspendida', user))
+                  .then(() => getStatics('Publicada', user))
+                  .then(() => getStatics('Destacada', user)));
+              return Promise.all(PromiseArray)
+                .then(() => {
+                  result.hasNextPage = res.count > res.rows.length && res.rows.length !== 0;
+                  result.totalCount = res.count;
+                  result.Users = res.rows;
+                  return result;
+                });
+            });
+        },
+      },
       AllUsersMails: {
         type: SearchUserResultType,
         args: {
@@ -445,6 +498,7 @@ const schema = new Schema({
                       { stateName: 'Apto para garantía' },
                     ],
                   },
+                  through: { where: { active: true } },
                 },
               ];
               options.order = [
@@ -465,6 +519,53 @@ const schema = new Schema({
             return options;
           },
         }),
+      },
+      LastPublications: {
+        type: new List(PublicationType),
+        args: {
+          limit: { type: Int },
+        },
+        resolve: (_nada, args) => Publication.findAndCountAll({
+          order: [['createdAt', 'DESC']],
+          include: [
+            {
+              model: PublicationState,
+              where: {
+                stateName: 'Publicada',
+              },
+              through: { where: { active: true } },
+            },
+          ],
+          limit: args.limit,
+        })
+          .then(({ rows, count }) => {
+            const searchMorePubs = () => {
+              args.limit += args.limit;
+              return Publication.findAndCountAll({
+                order: [['createdAt', 'DESC']],
+                include: [
+                  {
+                    model: PublicationState,
+                    where: {
+                      stateName: 'Publicada',
+                    },
+                    through: { where: { active: true } },
+                  },
+                ],
+                limit: args.limit,
+              })
+                .then(({ rows, count }) => {
+                  if (count > rows.length && rows.length < 4) {
+                    return searchMorePubs();
+                  }
+                  return rows;
+                });
+            };
+            if (count > rows.length && rows.length < 4) {
+              return searchMorePubs();
+            }
+            return rows;
+          }),
       },
       PublicationState: {
         type: PublicationStateType,
@@ -693,6 +794,7 @@ const schema = new Schema({
       markThreadAsReaded,
       modifyUserData,
       updatePassword,
+      deleteUser,
       resetPassword,
       markAsSold,
       highlightPublication,

@@ -118,10 +118,6 @@ const PublicationMutation = {
       const LIMIT = 9;
       options.where = { [Op.and]: {} };
 
-      if (args.page) {
-        options.limit = LIMIT;
-        options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
-      }
       if (args.text) {
         options.where = { [Op.or]: {}, [Op.and]: {} };
         args.text = _.upperFirst(_.lowerCase(args.text));
@@ -163,14 +159,6 @@ const PublicationMutation = {
           },
         ];
       }
-      if (args.MAHtoken) {
-        options.where = { [Op.and]: {} };
-        const user_id = decode(args.MAHtoken).id;
-        options.where[Op.and] = Object.assign(options.where[Op.and], {
-          user_id,
-        });
-      }
-
       if (args.carState) {
         options.where[Op.and] = Object.assign(options.where[Op.and], {
           carState: args.carState,
@@ -209,20 +197,37 @@ const PublicationMutation = {
           ];
         }
       }
+      if (args.page) {
+        options.limit = LIMIT;
+        options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+      }
 
-      return Publication.count(options)
-        .then((count) => {
-          if (count < 9) {
-            delete options.limit;
-            delete options.offset;
+      return Publication.findAndCountAll(options)
+        .then(({ rows, count }) => {
+          const searchMorePubs = () => {
+            options.limit += options.limit;
+            options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+            return Publication.findAndCountAll(options)
+              .then(({ rows, count }) => {
+                if
+                (count > rows.length && rows.length < LIMIT) {
+                  return searchMorePubs();
+                }
+                const totalPages = parseInt(count / 9, 10);
+                result.totalCount = count;
+                result.hasNextPage = args.page < totalPages;
+                result.Publications = rows;
+                return result;
+              });
+          };
+          if (count > rows.length && rows.length < LIMIT) {
+            return searchMorePubs();
           }
-          return Publication.findAll(options).then((publications) => {
-            const totalPages = parseInt(count / 9, 10);
-            result.totalCount = count;
-            result.hasNextPage = args.page < totalPages;
-            result.Publications = publications;
-            return result;
-          });
+          const totalPages = parseInt(count / 9, 10);
+          result.totalCount = count;
+          result.hasNextPage = args.page < totalPages;
+          result.Publications = rows;
+          return result;
         });
     },
   },

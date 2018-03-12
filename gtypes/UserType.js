@@ -6,6 +6,12 @@ const { User } = require('../models').mah;
 const jwtDecode = require('jwt-decode');
 const bcrypt = require('bcrypt-nodejs');
 
+const {
+  Publication,
+  CommentThread,
+  sequelize,
+} = require('../models').mah;
+
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -20,6 +26,25 @@ const UserType = new ObjectGraph({
   name: 'User',
   description: 'Usuario que puede ser agencia o un usuario común',
   fields: _.assign(attributeFields(User)),
+});
+const UserTypeWithResume = new ObjectGraph({
+  name: 'UserResume',
+  description: 'Resumen del usuario con campos con publicaciones y su estado',
+  fields: _.assign(attributeFields(User), {
+    Pendiente: { name: 'Pendiente', type: Int },
+    Destacada: { name: 'Destacada', type: Int },
+    Suspendida: { name: 'Suspendida', type: Int },
+    Publicada: { name: 'Publicada', type: Int },
+  }),
+});
+
+const SearchResumeType = new ObjectGraph({
+  name: 'SearchResume',
+  fields: {
+    Users: { type: List(UserTypeWithResume) },
+    totalCount: { type: Int },
+    hasNextPage: { type: Gboolean },
+  },
 });
 
 const SearchUserResultType = new ObjectGraph({
@@ -102,6 +127,44 @@ const UserMutations = {
         }
       }),
   },
+  deleteUser: {
+    type: Gboolean,
+    args: {
+      MAHtoken: { type: new NotNull(Gstring) },
+      userId: { type: new NotNull(Int) },
+    },
+    resolve: (_nada, args) => {
+      const userId = jwtDecode(args.MAHtoken).id;
+      const { Op } = sequelize;
+      return User.findById(userId)
+        .then((usr) => {
+          if (!usr.isAdmin) {
+            throw new UserError('Solo los administradores pueden realizar esta acción');
+          } else {
+            return User.findById(args.userId)
+              .then((us) => {
+                if (!us) {
+                  throw new UserError('Este usuario no existe.');
+                } else {
+                  if (us.isAdmin) {
+                    throw new UserError('Para eliminar un administrador contáctese con el proveedor del servicio (info@as-one.com.ar)');
+                  }
+                  Publication.destroy({ where: { user_id: us.id } })
+                    .then(() => CommentThread.destroy({ where: { [Op.or]: [{ participant1_id: us.id }, { participant2_id: us.id }] } })
+                      .then(() => {
+                        us.destroy()
+                          .then(() => true)
+                          .catch(error => error);
+                      }));
+                }
+              })
+              .catch(err => err);
+          }
+        });
+    },
+  },
 };
 
-module.exports = { UserType, UserMutations, SearchUserResultType };
+module.exports = {
+  UserType, UserMutations, SearchUserResultType, SearchResumeType,
+};

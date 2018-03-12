@@ -14,6 +14,7 @@ module.exports = {
         model: 'Publications',
         key: 'id',
       },
+      onDelete: 'CASCADE',
     },
     publicationState_id: {
       type: Sequelize.INTEGER,
