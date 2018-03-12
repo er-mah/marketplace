@@ -540,7 +540,7 @@ const schema = new Schema({
         })
           .then(({ rows, count }) => {
             const searchMorePubs = () => {
-              args.limit += args.limit;
+              args.limit += 5;
               return Publication.findAndCountAll({
                 order: [['createdAt', 'DESC']],
                 include: [
@@ -555,6 +555,11 @@ const schema = new Schema({
                 limit: args.limit,
               })
                 .then(({ rows, count }) => {
+                 /*  console.log(count > rows.length);
+                  console.log(rows.length < 4);
+                  console.log(count);
+                  console.log(rows.length);
+                  console.log(args.limit); */
                   if (count > rows.length && rows.length < 4) {
                     return searchMorePubs();
                   }

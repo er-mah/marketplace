@@ -205,7 +205,7 @@ const PublicationMutation = {
       return Publication.findAndCountAll(options)
         .then(({ rows, count }) => {
           const searchMorePubs = () => {
-            options.limit += options.limit;
+            options.limit += 5;
             options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
             return Publication.findAndCountAll(options)
               .then(({ rows, count }) => {
