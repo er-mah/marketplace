@@ -37,6 +37,7 @@ const {
   searchPublication,
   markAsSold,
   highlightPublication,
+  adminhighlightPublication,
   aprovePublication,
   disaprovePublication,
 } = require('../gtypes/PublicationType').PublicationMutation;
@@ -803,6 +804,7 @@ const schema = new Schema({
       resetPassword,
       markAsSold,
       highlightPublication,
+      adminhighlightPublication,
     },
   }),
   subscription: new ObjectGraph({

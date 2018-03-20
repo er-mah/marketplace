@@ -301,6 +301,47 @@ const PublicationMutation = {
       });
     },
   },
+  adminhighlightPublication: {
+    type: PublicationType,
+    name: 'highlightPublication',
+    args: {
+      publication_id: { type: Int },
+      MAHtoken: { type: Gstring },
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return User.findById(userID)
+        .then((us) => {
+          if (!us.isAdmin) {
+            throw new UserError('Solo administradores pueden realizar esta acción.');
+          }
+          return Publication.findOne({
+            where: { id: args.publication_id },
+          }).then((pub) => {
+            if (!pub) {
+              throw new UserError('Esta publicación no existe.');
+            }
+            return pub.getPublicationStates({ through: { where: { active: true } } })
+              .then((oldPs) => {
+                if (
+                  oldPs[0].dataValues.stateName === 'Destacada' ||
+                oldPs[0].dataValues.stateName === 'Pendiente' ||
+                oldPs[0].dataValues.stateName === 'Suspendida' ||
+                oldPs[0].dataValues.stateName === 'Eliminada' ||
+                oldPs[0].dataValues.stateName === 'Vencida') {
+                  throw new UserError('Esta publicación ya está destacada o no se ecuentra activa actualmente.');
+                }
+                oldPs[0].HistoryState = {
+                  active: false,
+                };
+                return PublicationState.findOne({ where: { stateName: 'Destacada' } })
+                  .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                  .then(() => pub);
+              });
+          });
+        });
+    },
+  },
   aprovePublication: {
     type: PublicationType,
     name: 'AprovePublication',
