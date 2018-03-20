@@ -1009,7 +1009,11 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] = 0;
         }
-        if (row.key === 'User') {
+        if (row.key === 'User' && row.value === null) {
+          row.key = 'userType';
+          row.value = 'Particular';
+          newObj[row.key][row.value] = 0;
+        } else if (row.key === 'User' && row.value !== null) {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] = 0;
@@ -1029,7 +1033,11 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
         }
-        if (row.key === 'User') {
+        if (row.key === 'User' && row.value === null) {
+          row.key = 'userType';
+          row.value = 'Particular';
+          newObj[row.key][row.value] += 1;
+        } else if (row.key === 'User' && row.value !== null) {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] += 1;
