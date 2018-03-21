@@ -144,6 +144,86 @@ const loginAdmin = (req, res) => {
         message: error,
       }));
 };
+const checkFacebookLogin = (req, res) => {
+  const { email } = req.params;
+  User.findOne({ where: { email } })
+    .then((us) => {
+      if (!us) {
+        res.status(200).send({ message: 'Usuario no registrado' });
+      } else {
+        let userType;
+        if (us.agencyName) {
+          userType = 'Agencia';
+        } else {
+          userType = 'Usuario';
+        }
+        if (us.isAdmin) {
+          userType = 'Admin';
+        }
+        const MAHtoken = jsonwt.sign(
+          {
+            id: us.id,
+            name: us.agencyName || us.name,
+            userType,
+          },
+          'MAH2018!#',
+        );
+        res.status(200).send({
+          status: 'ok',
+          message: MAHtoken,
+        });
+      }
+    });
+};
+const loginOrRegisterFacebook = (req, res) => {
+  const { data: { email, name } } = req.body;
+  User.findOne({ where: { email } })
+    .then((us) => {
+      if (!us) {
+        User.create({
+          email,
+          name,
+          isAgency: false,
+        }).then((usr) => {
+          const userType = 'Usuario';
+          const MAHtoken = jsonwt.sign(
+            {
+              id: usr.id,
+              name: usr.agencyName || usr.name,
+              userType,
+            },
+            'MAH2018!#',
+          );
+          res.status(200).send({
+            status: 'ok',
+            message: MAHtoken,
+          });
+        });
+      } else {
+        let userType;
+        if (us.isAgency) {
+          userType = 'Agencia';
+        } else {
+          userType = 'Usuario';
+        }
+        if (us.isAdmin) {
+          userType = 'Admin';
+        }
+        const MAHtoken = jsonwt.sign(
+          {
+            id: us.id,
+            name: us.agencyName || us.name,
+            userType,
+          },
+          'MAH2018!#',
+        );
+        res.status(200).send({
+          status: 'ok',
+          message: MAHtoken,
+        });
+      }
+    });
+};
 const removeOldFile = (file) => {
   fs.unlinkSync(`./images/${file.filename}`);
 };
@@ -1150,4 +1230,6 @@ module.exports = {
   registerUser,
   getImages,
   editPublication,
+  checkFacebookLogin,
+  loginOrRegisterFacebook,
 };

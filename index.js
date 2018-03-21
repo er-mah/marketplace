@@ -21,6 +21,8 @@ const {
   getSoldPublications,
   registerAgency,
   registerUser,
+  checkFacebookLogin,
+  loginOrRegisterFacebook,
 } = require('./routes');
 const multer = require('multer');
 
@@ -137,7 +139,8 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/subscriptions',
     '/graphql',
     '/login',
-    '/loginAdmin',
+    /^\/checkFacebookLogin/,
+    '/loginOrRegisterFacebook',
     '/recoverPassword',
     '/createPublication',
     '/registerAgency',
@@ -222,6 +225,8 @@ app.post(
 app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
 app.get('/getImages/:publication_id', getImages);
+app.get('/checkFacebookLogin/:email', checkFacebookLogin);
+app.post('/loginOrRegisterFacebook/', loginOrRegisterFacebook);
 app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
 app.post(
