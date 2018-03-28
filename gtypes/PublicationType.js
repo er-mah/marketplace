@@ -210,7 +210,7 @@ const PublicationMutation = {
             return Publication.findAndCountAll(options)
               .then(({ rows, count }) => {
                 if
-                (count > rows.length && rows.length < LIMIT) {
+                (count > rows.length && rows.length < LIMIT && args.page < parseInt(count / 9, 10)) {
                   return searchMorePubs();
                 }
                 const totalPages = parseInt(count / 9, 10);
@@ -220,7 +220,7 @@ const PublicationMutation = {
                 return result;
               });
           };
-          if (count > rows.length && rows.length < LIMIT) {
+          if (count > rows.length && rows.length < LIMIT && args.page < parseInt(count / 9, 10)) {
             return searchMorePubs();
           }
           const totalPages = parseInt(count / 9, 10);
