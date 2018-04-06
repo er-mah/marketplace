@@ -39,13 +39,50 @@ const login = (req, res) => {
         });
         return false;
       }
-      if (!user.validPassword(password, user.password)) {
-        res.status(401).send({
-          status: 'error',
-          message: 'Usuario inexistente o contraseña incorrecta.',
-        });
+      try {
+        if (!user.validPassword(password, user.password)) {
+          res.status(401).send({
+            status: 'error',
+            message: 'Usuario inexistente o contraseña incorrecta.',
+          });
+          return false;
+        }
+      } catch (e) {
+        if (e === 'Not a valid BCrypt hash.') {
+          User.findOne({ where: { email } })
+            .then((us) => {
+              if (!us) {
+                res.status(400).send(ResponseObj('error', 'No existe un usuario registrado con ese email.'));
+                return false;
+              }
+              const hash = User.generateHash(Math.random().toString());
+              us.update({
+                password: hash,
+              })
+                .then(() => {
+                  const data = {
+                    name: us.name,
+                    hash,
+                  };
+                  const msg = {
+                    to: us.email,
+                    from: miautoEmail,
+                    subject: 'Recupero de contraseña',
+                    html: generateMailAgenciaoParticular(data, 'recoverPassword'),
+                  };
+                  sgMail.send(msg)
+                    .catch((err) => {
+                      console.log(err);
+                    });
+                });
+            });
 
-        return false;
+          res.status(401).send({
+            status: 'error',
+            message: 'Tu contraseña ha expirado, te enviaremos un mail para que la actualices.',
+          });
+          return false;
+        }
       }
       let userType;
       if (user.agencyName) {
