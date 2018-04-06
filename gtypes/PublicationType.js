@@ -188,13 +188,6 @@ const PublicationMutation = {
               where: { isAgency: true, isAdmin: false },
             },
           ];
-        } else {
-          options.include = [
-            {
-              model: User,
-              where: { isAgency: false, isAdmin: false },
-            },
-          ];
         }
       }
       if (args.page) {
@@ -264,6 +257,47 @@ const PublicationMutation = {
               .then(() => pub);
           });
       });
+    },
+  },
+  adminMarkAsSold: {
+    type: PublicationType,
+    name: 'markPublicationAsSold',
+    args: {
+      publication_id: { type: Int },
+      MAHtoken: { type: Gstring },
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      User.findById(userID)
+        .then((usr) => {
+          if (!usr.isAdmin) {
+            throw new UserError('Solo los administradores pueden realizar esta acción');
+          }
+          return Publication.findOne({
+            where: { id: args.publication_id },
+          }).then((pub) => {
+            if (!pub) {
+              throw new UserError('Esta publicación no existe.');
+            }
+            return pub.getPublicationStates({ through: { where: { active: true } } })
+              .then((oldPs) => {
+                if (
+                  oldPs[0].dataValues.stateName === 'Vendida' ||
+                oldPs[0].dataValues.stateName === 'Pendiente' ||
+                oldPs[0].dataValues.stateName === 'Suspendida' ||
+                oldPs[0].dataValues.stateName === 'Eliminada' ||
+                oldPs[0].dataValues.stateName === 'Vencida') {
+                  throw new UserError('Esta publicación ya está vendida o no se ecuentra activa actualmente.');
+                }
+                oldPs[0].HistoryState = {
+                  active: false,
+                };
+                return PublicationState.findOne({ where: { stateName: 'Vendida' } })
+                  .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                  .then(() => pub);
+              });
+          });
+        });
     },
   },
   highlightPublication: {
