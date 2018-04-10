@@ -16,6 +16,7 @@ const { PublicationType } = require('../gtypes/PublicationType');
 const { PublicationStateType } = require('../gtypes/PublicationStateType');
 const { CommentThreadType } = require('../gtypes/CommentThreadType');
 const { MessageType } = require('../gtypes/MessageType');
+const { PageTextsType } = require('../gtypes/PageTextType');
 
 const {
   createCommentThread,
@@ -54,8 +55,8 @@ const {
   PublicationState,
   CommentThread,
   Message,
-  HistoryState,
   sequelize,
+  PageTexts,
 } = require('../models').mah;
 const {
   tautos30,
@@ -557,7 +558,7 @@ const schema = new Schema({
                 limit: args.limit,
               })
                 .then(({ rows, count }) => {
-                 /*  console.log(count > rows.length);
+                  /*  console.log(count > rows.length);
                   console.log(rows.length < 4);
                   console.log(count);
                   console.log(rows.length);
@@ -784,6 +785,17 @@ const schema = new Schema({
               throw new UserError('Solo los administradores pueden acceder');
             });
         },
+      },
+
+      // Web
+      PageTexts: {
+        name: 'PageTexts',
+        type: List(PageTextsType),
+        args: {
+          route: { type: Gstring },
+          section: { type: Gstring },
+        },
+        resolve: resolver(PageTexts),
       },
     },
   }),
