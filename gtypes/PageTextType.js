@@ -1,7 +1,9 @@
+const { UserError } = require('graphql-errors');
+const decode = require('jwt-decode');
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { PageTexts } = require('../models').mah;
+const { PageTexts, User } = require('../models').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,
@@ -23,14 +25,25 @@ const PageTextMutations = {
     name: 'updateText',
     description: 'Usado para modificar los textos de las páginas',
     args: {
-      MAHtoken: { tpye: new NotNull(Gstring) },
+      MAHtoken: { type: new NotNull(Gstring) },
       section: { type: new NotNull(Gstring) },
-      text: { type: Gstring },
-      resolve: (_nada, args) => {
-        console.log('hola');
-      },
+      route: { type: new NotNull(Gstring) },
+      text: { type: new NotNull(Gstring) },
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return User.findById(userID)
+        .then((usr) => {
+          if (!usr.isAdmin) {
+            throw new UserError('Solo los administradores pueden editar');
+          }
+          return PageTexts.findOne({ where: { route: args.route, section: args.section } })
+            .then(pt => pt.update({
+              text: args.text,
+            })
+              .then(ptUpdated => ptUpdated));
+        });
     },
   },
 };
-
 module.exports = { PageTextsType, PageTextMutations };

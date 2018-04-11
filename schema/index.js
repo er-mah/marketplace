@@ -48,6 +48,9 @@ const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
 const {
   threadAdded,
 } = require('../gtypes/CommentThreadType').CommentThreadSubscriptions;
+const {
+  updateText,
+} = require('../gtypes/PageTextType').PageTextMutations;
 
 const {
   User,
@@ -819,6 +822,7 @@ const schema = new Schema({
       adminMarkAsSold,
       highlightPublication,
       adminhighlightPublication,
+      updateText,
     },
   }),
   subscription: new ObjectGraph({
