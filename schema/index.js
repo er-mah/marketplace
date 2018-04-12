@@ -17,6 +17,7 @@ const { PublicationStateType } = require('../gtypes/PublicationStateType');
 const { CommentThreadType } = require('../gtypes/CommentThreadType');
 const { MessageType } = require('../gtypes/MessageType');
 const { PageTextsType } = require('../gtypes/PageTextType');
+const { RatesType } = require('../gtypes/RatesType');
 
 const {
   createCommentThread,
@@ -51,6 +52,9 @@ const {
 const {
   updateText,
 } = require('../gtypes/PageTextType').PageTextMutations;
+const {
+  updateRates,
+} = require('../gtypes/RatesType').RateMutations;
 
 const {
   User,
@@ -60,6 +64,7 @@ const {
   Message,
   sequelize,
   PageTexts,
+  Rates,
 } = require('../models').mah;
 const {
   tautos30,
@@ -800,6 +805,14 @@ const schema = new Schema({
         },
         resolve: resolver(PageTexts),
       },
+      AllRates: {
+        name: 'webRates',
+        type: List(RatesType),
+        args: {
+          limit: { type: Gstring },
+        },
+        resolve: resolver(Rates),
+      },
     },
   }),
   mutation: new ObjectGraph({
@@ -823,6 +836,7 @@ const schema = new Schema({
       highlightPublication,
       adminhighlightPublication,
       updateText,
+      updateRates,
     },
   }),
   subscription: new ObjectGraph({

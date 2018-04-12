@@ -4,6 +4,16 @@ const express = require('express');
 const Graphql = require('graphql').graphql;
 const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
+const schedule = require('node-schedule');
+
+
+//TERMINAR SCHEDULER
+const rule = new schedule.RecurrenceRule();
+rule.hour = 0;
+rule.minute = 1;
+const j = schedule.scheduleJob(rule, () => {
+
+});
 
 const { graphiqlExpress } = require('apollo-server-express');
 /* const socketioJwt = require('socketio-jwt'); */
