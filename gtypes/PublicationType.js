@@ -61,7 +61,7 @@ const PublicationType = new ObjectGraph({
           }),
       },
       CurrentState: {
-        type: PublicationStateType,
+        type: HistoryStateType,
         resolve: args =>
           HistoryState.findOne({
             where: { publication_id: args.id, active: true },
