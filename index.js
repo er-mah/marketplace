@@ -5,14 +5,47 @@ const Graphql = require('graphql').graphql;
 const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
+const moment = require('moment');
 
 
-//TERMINAR SCHEDULER
+//  SCHEDULER
+const {
+  Publication,
+  PublicationState,
+  HistoryState,
+} = require('./models').mah;
 const rule = new schedule.RecurrenceRule();
-rule.hour = 0;
+rule.hour = 3;
 rule.minute = 1;
 const j = schedule.scheduleJob(rule, () => {
-
+  console.log('COMENZANDO CON LA REVISIÓN DE PUBLICACIONES....');
+  HistoryState.findAll({
+    where: { active: true },
+    include: [PublicationState],
+  }).then((res) => {
+    let publicacionesVencidas = 0;
+  
+    res.map((row) => {
+      const publicationDate = moment(row.dataValues.createdAt);
+      const actualDate = moment();
+      const diff = actualDate.diff(publicationDate, 'days');
+      const publication_id = row.dataValues.publication_id;
+      if (diff > 60) {
+        publicacionesVencidas += 1;
+        return Publication.findById(publication_id)
+          .then(pub => pub.getPublicationStates({ through: { where: { active: true } } })
+            .then((oldPs) => {
+              oldPs[0].HistoryState = {
+                active: false,
+              };
+              return PublicationState.findOne({ where: { stateName: 'Vencida' } })
+                .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                .then(() => pub);
+            }));
+      }
+    });
+    console.log('SE VENCIERON:', publicacionesVencidas, 'PUBLICACIONES.');
+  });
 });
 
 const { graphiqlExpress } = require('apollo-server-express');
@@ -79,19 +112,7 @@ const app = express();
   sequelize,
 } = require('./models').mah;
 
-const a = 1;
-if (a === 1) {
-  Publication.findById(1)
-    .then((pub) => {
-      if (!pub.jorge) {
-        throw new Error('Buen dia');
-      }
-    })
-    .then(() =>
-      console.log('buen dia'))
-    .catch(e => console.log(e));
-}
-console.log('esto sigue'); */
+ */
 
 // ***************************************** */
 
