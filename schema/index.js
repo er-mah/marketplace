@@ -566,11 +566,53 @@ const schema = new Schema({
                 limit: args.limit,
               })
                 .then(({ rows, count }) => {
-                  /*  console.log(count > rows.length);
-                  console.log(rows.length < 4);
-                  console.log(count);
-                  console.log(rows.length);
-                  console.log(args.limit); */
+                  if (count > rows.length && rows.length < 4) {
+                    return searchMorePubs();
+                  }
+                  return rows;
+                });
+            };
+            if (count > rows.length && rows.length < 4) {
+              return searchMorePubs();
+            }
+            return rows;
+          }),
+      },
+      HighlightedPublications: {
+        type: new List(PublicationType),
+        args: {
+          limit: { type: Int },
+        },
+        resolve: (_nada, args) => Publication.findAndCountAll({
+          order: [['createdAt', 'DESC']],
+          include: [
+            {
+              model: PublicationState,
+              where: {
+                stateName: 'Destacada',
+              },
+              through: { where: { active: true } },
+            },
+          ],
+          limit: args.limit,
+        })
+          .then(({ rows, count }) => {
+            const searchMorePubs = () => {
+              args.limit += 5;
+              return Publication.findAndCountAll({
+                order: [['createdAt', 'DESC']],
+                include: [
+                  {
+                    model: PublicationState,
+                    where: {
+                      stateName: 'Destacada',
+                    },
+                    through: { where: { active: true } },
+                  },
+                ],
+                limit: args.limit,
+              })
+                .then(({ rows, count }) => {
                   if (count > rows.length && rows.length < 4) {
                     return searchMorePubs();
                   }
