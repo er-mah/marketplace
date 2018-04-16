@@ -14,6 +14,7 @@ const {
   PublicationState,
   HistoryState,
 } = require('./models').mah;
+
 const rule = new schedule.RecurrenceRule();
 rule.hour = 3;
 rule.minute = 1;
@@ -24,12 +25,12 @@ const j = schedule.scheduleJob(rule, () => {
     include: [PublicationState],
   }).then((res) => {
     let publicacionesVencidas = 0;
-  
+
     res.map((row) => {
       const publicationDate = moment(row.dataValues.createdAt);
       const actualDate = moment();
       const diff = actualDate.diff(publicationDate, 'days');
-      const publication_id = row.dataValues.publication_id;
+      const { publication_id } = row.dataValues;
       if (diff > 60) {
         publicacionesVencidas += 1;
         return Publication.findById(publication_id)

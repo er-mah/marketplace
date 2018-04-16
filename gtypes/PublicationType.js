@@ -92,6 +92,7 @@ const SearchResult = new ObjectGraph({
   },
 });
 
+
 const PublicationMutation = {
   searchPublication: {
     type: SearchResult,
@@ -259,11 +260,12 @@ const PublicationMutation = {
       });
     },
   },
-  adminMarkAsSold: {
+  adminChangeState: {
     type: PublicationType,
     name: 'markPublicationAsSold',
     args: {
       publication_id: { type: Int },
+      stateName: { type: new NotNull(Gstring) },
       MAHtoken: { type: Gstring },
     },
     resolve: (_nada, args) => {
@@ -282,18 +284,20 @@ const PublicationMutation = {
             return pub.getPublicationStates({ through: { where: { active: true } } })
               .then((oldPs) => {
                 if (
-                  oldPs[0].dataValues.stateName === 'Vendida' ||
-                oldPs[0].dataValues.stateName === 'Pendiente' ||
-                oldPs[0].dataValues.stateName === 'Suspendida' ||
-                oldPs[0].dataValues.stateName === 'Eliminada' ||
-                oldPs[0].dataValues.stateName === 'Vencida') {
-                  throw new UserError('Esta publicación ya está vendida o no se ecuentra activa actualmente.');
+                  oldPs[0].dataValues.stateName === args.stateName) {
+                  throw new UserError(`Esta publicación ya está en estado ${args.stateName}.`);
                 }
                 oldPs[0].HistoryState = {
                   active: false,
                 };
-                return PublicationState.findOne({ where: { stateName: 'Vendida' } })
-                  .then(newPs => pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } }))
+                return PublicationState.findOne({ where: { stateName: args.stateName } })
+                  .then((newPs) => {
+                    if (!newPs) {
+                      throw new UserError(`Por favor, vuelva a intentar con alguno de estos estados:
+                     Pendiente Publicada Destacada Suspendida Vendida Archivada Eliminada Vencida`);
+                    }
+                    return pub.setPublicationStates([oldPs[0], newPs], { through: { active: true } });
+                  })
                   .then(() => pub);
               });
           });
@@ -531,6 +535,7 @@ const PublicationMutation = {
         });
     },
   },
+
 
 };
 

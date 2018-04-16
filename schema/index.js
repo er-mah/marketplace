@@ -38,7 +38,7 @@ const {
 const {
   searchPublication,
   markAsSold,
-  adminMarkAsSold,
+  adminChangeState,
   highlightPublication,
   adminhighlightPublication,
   aprovePublication,
@@ -832,7 +832,7 @@ const schema = new Schema({
       deleteUser,
       resetPassword,
       markAsSold,
-      adminMarkAsSold,
+      adminChangeState,
       highlightPublication,
       adminhighlightPublication,
       updateText,
