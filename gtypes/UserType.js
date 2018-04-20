@@ -163,6 +163,25 @@ const UserMutations = {
         });
     },
   },
+  searchUser: {
+    type: SearchUserResultType,
+    description: 'Busca un usuario por mail o nombre',
+    args: {
+      text: { type: new NotNull(Gstring) },
+    },
+    resolve: (_,args)=>{
+      args.text += '%';
+      const {Op} = sequelize;
+      return User.findAndCountAll({where:{[Op.or]: {email:{ [Op.iLike]: args.text }, name: { [Op.iLike]: args.text }}}})
+      .then((res) => {
+        const result = {};
+        result.hasNextPage = res.count > res.rows.length && res.rows.length !== 0;
+        result.totalCount = res.count;
+        result.Users = res.rows;
+        return result;
+      });
+    }
+  },
 };
 
 module.exports = {

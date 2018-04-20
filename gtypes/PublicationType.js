@@ -126,12 +126,12 @@ const PublicationMutation = {
 
         options.where[Op.or] = Object.assign(
           options.where[Op.or],
-          { brand: { [Op.like]: args.text } },
-          { group: { [Op.like]: args.text } },
-          { modelName: { [Op.like]: args.text } },
-          { kms: { [Op.like]: args.text } },
-          { fuel: { [Op.like]: args.text } },
-          { name: { [Op.like]: args.text } },
+          { brand: { [Op.iLike]: args.text } },
+          { group: { [Op.iLike]: args.text } },
+          { modelName: { [Op.iLike]: args.text } },
+          { kms: { [Op.iLike]: args.text } },
+          { fuel: { [Op.iLike]: args.text } },
+          { name: { [Op.iLike]: args.text } },
         );
       }
       if (args.user_id) {

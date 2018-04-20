@@ -33,6 +33,7 @@ const {
   updatePassword,
   resetPassword,
   deleteUser,
+  searchUser,
 } = require('../gtypes/UserType').UserMutations;
 
 const {
@@ -377,9 +378,10 @@ const schema = new Schema({
           page: {
             type: Int,
           },
-          resume: {
-            type: Gboolean,
-          },
+          userType: {
+            type: Gstring,
+          }
+
         },
         resolve: (_nada, args) => {
           const options = {};
@@ -387,6 +389,13 @@ const schema = new Schema({
           if (args.page) {
             options.limit = LIMIT;
             options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+          }
+          if(args.userType){
+            if(args.userType ==='Agencia'){
+              options.where= {isAgency: true}
+            }else{
+              options.where= {isAgency: false}
+            }
           }
           return User.findAndCountAll(options)
             .then((res) => {
@@ -879,6 +888,7 @@ const schema = new Schema({
       adminhighlightPublication,
       updateText,
       updateRates,
+      searchUser,
     },
   }),
   subscription: new ObjectGraph({
