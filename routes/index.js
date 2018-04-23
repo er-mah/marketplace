@@ -14,7 +14,7 @@ const {
 const _ = require('lodash');
 const fs = require('fs');
 
-const { generateMailAgenciaoParticular, generateSinRegistro } = require('../mails');
+const { generateMailAgenciaoParticular, generateSinRegistro, generateForAdmin } = require('../mails');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -1255,6 +1255,37 @@ const recoverPassword = (req, res) => {
         });
     });
 };
+const requestCredit = (req,res)=>{
+  const datos = req.body;
+  datos.DNI = datos.dni;
+  delete datos.dni;
+  datos.Nombre = datos.name;
+  delete datos.name;
+  datos.Domicilio = datos.address;
+  delete datos.address;
+  datos.Ingresos = datos.ganancy;
+  delete datos.ganancy;  
+  datos.MontoAFinanciar = datos.financyAmount;
+  delete datos.financyAmount;  
+  datos.DestinoDelCredito = datos.creditReason;
+  delete datos.creditReason;    
+  datos.Telefono = datos.phone;
+  delete datos.phone;    
+  datos.Mensaje = datos.message;
+  delete datos.message;
+  const html = generateForAdmin(req.body, 'solicitudCredito')
+  const msg = {
+    to: miautoEmail,
+    from: datos.email,
+    subject: 'Solicitud de Crédito',
+    html: html
+  };
+  sgMail.send(msg)
+    .catch((err) => {
+      console.log(err);
+    });
+  res.status(200).send({status: 'ok'});
+}
 module.exports = {
   login,
   loginAdmin,
@@ -1269,4 +1300,5 @@ module.exports = {
   editPublication,
   checkFacebookLogin,
   loginOrRegisterFacebook,
+  requestCredit
 };

@@ -67,6 +67,7 @@ const {
   registerUser,
   checkFacebookLogin,
   loginOrRegisterFacebook,
+  requestCredit,
 } = require('./routes');
 const multer = require('multer');
 
@@ -179,6 +180,7 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/registerUser',
     '/getFiltersAndTotalResult',
     /^\/images/,
+    '/requestCredit'
   ],
 }));
 
@@ -261,6 +263,7 @@ app.get('/checkFacebookLogin/:email', checkFacebookLogin);
 app.post('/loginOrRegisterFacebook/', loginOrRegisterFacebook);
 app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
+app.post('/requestCredit', requestCredit);
 app.post(
   '/uploadAgencyImages/:id',
   upload.fields([
