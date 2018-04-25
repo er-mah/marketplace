@@ -244,13 +244,13 @@ const generateSinRegistro = (data, tipoMail) => {
   </body>
   </html>`;
 };
-const generateForAdmin = (data, tipoMail)=>{
+const generateForAdmin = (data, carData, tipoMail)=>{
   let saludo = '';
   let intro = '';
   let body = '';
   switch (tipoMail){
     case 'solicitudCredito':{
-  saludo = 'Hola';
+      saludo = 'Hola';
       intro= 'Tienes una nueva solicitud de crédito';
       body= `El usuario ${data.Nombre} solicitó un crédito, estos son sus datos: <br/> 
       <ul> ${split(data).map((row)=>`
@@ -258,6 +258,22 @@ const generateForAdmin = (data, tipoMail)=>{
       </ul>`;
       break;
     }
+    case 'personalShopper':{
+      saludo = 'Hola';
+      intro= 'Tienes una nueva solicitud de crédito';
+      body= `El usuario ${data.Nombre} solicitó un crédito PersonalShopper, estos son sus datos: <br/> 
+      <ul> ${split(data).map((row)=>`
+          <li>${row.key}: ${row.value}</li>`)}
+      </ul><br/>
+      <h4>Datos del auto:</h4>
+      <ul> ${split(carData).map((row)=>`
+        <li>${row.key}: ${row.value}</li>`)}
+      </ul>
+      `;
+      break;
+    }
+    default: { return ''; }
+    
   }
   return `<html>
   <meta charset="utf-8">

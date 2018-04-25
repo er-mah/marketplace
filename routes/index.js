@@ -1257,6 +1257,7 @@ const recoverPassword = (req, res) => {
 };
 const requestCredit = (req,res)=>{
   const datos = req.body;
+  let html = '';
   datos.DNI = datos.dni;
   delete datos.dni;
   datos.Nombre = datos.name;
@@ -1273,17 +1274,38 @@ const requestCredit = (req,res)=>{
   delete datos.phone;    
   datos.Mensaje = datos.message;
   delete datos.message;
-  const html = generateForAdmin(req.body, 'solicitudCredito')
+  if (datos.personalShopper){
+    const carData={}
+    carData.Año = datos.year;
+    delete datos.year;
+    carData.Precio = datos.price;
+    delete datos.price;
+    carData.Marca = datos.brand;
+    delete datos.brand;
+    carData.Versión = datos.group;
+    delete datos.group;
+    carData.Observaciones = datos.observation;
+    delete datos.observation;
+    datos.Trabajo = datos.job;
+    delete datos.job
+    delete datos.personalShopper;
+    html = generateForAdmin(datos, carData, 'personalShopper')
+  }else{
+    html = generateForAdmin(datos,null, 'solicitudCredito')
+  }
+
   const msg = {
-    to: miautoEmail,
+    to: 'usuarioloco@yopmail.com',
     from: datos.email,
     subject: 'Solicitud de Crédito',
     html: html
   };
+  //return false;
   sgMail.send(msg)
     .catch((err) => {
       console.log(err);
     });
+    return false;
   res.status(200).send({status: 'ok'});
 }
 module.exports = {
