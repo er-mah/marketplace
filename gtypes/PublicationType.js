@@ -176,8 +176,8 @@ const PublicationMutation = {
                 { stateName: 'Vendida' },
                 { stateName: 'Apto para garantía' },
               ],
-              through: { where: { active: true } },
             },
+            through: { where: { active: true } },
           },
         ];
       }

@@ -1114,18 +1114,18 @@ const getFiltersAndTotalResult = (req, res) => {
     const newObj = {};
     newObj.fuel = {};
     newObj.year = {};
-    newObj.state = {};
     newObj.userType = {};
+    newObj.modelName = {};
     results.map(({ dataValues }) => {
       split(dataValues).map((row) => {
-        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state') {
+        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName') {
           newObj[row.key][row.value] = 0;
         }
-        if (row.key === 'PublicationStates') {
+      /*   if (row.key === 'PublicationStates') {
           row.key = 'state';
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] = 0;
-        }
+        } */
         if (row.key === 'User' && row.value === null) {
           row.key = 'userType';
           row.value = 'Particular';
@@ -1145,11 +1145,11 @@ const getFiltersAndTotalResult = (req, res) => {
     }
     results.map(({ dataValues }) => {
       split(dataValues).map((row) => {
-        if (row.key === 'PublicationStates') {
+       /*  if (row.key === 'PublicationStates') {
           row.key = 'state';
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
-        }
+        } */
         if (row.key === 'User' && row.value === null) {
           row.key = 'userType';
           row.value = 'Particular';
@@ -1161,6 +1161,9 @@ const getFiltersAndTotalResult = (req, res) => {
         }
         switch (row.key) {
           case 'fuel':
+            newObj[row.key][row.value] += 1;
+            break;
+          case 'modelName':
             newObj[row.key][row.value] += 1;
             break;
           case 'year':

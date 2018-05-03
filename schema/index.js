@@ -788,6 +788,7 @@ const schema = new Schema({
             include: [{
               model: PublicationState,
               where: { [Op.or]: { stateName: ['Publicada', 'Pendiente', 'Destacada', 'Vendida'] } },
+              through: { where: { active: true } },
             }],
           })
             .then(res => res);
@@ -806,6 +807,7 @@ const schema = new Schema({
             include: [{
               model: PublicationState,
               where: { [Op.or]: { stateName: ['Destacada'] } },
+              through: { where: { active: true } },              
             }],
           })
             .then(res => res);
