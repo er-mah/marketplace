@@ -436,6 +436,54 @@ const PublicationMutation = {
       });
     }
   },
+  adminUnHighlightPublication: {
+    type: PublicationType,
+    name: "adminUnHighlightPublication",
+    args: {
+      publication_id: { type: Int },
+      MAHtoken: { type: Gstring }
+    },
+    resolve: (_nada, args) => {
+      const userID = decode(args.MAHtoken).id;
+      return User.findById(userID).then(us => {
+        if (!us.isAdmin) {
+          throw new UserError(
+            "Solo administradores pueden realizar esta acción."
+          );
+        }
+        return Publication.findOne({
+          where: { id: args.publication_id }
+        }).then(pub => {
+          if (!pub) {
+            throw new UserError("Esta publicación no existe.");
+          }
+          return pub
+            .getPublicationStates({ through: { where: { active: true } } })
+            .then(oldPs => {
+              if (
+                oldPs[0].dataValues.stateName !== "Destacada"
+              ) {
+                throw new UserError(
+                  "Esta publicación no está destacada actualmente."
+                );
+              }
+              oldPs[0].HistoryState = {
+                active: false
+              };
+              return PublicationState.findOne({
+                where: { stateName: "Publicada" }
+              })
+                .then(newPs =>
+                  pub.setPublicationStates([oldPs[0], newPs], {
+                    through: { active: true }
+                  })
+                )
+                .then(() => pub);
+            });
+        });
+      });
+    }
+  },
   aprovePublication: {
     type: PublicationType,
     name: "AprovePublication",

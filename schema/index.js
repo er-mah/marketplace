@@ -42,6 +42,7 @@ const {
   adminChangeState,
   highlightPublication,
   adminhighlightPublication,
+  adminUnHighlightPublication,
   aprovePublication,
   disaprovePublication,
 } = require('../gtypes/PublicationType').PublicationMutation;
@@ -919,6 +920,7 @@ const schema = new Schema({
       adminChangeState,
       highlightPublication,
       adminhighlightPublication,
+      adminUnHighlightPublication,
       updateText,
       updateRates,
       searchUser,
