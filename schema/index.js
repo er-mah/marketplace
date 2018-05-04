@@ -607,7 +607,7 @@ const schema = new Schema({
         })
           .then(({ rows, count }) => {
             
-            const fillWithNormalPubs = (numberOfPubs) =>{
+            const fillWithNormalPubs = (numberOfPubs, findedPubs) =>{
               const limit = numberOfPubs;
               return Publication.findAll({
                 order: sequelize.options.dialect === 'mysql' ? sequelize.fn('RAND') : sequelize.fn('RANDOM'),
@@ -623,7 +623,8 @@ const schema = new Schema({
                 limit,
               })
               .then((rows) => {
-                return rows;
+                const result = _.concat(findedPubs, rows)
+                return result;
               });
             }
 
@@ -646,6 +647,10 @@ const schema = new Schema({
                   if (count > rows.length && rows.length < 4) {
                     return searchMorePubs();
                   }
+                  if(rows.length < 12){
+                    const numberOfPubs = 12 - rows.length
+                    return fillWithNormalPubs(numberOfPubs,rows)
+                  }
                   return rows;
                 });
             };
@@ -655,7 +660,7 @@ const schema = new Schema({
             }
             if(rows.length < 12){
               const numberOfPubs = 12 - rows.length
-              return fillWithNormalPubs(numberOfPubs)
+              return fillWithNormalPubs(numberOfPubs, rows)
             }
             return rows;
           }),
