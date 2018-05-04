@@ -606,6 +606,27 @@ const schema = new Schema({
           limit: args.limit,
         })
           .then(({ rows, count }) => {
+            
+            const fillWithNormalPubs = (numberOfPubs) =>{
+              const limit = numberOfPubs;
+              return Publication.findAll({
+                order: sequelize.options.dialect === 'mysql' ? sequelize.fn('RAND') : sequelize.fn('RANDOM'),
+                include: [
+                  {
+                    model: PublicationState,
+                    where: {
+                      stateName: 'Publicada',
+                    },
+                    through: { where: { active: true } },
+                  },
+                ],
+                limit,
+              })
+              .then((rows) => {
+                return rows;
+              });
+            }
+
             const searchMorePubs = () => {
               args.limit += 5;
               return Publication.findAndCountAll({
@@ -628,8 +649,13 @@ const schema = new Schema({
                   return rows;
                 });
             };
+
             if (count > rows.length && rows.length < 4) {
               return searchMorePubs();
+            }
+            if(rows.length < 12){
+              const numberOfPubs = 12 - rows.length
+              return fillWithNormalPubs(numberOfPubs)
             }
             return rows;
           }),
