@@ -265,7 +265,10 @@ const removeOldFile = (file) => {
   fs.unlinkSync(`./images/${file.filename}`);
 };
 const optimizeImage = file => sharp(`./images/${file.filename}`)
-  .resize(752, 500)
+  .jpeg({
+    quality: 60,
+    chromaSubsampling: '4:4:4'
+  })
   .toFile(`./images/opt-${file.filename}`)
   .then(() => removeOldFile(file));
 
