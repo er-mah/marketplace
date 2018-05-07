@@ -104,6 +104,7 @@ const PublicationMutation = {
     args: {
       MAHtoken: { type: Gstring },
       carState: { type: Gstring },
+      modelName: { type: Gstring },
       text: { type: Gstring },
       page: { type: Int },
       limit: { type: Int },
@@ -138,6 +139,11 @@ const PublicationMutation = {
           { name: { [Op.iLike]: args.text } }
         );
       }
+      if (args.modelName) {
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          modelName: args.modelName
+        });
+      }
       if (args.user_id) {
         options.where[Op.and] = Object.assign(options.where[Op.and], {
           user_id: args.user_id
@@ -153,7 +159,7 @@ const PublicationMutation = {
           year: args.year
         });
       }
-            if (args.userType) {        
+      if (args.userType) {        
         if (args.userType === "Agencia") {
           if (_.isEmpty(options.include)) {
             options.include = [

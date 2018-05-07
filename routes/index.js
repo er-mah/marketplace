@@ -1051,7 +1051,7 @@ const getFiltersAndTotalResult = (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state, userType,
+    carState, fuel, year, state, userType, modelName,
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -1074,6 +1074,11 @@ const getFiltersAndTotalResult = (req, res) => {
   if (fuel) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
   }
+  if (modelName) {
+    options.where[Op.and] = Object.assign(options.where[Op.and], {
+      modelName: modelName
+    });
+  }
   if (year) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { year });
   }
@@ -1089,24 +1094,25 @@ const getFiltersAndTotalResult = (req, res) => {
       { model: User },
     ];
   }
-  if (userType) {
-    if (userType === 'Agencia') {
-      options.include = [
-        {
-          model: User,
-          where: { isAgency: true, isAdmin: false },
-        },
-      ];
-    } else {
-      options.include = [
-        {
-          model: User,
-          where: { isAgency: false, isAdmin: false },
-        },
-      ];
+  if (userType) {        
+    if (userType === "Agencia") {
+      if (_.isEmpty(options.include)) {
+        options.include = [
+          {
+            model: User,
+            where: { isAgency: true, isAdmin: false }
+          }
+        ];
+      }else{
+        options.include.push(
+          {
+            model: User,
+            where: { isAgency: true, isAdmin: false }
+          }
+        )
+      }
     }
   }
-
   Publication.findAll(options).then((results) => {
     if (results === null) {
       results = {};
