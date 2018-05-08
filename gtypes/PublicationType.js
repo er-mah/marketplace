@@ -176,6 +176,22 @@ const PublicationMutation = {
               }
             )
           }
+        }else{
+          if (_.isEmpty(options.include)) {
+            options.include = [
+              {
+                model: User,
+                where: { isAgency: false}
+              }
+            ];
+          }else{
+            options.include.push(
+              {
+                model: User,
+                where: { isAgency: false }
+              }
+            )
+          }
         }
       }
       if (args.state) {

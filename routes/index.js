@@ -1073,7 +1073,6 @@ const getFiltersAndTotalResult = (req, res) => {
     ],
     [Op.and]: { carState },
   };
-  options.include = [User, PublicationState];
   if (fuel) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
   }
@@ -1094,8 +1093,9 @@ const getFiltersAndTotalResult = (req, res) => {
         },
         through: { where: { active: true } },
       },
-      { model: User },
     ];
+  }else{
+  options.include = [PublicationState];
   }
   if (userType) {        
     if (userType === "Agencia") {
@@ -1114,8 +1114,31 @@ const getFiltersAndTotalResult = (req, res) => {
           }
         )
       }
+    }else{
+      if (_.isEmpty(options.include)) {
+        options.include = [
+          {
+            model: User,
+            where: { isAgency: false }
+          }
+        ];
+      }else{
+        options.include.push(
+          {
+            model: User,
+            where: { isAgency: false}
+          }
+        )
+      }
+    }
+  }else{
+    if (_.isEmpty(options.include)) {
+      options.include = [User];
+    }else{
+      options.include.push(User)
     }
   }
+  console.log(options);
   Publication.findAll(options).then((results) => {
     if (results === null) {
       results = {};
