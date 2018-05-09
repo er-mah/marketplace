@@ -1054,7 +1054,7 @@ const getFiltersAndTotalResult = (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state, userType, modelName,
+    carState, fuel, year, state, userType, modelName, brand,
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -1083,6 +1083,9 @@ const getFiltersAndTotalResult = (req, res) => {
   }
   if (year) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { year });
+  }
+  if (brand) {
+    options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
   }
   if (state) {
     options.include = [
@@ -1126,19 +1129,22 @@ const getFiltersAndTotalResult = (req, res) => {
         options.include.push(
           {
             model: User,
-            where: { isAgency: false}
+            where: { isAgency: false }
           }
         )
       }
     }
   }else{
     if (_.isEmpty(options.include)) {
-      options.include = [User];
+      options.include = [ {
+        model: User,
+      }];
     }else{
-      options.include.push(User)
+      options.include.push( {
+        model: User,
+      })
     }
   }
-  console.log(options);
   Publication.findAll(options).then((results) => {
     if (results === null) {
       results = {};
@@ -1146,11 +1152,12 @@ const getFiltersAndTotalResult = (req, res) => {
     const newObj = {};
     newObj.fuel = {};
     newObj.year = {};
+    newObj.brand = {};
     newObj.userType = {};
     newObj.modelName = {};
     results.map(({ dataValues }) => {
       split(dataValues).map((row) => {
-        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName') {
+        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName' || row.key === 'brand') {
           newObj[row.key][row.value] = 0;
         }
       /*   if (row.key === 'PublicationStates') {
@@ -1199,6 +1206,9 @@ const getFiltersAndTotalResult = (req, res) => {
             newObj[row.key][row.value] += 1;
             break;
           case 'year':
+            newObj[row.key][row.value] += 1;
+            break;
+          case 'brand':
             newObj[row.key][row.value] += 1;
             break;
           default:

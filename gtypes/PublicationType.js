@@ -105,6 +105,7 @@ const PublicationMutation = {
       MAHtoken: { type: Gstring },
       carState: { type: Gstring },
       modelName: { type: Gstring },
+      brand: { type: Gstring },
       text: { type: Gstring },
       page: { type: Int },
       limit: { type: Int },
@@ -159,6 +160,11 @@ const PublicationMutation = {
           year: args.year
         });
       }
+      if (args.brand) {
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          brand: args.brand
+        });
+      }
       if (args.userType) {        
         if (args.userType === "Agencia") {
           if (_.isEmpty(options.include)) {
@@ -181,7 +187,7 @@ const PublicationMutation = {
             options.include = [
               {
                 model: User,
-                where: { isAgency: false}
+                where: { isAgency: false }
               }
             ];
           }else{
