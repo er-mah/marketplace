@@ -1340,7 +1340,7 @@ const requestCredit = (req,res)=>{
   }
 
   const msg = {
-    to: 'usuarioloco@yopmail.com',
+    to: 'info@miautohoy.com',
     from: datos.email,
     subject: 'Solicitud de Crédito',
     html: html
@@ -1350,7 +1350,6 @@ const requestCredit = (req,res)=>{
     .catch((err) => {
       console.log(err);
     });
-    return false;
   res.status(200).send({status: 'ok'});
 }
 module.exports = {
