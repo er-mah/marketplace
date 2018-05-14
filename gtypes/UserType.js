@@ -57,29 +57,85 @@ const UserMutations = {
     description: "Modifica los datos de un usuario",
     args: {
       MAHtoken: { type: new NotNull(Gstring) },
+      userId: {type: Int},
       name: { type: Gstring },
       address: { type: Gstring },
-      phone: { type: Gstring }
+      phone: { type: Gstring },
+      agencyName: {type: Gstring},
+      agencyAdress: {type: Gstring},
+      agencyEmail: {type: Gstring},
+      agencyPhone: {type: Gstring},
     },
-    resolve: (value, { name, address, phone, MAHtoken }) => {
-      const userId = jwtDecode(MAHtoken).id;
-      return User.findById(userId).then(us => {
-        if (!us) {
-          throw new UserError("El usuario no existe.");
-        } else {
-          const UpdateData = {};
-          if (name) {
-            UpdateData.name = name;
-          }
-          if (address) {
-            UpdateData.address = address;
-          }
-          if (phone) {
-            UpdateData.phone = phone;
-          }
-          return us.update(UpdateData).then(usUp => usUp);
+    resolve: (value, { userId, name, address, phone, MAHtoken, agencyName, agencyAdress, agencyEmail, agencyPhone}) => {
+      if(userId){
+      const adminId = jwtDecode(MAHtoken).id;
+      return User.findById(adminId).then(us => {
+        if(!us.isAdmin){
+          throw new UserError("Solo los administradores pueden modificar datos de otro usuario.");
+        }else{
+          return User.findById(userId)
+          .then(us=>{
+            if (!us) {
+              throw new UserError("El usuario no existe.");
+            } else {
+              const UpdateData = {};
+              if (name) {
+                UpdateData.name = name;
+              }
+              if (address) {
+                UpdateData.address = address;
+              }
+              if (phone) {
+                UpdateData.phone = phone;
+              }
+              if (agencyName) {
+                UpdateData.agencyName = agencyName;
+              }
+              if (agencyAdress) {
+                UpdateData.agencyAdress = agencyAdress;
+              }
+              if (agencyEmail) {
+                UpdateData.agencyEmail = agencyEmail;
+              }
+              if (agencyPhone) {
+                UpdateData.agencyPhone = agencyPhone;
+              }
+              return us.update(UpdateData).then(usUp => usUp);
+            }
+          })
         }
-      });
+      })}else{
+        const user_id = jwtDecode(MAHtoken).id;
+        return User.findById(user_id).then(us => {
+          if (!us) {
+            throw new UserError("El usuario no existe.");
+          } else {
+            const UpdateData = {};
+            if (name) {
+              UpdateData.name = name;
+            }
+            if (address) {
+              UpdateData.address = address;
+            }
+            if (phone) {
+              UpdateData.phone = phone;
+            }
+            if (agencyName) {
+              UpdateData.agencyName = agencyName;
+            }
+            if (agencyAdress) {
+              UpdateData.agencyAdress = agencyAdress;
+            }
+            if (agencyEmail) {
+              UpdateData.agencyEmail = agencyEmail;
+            }
+            if (agencyPhone) {
+              UpdateData.agencyPhone = agencyPhone;
+            }
+            return us.update(UpdateData).then(usUp => usUp);
+          }
+        });
+      }
     }
   },
   updatePassword: {

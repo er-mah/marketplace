@@ -326,9 +326,22 @@ const schema = new Schema({
           MAHtoken: {
             type: new NotNull(Gstring),
           },
+          id:{type: Int}
         },
         resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
+          if(args.id){
+            return User.findById(userId)
+            .then(us=>{
+              if(us.isAdmin){
+                return User.findById(args.id)
+                .then(us=>us)
+                .catch((error)=>{throw new UserError(error)})
+              }else{
+                throw new UserError('Solo los administradores pueden acceder')
+              }
+            })
+          }
           return User.findById(userId)
             .then(us => us);
         },
