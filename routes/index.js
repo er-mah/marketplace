@@ -1340,7 +1340,7 @@ const requestCredit = (req,res)=>{
   }
 
   const msg = {
-    to: 'info@miautohoy.com',
+    to: 'contacto@miautohoy.com',
     from: datos.email,
     subject: 'Solicitud de Crédito',
     html: html
