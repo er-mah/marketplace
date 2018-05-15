@@ -13,6 +13,8 @@ const {
 } = require('../models').mah;
 const _ = require('lodash');
 const fs = require('fs');
+var StatsD = require('node-dogstatsd').StatsD;
+var dogstatsd = new StatsD();
 
 const { generateMailAgenciaoParticular, generateSinRegistro, generateForAdmin } = require('../mails');
 const sgMail = require('@sendgrid/mail');
@@ -1051,6 +1053,7 @@ const uploadAgencyImages = (req, res) => {
   });
 };
 const getFiltersAndTotalResult = (req, res) => {
+  dogstatsd.increment('cars.searched')
   req.body = req.body.search;
   let { text } = req.body;
   const {
