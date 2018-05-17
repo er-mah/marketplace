@@ -9,6 +9,7 @@ const {
   ImageGroup,
   PublicationState,
   PublicationDetail,
+  Sliders,
   sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
@@ -1355,6 +1356,42 @@ const requestCredit = (req,res)=>{
     });
   res.status(200).send({status: 'ok'});
 }
+
+const uploadSliders = (req, res) => {
+  const [ slider1, slider2, slider3 ] = req.files;
+  const imageData = [];
+  if (slider1) {
+    imageData.push({name: 'slider1', image: slider1.filename})
+  }
+  if (slider2) {
+    imageData.push({name: 'slider2', image: slider2.filename})
+  }
+  if (slider3) {
+    imageData.push({name: 'slider3', image: slider3.filename})
+  }
+  Sliders.destroy({truncate: true})
+  .then(()=>{
+    Sliders.bulkCreate(imageData)
+    .then(()=>{
+      Sliders.findAll({limit: 3})
+      .then((result)=>{
+      res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
+    })
+    })
+    .catch((err)=>{
+      res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
+    })
+  })
+};
+const getSliders = (req,res)=>{
+  Sliders.findAll({limit: 3})
+  .then((result)=>{
+    res.status(200).send({status:'ok', data: result})
+  })
+  .catch((err)=>{
+    res.status(400).send({status:'error', message:'Hubo un problema, intente mas tarde.', data: err})
+  })
+}
 module.exports = {
   login,
   loginAdmin,
@@ -1369,5 +1406,7 @@ module.exports = {
   editPublication,
   checkFacebookLogin,
   loginOrRegisterFacebook,
-  requestCredit
+  requestCredit,
+  uploadSliders,
+  getSliders
 };

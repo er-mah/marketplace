@@ -6,6 +6,7 @@ const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
 const moment = require('moment');
+const _ = require('lodash')
 
 
 //  SCHEDULER
@@ -13,6 +14,7 @@ const {
   Publication,
   PublicationState,
   HistoryState,
+  User,
 } = require('./models').mah;
 
 const rule = new schedule.RecurrenceRule();
@@ -48,6 +50,73 @@ const j = schedule.scheduleJob(rule, () => {
     console.log('SE VENCIERON:', publicacionesVencidas, 'PUBLICACIONES.');
   });
 });
+/* HistoryState.findAll({
+  where: { active: true },
+  include: [PublicationState],
+}).then((res) => {
+  let publicacionesVencidas = 0;
+
+  res.map((row) => {
+    const publicationDate = moment(row.dataValues.createdAt);
+    const actualDate = moment();
+    const diff = actualDate.diff(publicationDate, 'days');
+    const { publication_id } = row.dataValues;
+    const mailArray = [];
+    Publication.findOne({where: {id: row.dataValues.publication_id}})
+    .then(res=>{
+      const getUserEmail = (res)=>{
+        const data = res.dataValues;
+        let userMail = false;
+        if ((_.isUndefined(data.email) || _.isNull(data.email)) && data.user_id){
+          return User.findById(data.user_id, {attributes: ['email']})
+            .then((us)=>{
+              mailArray.push(getUserEmail(us.dataValues.mail))              
+            })
+        }else{
+          userMail = data.email
+          return mailArray.push(userMail);
+        }
+      }
+      getUserEmail(res)
+      //generateMailAgenciaoParticular(res.dataValues, 'vencimientoProximo')
+    }
+  )})
+})
+const rule2 = new schedule.RecurrenceRule();
+rule2.hour = 11;
+rule2.minute = 42;
+const j2 = schedule.scheduleJob(rule2, () => {
+  HistoryState.findAll({
+    where: { active: true },
+    include: [PublicationState],
+  }).then((res) => {
+    let publicacionesVencidas = 0;
+
+    res.map((row) => {
+      const publicationDate = moment(row.dataValues.createdAt);
+      const actualDate = moment();
+      const diff = actualDate.diff(publicationDate, 'days');
+      const { publication_id } = row.dataValues;
+      Publication.findOne({where: {id: row.dataValues.publication_id}})
+      .then(res=>{
+        const getUserEmail = (res)=>{
+          const data = res.dataValues;
+          if (_.isUndefined(data.email) || _.isNull(data.email)){
+            User.findById(data.user_id)
+              .then((us)=>{
+                return us.dataValues.email
+              })
+          }else{
+            return data.email
+          }
+        }
+        res.dataValues.email = getUserEmail(res);
+        console.log(res.dataValues.email);
+        //generateMailAgenciaoParticular(res.dataValues, 'vencimientoProximo')
+      }
+    )})
+})
+}) */
 
 const { graphiqlExpress } = require('apollo-server-express');
 /* const socketioJwt = require('socketio-jwt'); */
@@ -68,6 +137,8 @@ const {
   checkFacebookLogin,
   loginOrRegisterFacebook,
   requestCredit,
+  uploadSliders,
+  getSliders
 } = require('./routes');
 const multer = require('multer');
 
@@ -180,7 +251,8 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/registerUser',
     '/getFiltersAndTotalResult',
     /^\/images/,
-    '/requestCredit'
+    '/requestCredit',
+    '/getSliders'
   ],
 }));
 
@@ -194,53 +266,6 @@ app.use((req, res, next) => {
 });
 
 /* console.log(schema.getSubscriptionType().getFields().messageAdded) */
-
-// ===================================================================
-
-// SOCKETS ------------------------------------------------------------
-/* const socketServer = require('http').createServer(app);
-const io = require('socket.io')(socketServer);
-
-socketServer.listen(process.env.PORT || 4100);
-
-io.use((socket, next) => {
-  const handShake = socket.handshake;
-  const { token } = handShake.query;
-  if (jsonwt.verify(token, 'MAH2018!#')) {
-    next();
-  }
-  next(new Error('No autorizado'));
-});
-
-io.of('/offerChat').on('connection', (socket) => {
-  const id = socket.handshake.query.offerId;
-  const sockets = {};
-  if (id !== '') {
-    sockets[id] = socket;
-  }
-  socket.on('sellerTyping', () => {
-    socket.broadcast.emit('sellerTyping');
-  });
-  socket.on('sellerStopTyping', () => {
-    socket.broadcast.emit('sellerStopTyping');
-  });
-  socket.on('buyerTyping', () => {
-    socket.broadcast.emit('buyerTyping');
-  });
-  socket.on('buyerStopTyping', () => {
-    socket.broadcast.emit('buyerStopTyping');
-  }); */
-
-/*   socket.on('newMessage', (data) => {
-    createMessage(data.id_from, data.id_to, data.messageThread_id, data.content)
-      .then((res) => {
-        socket.emit('messageCreated', res);
-        socket.broadcast.emit('messageCreated', res);
-      });
-  });
-});
-*/
-// ===================================================================
 
 // ROUTES --------------------------------------------------------------
 app.post('/login', login);
@@ -264,6 +289,7 @@ app.post('/loginOrRegisterFacebook/', loginOrRegisterFacebook);
 app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
 app.post('/requestCredit', requestCredit);
+app.get('/getSliders', getSliders);
 app.post(
   '/uploadAgencyImages/:id',
   upload.fields([
@@ -271,5 +297,10 @@ app.post(
     { name: 'bannerImage', maxCount: 1 },
   ]),
   uploadAgencyImages,
+);
+app.post(
+  '/uploadSliders',
+  upload.array('sliders', 3),
+  uploadSliders,
 );
 // ===================================================================
