@@ -242,19 +242,32 @@ const UserMutations = {
     type: SearchResumeType,
     description: "Busca un usuario por mail o nombre",
     args: {
-      text: { type: new NotNull(Gstring) }
+      text: { type: new NotNull(Gstring) },
+      userType: {type: Gstring}
     },
     resolve: (_, args) => {
       args.text += "%";
       const { Op } = sequelize;
-      return User.findAndCountAll({
-        where: {
-          [Op.or]: {
-            email: { [Op.iLike]: args.text },
-            name: { [Op.iLike]: args.text }
-          }
+      const options = {}
+      options.where = {
+        [Op.or]: {
+          email: { [Op.iLike]: args.text },
+          name: { [Op.iLike]: args.text }
+        },
+        [Op.and]: {}
         }
-      }).then(res => {
+      if(args.userType){
+        if (args.userType === "Agencia") {
+          options.where[Op.and] = Object.assign(options.where[Op.and], 
+           { isAgency: true, isAdmin: false }
+          );
+      }else{
+         options.where[Op.and] = Object.assign(options.where[Op.and], 
+           { isAgency: false}
+          );
+      }
+    }
+      return User.findAndCountAll(options).then(res => {
         const getStatics = (stateName, user) =>
           Publication.count({
             where: { user_id: user.id },
