@@ -3,6 +3,7 @@ const { split } = require('split-object');
 const decode = require('jwt-decode');
 const moment = require('moment');
 const sharp = require('sharp');
+const PythonShell = require('python-shell');
 const {
   User,
   Publication,
@@ -1392,6 +1393,13 @@ const getSliders = (req,res)=>{
     res.status(400).send({status:'error', message:'Hubo un problema, intente mas tarde.', data: err})
   })
 }
+const getToken = (req,res)=>{
+  console.log(__dirname)
+  PythonShell.run(`service-account.py`,{scriptPath:__dirname, pythonPath:'/usr/bin/python'}, function (err,results) {
+    if (err) throw err;
+    res.status(200).send({status:'ok', message:results})
+  });
+}
 module.exports = {
   login,
   loginAdmin,
@@ -1408,5 +1416,6 @@ module.exports = {
   loginOrRegisterFacebook,
   requestCredit,
   uploadSliders,
-  getSliders
+  getSliders,
+  getToken
 };

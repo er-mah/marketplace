@@ -138,7 +138,8 @@ const {
   loginOrRegisterFacebook,
   requestCredit,
   uploadSliders,
-  getSliders
+  getSliders,
+  getToken
 } = require('./routes');
 const multer = require('multer');
 
@@ -290,6 +291,7 @@ app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
 app.post('/requestCredit', requestCredit);
 app.get('/getSliders', getSliders);
+app.get('/getToken', getToken);
 app.post(
   '/uploadAgencyImages/:id',
   upload.fields([
