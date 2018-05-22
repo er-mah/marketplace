@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
 const moment = require('moment');
 const _ = require('lodash')
+const methodOverride = require('method-override');
 
 
 //  SCHEDULER
@@ -139,6 +140,7 @@ const {
   requestCredit,
   uploadSliders,
   getSliders,
+  deleteSlider,
   getToken
 } = require('./routes');
 const multer = require('multer');
@@ -291,6 +293,7 @@ app.post('/registerAgency', registerAgency);
 app.post('/registerUser', registerUser);
 app.post('/requestCredit', requestCredit);
 app.get('/getSliders', getSliders);
+app.get('/deleteSlider/:id', deleteSlider);
 app.get('/getToken', getToken);
 app.post(
   '/uploadAgencyImages/:id',
@@ -301,8 +304,27 @@ app.post(
   uploadAgencyImages,
 );
 app.post(
-  '/uploadSliders',
-  upload.array('sliders', 3),
+  '/uploadSliders/:id',
+  upload.single('slider'),
   uploadSliders,
 );
 // ===================================================================
+
+app.use(methodOverride());
+app.use(logErrors);
+app.use(clientErrorHandler);
+app.use(errorHandler);
+function logErrors(err, req, res, next) {
+  next(err);
+}
+function clientErrorHandler(err, req, res, next) {
+  if (req.xhr) {
+    res.status(500).send({ error: 'Algo ha fallado! Intente nuevamente más tarde' });
+  } else {
+    next(err);
+  }
+}
+function errorHandler(err, req, res, next) {
+  console.log(err);
+  res.status(500).send({ message: err.message });
+}

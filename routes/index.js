@@ -1359,30 +1359,20 @@ const requestCredit = (req,res)=>{
 }
 
 const uploadSliders = (req, res) => {
-  const [ slider1, slider2, slider3 ] = req.files;
-  const imageData = [];
-  if (slider1) {
-    imageData.push({name: 'slider1', image: slider1.filename})
-  }
-  if (slider2) {
-    imageData.push({name: 'slider2', image: slider2.filename})
-  }
-  if (slider3) {
-    imageData.push({name: 'slider3', image: slider3.filename})
-  }
-  Sliders.destroy({truncate: true})
-  .then(()=>{
-    Sliders.bulkCreate(imageData)
-    .then(()=>{
-      Sliders.findAll({limit: 3})
-      .then((result)=>{
+  const slider = req.file
+  const sliderNumber = req.params.id;
+  const sliderName = `slider${sliderNumber}`
+  Sliders.upsert({
+    id: sliderNumber,
+    name:sliderName,
+    image: slider.filename,
+  })
+    .then((result)=>{
       res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
-    })
     })
     .catch((err)=>{
       res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
     })
-  })
 };
 const getSliders = (req,res)=>{
   Sliders.findAll({limit: 3})
@@ -1392,6 +1382,16 @@ const getSliders = (req,res)=>{
   .catch((err)=>{
     res.status(400).send({status:'error', message:'Hubo un problema, intente mas tarde.', data: err})
   })
+}
+const deleteSlider = (req,res)=>{
+  const sliderNumber = req.params.id
+  Sliders.findById(sliderNumber)
+  .then((sld)=>sld.destroy()  
+    .then(()=>res.status(200).send({status:'ok'}))
+    .catch((err)=>res.status(400).send({status:'error', message: err.message}))
+  )
+  .catch((err)=>res.status(400).send({status:'error', message: err.message}))
+  
 }
 const getToken = (req,res)=>{
   console.log(__dirname)
@@ -1417,5 +1417,6 @@ module.exports = {
   requestCredit,
   uploadSliders,
   getSliders,
+  deleteSlider,
   getToken
 };
