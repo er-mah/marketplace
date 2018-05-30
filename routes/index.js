@@ -44,6 +44,13 @@ const login = (req, res) => {
         return false;
       }
       try {
+        if((_.isNull(user.password))){
+          res.status(401).send({
+            status: 'error',
+            message: 'Usted ya se encuentra registrado a través de una red social. Ingrese presionando el botón correspondiente.',
+          });
+          return false;
+        }
         if (!user.validPassword(password, user.password)) {
           res.status(401).send({
             status: 'error',
@@ -51,7 +58,7 @@ const login = (req, res) => {
           });
           return false;
         }
-      } catch (e) {
+      } catch (e) {        
         if (e === 'Not a valid BCrypt hash.') {
           User.findOne({ where: { email } })
             .then((us) => {
@@ -86,6 +93,12 @@ const login = (req, res) => {
             message: 'Tu contraseña ha expirado, te enviaremos un mail para que la actualices.',
           });
           return false;
+        }else{
+          console.log(e);
+          res.status(401).send({
+            status: 'error',
+            message: e.message
+          });
         }
       }
       let userType;
@@ -273,7 +286,7 @@ const optimizeImage = file => sharp(`./images/${file.filename}`)
     quality: 60,
     chromaSubsampling: '4:4:4'
   })
-  .toFile(`./images/opt-${file.filename}`)
+  .toFile(`./images/opt-${file.filename}.jpg`)
   .then(() => removeOldFile(file));
 
 const prepareArrayToSharp = (imageGroup) => {
@@ -1362,17 +1375,20 @@ const uploadSliders = (req, res) => {
   const slider = req.file
   const sliderNumber = req.params.id;
   const sliderName = `slider${sliderNumber}`
-  Sliders.upsert({
-    id: sliderNumber,
-    name:sliderName,
-    image: slider.filename,
+  optimizeImage(slider)
+  .then(()=>{
+    Sliders.upsert({
+      id: sliderNumber,
+      name:sliderName,
+      image: `opt-${slider.filename}.jpg`,
+    })
+      .then((result)=>{
+        res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
+      })
+      .catch((err)=>{
+        res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
+      })
   })
-    .then((result)=>{
-      res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
-    })
-    .catch((err)=>{
-      res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
-    })
 };
 const getSliders = (req,res)=>{
   Sliders.findAll({limit: 3})

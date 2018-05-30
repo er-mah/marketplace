@@ -2,7 +2,7 @@
 
 echo Comenzando migracion...
 
-cat asimil.sql extrad.sql extrad2.sql extrad3.sql tautos30.sql grupos.sql usados.sql | psql -U postgres --password tautos
+cat asimil.sql extrad.sql extrad2.sql extrad3.sql tautos30.sql grupos.sql usados.sql | psql -U postgres --password tauto_production
 
 
 
