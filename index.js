@@ -246,6 +246,7 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/subscriptions',
     '/graphql',
     '/login',
+    '/loginAdmin',
     /^\/checkFacebookLogin/,
     '/loginOrRegisterFacebook',
     '/recoverPassword',
