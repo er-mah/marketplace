@@ -9,10 +9,12 @@ if [[ $TARGET == "production" ]]; then
   SERVER=api.miautohoy.com
   APP_PATH=/var/www/miautohoyapi/current
   SERVICE=miautohoyapi
+  EXTRA_RSYNC_OPTIONS=""
 else
   SERVER=api-test.miautohoy.com
   APP_PATH=/var/www/miautohoyapitest/current
   SERVICE=miautohoyapitest
+  EXTRA_RSYNC_OPTIONS="--exclude newrelic.js"
 fi
 
 echo "Deploying to $TARGET, please wait..."
@@ -20,7 +22,7 @@ echo "Deploying to $TARGET, please wait..."
 ssh $USER@$SERVER "mkdir -p $APP_PATH"
 rsync -az --delete --exclude .git --exclude .gitignore \
   --exclude deploy --exclude node_modules \
-  --exclude images \
+  --exclude images $EXTRA_RSYNC_OPTIONS \
   -e ssh . $USER@$SERVER:$APP_PATH
 ssh $USER@$SERVER "cd $APP_PATH && npm install"
 ssh root@$SERVER "systemctl restart $SERVICE"
