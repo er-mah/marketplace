@@ -360,8 +360,9 @@ const PublicationMutation = {
                   return pub.setPublicationStates([oldPs[0], newPs], {
                     through: { active: true }
                   });
+                  return pub;
                 })
-                .then(() => pub);
+                .then((pub) => pub);
             });
         });
       });

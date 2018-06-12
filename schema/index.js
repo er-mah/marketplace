@@ -3,7 +3,7 @@ const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
-const { UserError } = require('graphql-errors');
+const { UserError, maskErrors } = require('graphql-errors');
 
 
 const { UserType, SearchUserResultType, SearchResumeType } = require('../gtypes/UserType');
@@ -949,5 +949,5 @@ const schema = new Schema({
     },
   }),
 });
-
+maskErrors(schema);
 module.exports = schema;

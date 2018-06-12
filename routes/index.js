@@ -286,7 +286,7 @@ const optimizeImage = file => sharp(`./images/${file.filename}`)
     quality: 60,
     chromaSubsampling: '4:4:4'
   })
-  .toFile(`./images/opt-${file.filename}.jpg`)
+  .toFile(`./images/opt-${file.filename}`)
   .then(() => removeOldFile(file));
 
 const prepareArrayToSharp = (imageGroup) => {
@@ -1380,7 +1380,7 @@ const uploadSliders = (req, res) => {
     Sliders.upsert({
       id: sliderNumber,
       name:sliderName,
-      image: `opt-${slider.filename}.jpg`,
+      image: `opt-${slider.filename}`,
     })
       .then((result)=>{
         res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
