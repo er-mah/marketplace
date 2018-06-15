@@ -381,7 +381,9 @@ const createPublication = (req, res) => {
         isAdmin = true;
         userId = req.body.userId;
         User.findById(userId)
-          .then((us) => { userMail = us.dataValues.email; });
+          .then((us) => { userMail = us.dataValues.email; })
+          .catch(()=>res.status(400).send('Cree publicaciones para un usuario desde el superAdmin'));
+          return false;
       } else {
         User.findById(userId)
           .then((us) => { userMail = us.dataValues.email; });
