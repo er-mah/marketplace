@@ -695,7 +695,7 @@ const schema = new Schema({
           id: { type: new NotNull(Int) },
           MAHtoken: { type: new NotNull(Gstring) },
         },
-        resolve: resolver(CommentThread, {
+        resolve: resolver(CommentThread)/* , {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
             User.findById(userId)
@@ -709,7 +709,8 @@ const schema = new Schema({
                 return options;
               });
           },
-        }),
+          //after:(a,b)=>{console.log('a',a); console.log('b',b)}
+        }), */
       },
       CommentThread: {
         type: List(CommentThreadType),
