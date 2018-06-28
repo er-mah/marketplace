@@ -1107,16 +1107,34 @@ const getFiltersAndTotalResult = (req, res) => {
   if (brand) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
   }
+ 
   if (state) {
-    options.include = [
-      {
-        model: PublicationState,
-        where: {
-          stateName: state,
+    if (state === "Activas") {
+      options.include = [
+        {
+          model: PublicationState,
+          where: {
+            [Op.or]: [
+              { stateName: "Publicada" },
+              { stateName: "Destacada" },
+              { stateName: "Vendida" },
+              { stateName: "Apto para garantía" }
+            ]
+          },
+          through: { where: { active: true } }
+        }
+      ];
+    }else{
+      options.include = [
+        {
+          model: PublicationState,
+          where: {
+            stateName: state,
+          },
+          through: { where: { active: true } },
         },
-        through: { where: { active: true } },
-      },
-    ];
+      ];
+    }
   }else{
   options.include = [PublicationState];
   }
