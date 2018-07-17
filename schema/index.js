@@ -886,7 +886,7 @@ const schema = new Schema({
           return User.findById(userId)
             .then((usr) => {
               if (usr && usr.isAdmin) {
-                return CommentThread.findAll()
+                return CommentThread.findAll({order: [['createdAt', 'DESC']]})
                   .then(ct => ct);
               }
               throw new UserError('Solo los administradores pueden acceder');
