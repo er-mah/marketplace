@@ -17,11 +17,11 @@ module.exports = {
     },
   },
   test: {
-    username: 'root',
+    username: 'postgres',
     password: 'root',
     database: 'mah_test',
     host: '127.0.0.1',
-    dialect: 'mysql',
+    dialect: 'postgres',
     seederStorage: 'sequelize',
     operatorsAliases: false,
     databases: {

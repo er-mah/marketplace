@@ -3,7 +3,7 @@ const { split } = require('split-object');
 const decode = require('jwt-decode');
 const moment = require('moment');
 const sharp = require('sharp');
-const PythonShell = require('python-shell');
+// /const PythonShell = require('python-shell');
 const {
   User,
   Publication,
@@ -11,12 +11,12 @@ const {
   PublicationState,
   PublicationDetail,
   Sliders,
+  Provinces,
+  Town,
   sequelize,
 } = require('../models').mah;
 const _ = require('lodash');
 const fs = require('fs');
-var StatsD = require('node-dogstatsd').StatsD;
-var dogstatsd = new StatsD();
 
 const { generateMailAgenciaoParticular, generateSinRegistro, generateForAdmin } = require('../mails');
 const sgMail = require('@sendgrid/mail');
@@ -37,7 +37,7 @@ const login = (req, res) => {
     .then((user) => {
       if (_.isNull(user)) {
         console.log('usuario inexistente');
-        res.status(400).send({
+        res.status(401).send({
           status: 'error',
           message: 'Usuario inexistente o contraseña incorrecta.',
         });
@@ -94,10 +94,9 @@ const login = (req, res) => {
           });
           return false;
         }else{
-          console.log(e);
-          res.status(401).send({
+          return res.status(500).send({
             status: 'error',
-            message: e.message
+            message: e
           });
         }
       }
@@ -1070,11 +1069,10 @@ const uploadAgencyImages = (req, res) => {
   });
 };
 const getFiltersAndTotalResult = (req, res) => {
-  dogstatsd.increment('cars.searched')
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state, userType, modelName, brand,
+    carState, fuel, year, state, userType, modelName, brand, province_id
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -1093,6 +1091,12 @@ const getFiltersAndTotalResult = (req, res) => {
     ],
     [Op.and]: { carState },
   };
+  options.include = [
+    {model: User,
+    include :[Provinces]
+    }
+  ]
+
   if (fuel) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
   }
@@ -1110,8 +1114,8 @@ const getFiltersAndTotalResult = (req, res) => {
  
   if (state) {
     if (state === "Activas") {
-      options.include = [
-        {
+      options.include.push
+        ({
           model: PublicationState,
           where: {
             [Op.or]: [
@@ -1122,10 +1126,9 @@ const getFiltersAndTotalResult = (req, res) => {
             ]
           },
           through: { where: { active: true } }
-        }
-      ];
+        })
     }else{
-      options.include = [
+      options.include.push(
         {
           model: PublicationState,
           where: {
@@ -1133,54 +1136,19 @@ const getFiltersAndTotalResult = (req, res) => {
           },
           through: { where: { active: true } },
         },
-      ];
+      );
     }
   }else{
-  options.include = [PublicationState];
+  options.include.push({model: PublicationState})
+  }
+  if (province_id) {
+    options.include[0].include[0].where = {id : province_id}
   }
   if (userType) {        
     if (userType === "Agencia") {
-      if (_.isEmpty(options.include)) {
-        options.include = [
-          {
-            model: User,
-            where: { isAgency: true, isAdmin: false }
-          }
-        ];
-      }else{
-        options.include.push(
-          {
-            model: User,
-            where: { isAgency: true, isAdmin: false }
-          }
-        )
-      }
+        options.include[0].where = { isAgency: true, isAdmin: false }
     }else{
-      if (_.isEmpty(options.include)) {
-        options.include = [
-          {
-            model: User,
-            where: { isAgency: false }
-          }
-        ];
-      }else{
-        options.include.push(
-          {
-            model: User,
-            where: { isAgency: false }
-          }
-        )
-      }
-    }
-  }else{
-    if (_.isEmpty(options.include)) {
-      options.include = [ {
-        model: User,
-      }];
-    }else{
-      options.include.push( {
-        model: User,
-      })
+      options.include[0].where = {isAgency: false}
     }
   }
   Publication.findAll(options).then((results) => {
@@ -1193,6 +1161,7 @@ const getFiltersAndTotalResult = (req, res) => {
     newObj.brand = {};
     newObj.userType = {};
     newObj.modelName = {};
+    newObj.province = {};
     results.map(({ dataValues }) => {
       split(dataValues).map((row) => {
         if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName' || row.key === 'brand') {
@@ -1203,15 +1172,19 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] = 0;
         } */
-        if (row.key === 'User' && row.value === null) {
+        
+        if (row.key === 'User' && !_.isNull(row.value.Province)){
+          newObj['province'][row.value.Province.dataValues.name] = 0
+        }
+        if (row.key === 'User' && _.isNull(row.value)) {
           row.key = 'userType';
           row.value = 'Particular';
           newObj[row.key][row.value] = 0;
-        } else if (row.key === 'User' && row.value !== null) {
+        } else if (row.key === 'User' && !_.isNull(row.value)) {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] = 0;
-        }
+        } 
         return newObj;
       });
     });
@@ -1227,6 +1200,9 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
         } */
+        if (row.key === 'User' && !_.isNull(row.value.Province)){
+          newObj['province'][row.value.Province.dataValues.name] += 1
+        }
         if (row.key === 'User' && row.value === null) {
           row.key = 'userType';
           row.value = 'Particular';
@@ -1235,7 +1211,7 @@ const getFiltersAndTotalResult = (req, res) => {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] += 1;
-        }
+        } 
         switch (row.key) {
           case 'fuel':
             newObj[row.key][row.value] += 1;
@@ -1429,12 +1405,22 @@ const deleteSlider = (req,res)=>{
   .catch((err)=>res.status(400).send({status:'error', message: err.message}))
   
 }
-const getToken = (req,res)=>{
-  console.log(__dirname)
+/* const getToken = (req,res)=>{
   PythonShell.run(`service-account.py`,{scriptPath:__dirname, pythonPath:'/usr/bin/python'}, function (err,results) {
     if (err) throw err;
     res.status(200).send({status:'ok', message:results})
   });
+} */
+const getProvinces =(req,res)=>{
+  Provinces.findAll()
+    .then((provs)=>res.send({status:'ok', data:provs}))
+    .catch((e)=>res.status(400).send({status: 'error', message:e.message}))
+}
+const getTowns = (req,res)=>{
+  const province_id = req.body
+  Town.findAll({where:province_id})
+  .then((towns)=>res.send({status:'ok', data:towns}))
+  .catch((e)=>res.status(400).send({status: 'error', message:e.message}))
 }
 module.exports = {
   login,
@@ -1454,5 +1440,6 @@ module.exports = {
   uploadSliders,
   getSliders,
   deleteSlider,
-  getToken
+  getProvinces,
+  getTowns,
 };

@@ -8,7 +8,8 @@ const {
   PublicationState,
   HistoryState,
   User,
-  sequelize
+  Provinces,
+  sequelize,
 } = require("../models").mah;
 const { ImageGroupType } = require("./ImageGroupType");
 const { HistoryStateType } = require("./HistoryStateType");
@@ -115,6 +116,7 @@ const PublicationMutation = {
       state: { type: Gstring },
       order: { type: Gstring },
       user_id: { type: Int },
+      province_id: {type: Int},
       userType: { type: Gstring }
     },
     resolve: (_nada, args) => {
@@ -164,6 +166,33 @@ const PublicationMutation = {
         options.where[Op.and] = Object.assign(options.where[Op.and], {
           brand: args.brand
         });
+      }
+      if (args.province_id) {
+        if (_.isEmpty(options.include)) {
+          options.include = [
+            {
+              model: User,
+              include :[
+                {
+                  model: Provinces,
+                  where: {id: args.province_id}
+                }
+              ]
+            }
+          ]
+        }else{
+          options.include.push(
+            {
+              model: User,
+              include :[
+                {
+                  model: Provinces,
+                  where: {id: args.province_id}
+                }
+              ]
+            }
+          )
+        }
       }
       if (args.userType) {        
         if (args.userType === "Agencia") {
