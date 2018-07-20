@@ -1072,7 +1072,7 @@ const getFiltersAndTotalResult = (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state, userType, modelName, brand, province_id
+    carState, fuel, year, state, userType, modelName, brand, province
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -1111,7 +1111,9 @@ const getFiltersAndTotalResult = (req, res) => {
   if (brand) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
   }
- 
+  if (province) {    
+    options.include[0].include[0].where = {name : province}
+  }
   if (state) {
     if (state === "Activas") {
       options.include.push
@@ -1141,12 +1143,9 @@ const getFiltersAndTotalResult = (req, res) => {
   }else{
   options.include.push({model: PublicationState})
   }
-  if (province_id) {
-    options.include[0].include[0].where = {id : province_id}
-  }
   if (userType) {        
     if (userType === "Agencia") {
-        options.include[0].where = { isAgency: true, isAdmin: false }
+      options.include[0].where = { isAgency: true, isAdmin: false }
     }else{
       options.include[0].where = {isAgency: false}
     }
@@ -1173,8 +1172,10 @@ const getFiltersAndTotalResult = (req, res) => {
           newObj[row.key][row.value] = 0;
         } */
         
-        if (row.key === 'User' && !_.isNull(row.value.Province)){
+        if (row.key === 'User' && !_.isNull(row.value)){
+          if(!_.isNull(row.value.Province)){
           newObj['province'][row.value.Province.dataValues.name] = 0
+          }
         }
         if (row.key === 'User' && _.isNull(row.value)) {
           row.key = 'userType';
@@ -1200,8 +1201,10 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
         } */
-        if (row.key === 'User' && !_.isNull(row.value.Province)){
+        if (row.key === 'User' && !_.isNull(row.value)){
+          if(!_.isNull(row.value.Province)){
           newObj['province'][row.value.Province.dataValues.name] += 1
+        }
         }
         if (row.key === 'User' && row.value === null) {
           row.key = 'userType';
