@@ -1,7 +1,7 @@
 const moment = require('moment');
 const split = require('split-object')
 
-const host = 'https://beta.miautohoy.com';
+const host = 'https://miautohoy.com';
 
 const generateMailAgenciaoParticular = (data, tipoMail) => {
   let saludo = '';
@@ -30,7 +30,7 @@ const generateMailAgenciaoParticular = (data, tipoMail) => {
       saludo = 'Olvidaste tu contraseña';
       intro = `Hola ${data.name}`;
       body = `Olvidaste tu contraseña, no te preocupes es muy fácil recuperarla.<br />
-      Haz click en el siguiente <a href="${host}/recoverPassword?hash=${data.hash}">link</a> y podrás podrás reestablecer tu contraseña.
+      Haz click en el siguiente <a href="${host}/recoverPassword?hash=${data.hash}">link</a> y podrás reestablecer tu contraseña.
       `;
       break;
     }
