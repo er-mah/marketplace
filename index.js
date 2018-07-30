@@ -144,6 +144,7 @@ const {
   deleteSlider,
   getProvinces,
   getTowns,
+  getToken,
 } = require('./routes');
 const multer = require('multer');
 
@@ -314,6 +315,7 @@ app.post(
   upload.single('slider'),
   uploadSliders,
 );
+app.get('/getToken', getToken)
 // ===================================================================
 
 app.use(methodOverride());

@@ -3,7 +3,7 @@ const { split } = require('split-object');
 const decode = require('jwt-decode');
 const moment = require('moment');
 const sharp = require('sharp');
-// /const PythonShell = require('python-shell');
+const PythonShell = require('python-shell');
 const {
   User,
   Publication,
@@ -313,6 +313,8 @@ const createPublication = (req, res) => {
     name,
     email,
     phone,
+    province_id,
+    town_id,
     Alimentacion,
     Motor,
     Puertas,
@@ -427,8 +429,8 @@ const createPublication = (req, res) => {
                   brand,
                   group,
                   modelName,
-                  kms,
-                  price,
+                  kms: kms || null,
+                  price: price || null,
                   year,
                   fuel,
                   observation,
@@ -438,6 +440,8 @@ const createPublication = (req, res) => {
                   name,
                   email,
                   phone,
+                  province_id,
+                  town_id,
                   user_id: userId,
                   publicationDetail: {
                     Alimentacion,
@@ -663,6 +667,8 @@ const editPublication = (req, res) => {
     name,
     email,
     phone,
+    province_id,
+    town_id,
     Alimentacion,
     Motor,
     Puertas,
@@ -755,8 +761,8 @@ const editPublication = (req, res) => {
             brand,
             group,
             modelName,
-            kms,
-            price,
+            kms: kms || null,
+            price: price || null,
             year,
             fuel,
             observation,
@@ -765,6 +771,8 @@ const editPublication = (req, res) => {
             name,
             email,
             phone,
+            province_id,
+            town_id,
             user_id: userId,
             publicationDetail: {
               Alimentacion,
@@ -858,8 +866,8 @@ const editPublication = (req, res) => {
                       brand,
                       group,
                       modelName,
-                      kms,
-                      price,
+                      kms: kms || null,
+                      price: price || null,
                       year,
                       fuel,
                       observation,
@@ -869,6 +877,8 @@ const editPublication = (req, res) => {
                       name,
                       email,
                       phone,
+                      province_id,
+                      town_id,
                       user_id: userId,
                       publicationDetail: {
                         Alimentacion,
@@ -1408,12 +1418,12 @@ const deleteSlider = (req,res)=>{
   .catch((err)=>res.status(400).send({status:'error', message: err.message}))
   
 }
-/* const getToken = (req,res)=>{
+const getToken = (req,res)=>{
   PythonShell.run(`service-account.py`,{scriptPath:__dirname, pythonPath:'/usr/bin/python'}, function (err,results) {
     if (err) throw err;
     res.status(200).send({status:'ok', message:results})
   });
-} */
+}
 const getProvinces =(req,res)=>{
   Provinces.findAll()
     .then((provs)=>res.send({status:'ok', data:provs}))
@@ -1445,4 +1455,5 @@ module.exports = {
   deleteSlider,
   getProvinces,
   getTowns,
+  getToken,
 };
