@@ -4,6 +4,7 @@ const decode = require('jwt-decode');
 const moment = require('moment');
 const sharp = require('sharp');
 const PythonShell = require('python-shell');
+const fetch = require('node-fetch')
 const {
   User,
   Publication,
@@ -310,8 +311,6 @@ const createPublication = (req, res) => {
     brand,
     group,
     modelName,
-    kms,
-    price,
     year,
     Combustible,
     observation,
@@ -373,6 +372,10 @@ const createPublication = (req, res) => {
     AsientosTermicos,
     RunFlat,
   } = req.body;
+  let{price,kms} = req.body
+
+  if(!price){price=null}
+  if(!kms){kms=null}
   const imageGroup = req.files;
   if (imageGroup.length === 0) {
     res.status(400).send('Por favor elija aunque sea una imágen');
@@ -673,13 +676,15 @@ const editPublication = (req, res) => {
     if (req.body[row.key] === 'NO') req.body[row.key] = false;
     if (req.body[row.key] === '.') req.body[row.key] = false;
   });
+  let{price,kms} = req.body
+
+  if(!price){price=null}
+  if(!kms){kms=null}
   const {
     publication_id,
     brand,
     group,
     modelName,
-    kms,
-    price,
     year,
     Combustible,
     observation,
@@ -1414,7 +1419,6 @@ const requestCredit = (req,res)=>{
     });
   res.status(200).send({status: 'ok'});
 }
-
 const uploadSliders = (req, res) => {
   const slider = req.file
   const sliderNumber = req.params.id;
@@ -1470,6 +1474,21 @@ const getTowns = (req,res)=>{
   .then((towns)=>res.send({status:'ok', data:towns}))
   .catch((e)=>res.status(400).send({status: 'error', message:e.message}))
 }
+
+//Integración 123Seguro
+const addUserAndCarData = async (req,res)=>{
+  const {vehiculo_id, anio,} = req.body
+  try{
+    fetch('https://oauth-staging.123seguro.com/auth/login?email=admin@123seguro.com.ar&password=123seguro',{method:'POST'})
+    .then((res)=>res.json())
+    .then((response)=>res.send(response))
+  }catch(e){
+    res.status(400).send({status:'error', message: e.message})
+  }
+}
+
+//====================
+
 module.exports = {
   login,
   loginAdmin,
@@ -1491,4 +1510,6 @@ module.exports = {
   getProvinces,
   getTowns,
   getToken,
+  //123 seguro
+  addUserAndCarData
 };
