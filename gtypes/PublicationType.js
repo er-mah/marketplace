@@ -68,12 +68,23 @@ const PublicationType = new ObjectGraph({
       CurrentState: {
         type: HistoryStateType,
         resolve: args =>
-          HistoryState.findOne({
-            where: { publication_id: args.id, active: true },
+            HistoryState.findOne({
+            where: { publication_id: args.dataValues.id, active: true },
             include: [PublicationState]
           }).then(res => {
-            res.stateName = res.PublicationState.stateName;
-            return res;
+            if(_.isNull(res)){
+              res = {};
+             return HistoryState.findOne({
+                where: { publication_id: args.dataValues.id},
+                include: [PublicationState]
+              }).then(resp => {
+                resp.stateName = resp.dataValues.PublicationState.stateName;
+                return resp
+              })
+            }else{
+              res.stateName = res.dataValues.PublicationState.stateName;
+              return res;
+            }
           })
       },
       Specifications: {
