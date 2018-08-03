@@ -238,6 +238,13 @@ const loginOrRegisterFacebook = (req, res) => {
           name,
           isAgency: false,
         }).then((usr) => {
+          const msgToAdmin = {
+            to: miautoEmail,
+            from: miautoEmail,
+            subject: 'Nuevo Usuario Registrado!',
+            html: generateForAdmin('Hola!', 'Se ha registrado un nuevo usuario', null, `Se ha registrado un nuevo usuario con email: ${email} a través de Facebook.`),
+          };
+          sgMail.send(msgToAdmin);
           const userType = 'Usuario';
           const MAHtoken = jsonwt.sign(
             {
@@ -519,6 +526,13 @@ const createPublication = (req, res) => {
                     html: generateSinRegistro(publication, 'newPublication'),
                   };
                   sgMail.send(msg);
+                  const msgToAdmin = {
+                    to: miautoEmail,
+                    from: miautoEmail,
+                    subject: 'Nueva Publicación anónima!',
+                    html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación anónima', null, `Una nueva publicación anónima está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
+                  };
+                  sgMail.send(msgToAdmin);
                 });
               });
             })
@@ -628,6 +642,13 @@ const createPublication = (req, res) => {
                   html: generateMailAgenciaoParticular(publication, 'newPublication'),
                 };
                 sgMail.send(msg);
+                const msgToAdmin = {
+                  to: miautoEmail,
+                  from: miautoEmail,
+                  subject: 'Nueva Publicación!',
+                  html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, `Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
+                };
+                sgMail.send(msgToAdmin);
               });
             });
           })
@@ -983,6 +1004,13 @@ const registerAgency = (req, res) => {
             html: generateMailAgenciaoParticular(data, 'newAccount'),
           };
           sgMail.send(msg);
+          const msgToAdmin = {
+            to: miautoEmail,
+            from: miautoEmail,
+            subject: 'Nueva agencia Registrada!',
+            html: generateForAdmin('Hola!', 'Se ha registrado una nueva agencia', null, `Se ha registrado una nueva agencia con email: ${data.email} y nombre ${data.name} `),
+          };
+          sgMail.send(msgToAdmin);
         })
         .catch((err) => {
           res.status(400).send(ResponseObj('error', err));
@@ -1038,6 +1066,13 @@ const registerUser = (req, res) => {
             html: generateMailAgenciaoParticular(data, 'newAccount'),
           };
           sgMail.send(msg);
+          const msgToAdmin = {
+            to: miautoEmail,
+            from: miautoEmail,
+            subject: 'Nuevo Usuario Registrado!',
+            html: generateForAdmin('Hola!', 'Se ha registrado un nuevo usuario', null, `Se ha registrado un nuevo usuario con email: ${data.email} y nombre ${data.name} `),
+          };
+          sgMail.send(msgToAdmin);
         })
         .catch((err) => {
           res.status(400).send(ResponseObj('error', err));

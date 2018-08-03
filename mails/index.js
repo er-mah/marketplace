@@ -244,7 +244,7 @@ const generateSinRegistro = (data, tipoMail) => {
   </body>
   </html>`;
 };
-const generateForAdmin = (data, carData, tipoMail)=>{
+const generateForAdmin = (data, carData, tipoMail, bodyData)=>{
   let saludo = '';
   let intro = '';
   let body = '';
@@ -272,7 +272,7 @@ const generateForAdmin = (data, carData, tipoMail)=>{
       `;
       break;
     }
-    default: { return ''; }
+    default: { saludo = data; intro=carData; body=bodyData }
     
   }
   return `<html>
