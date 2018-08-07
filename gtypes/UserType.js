@@ -1,11 +1,11 @@
-const { attributeFields } = require("graphql-sequelize");
+const { attributeFields, resolver } = require("graphql-sequelize");
 const _ = require("lodash");
 const { UserError } = require("graphql-errors");
 const graphql = require("graphql");
-const { User,PublicationState } = require("../models").mah;
+const { User, PublicationState } = require("../models").mah;
 const jwtDecode = require("jwt-decode");
 const bcrypt = require("bcrypt-nodejs");
-
+const {ProvincesType} = require('./ProvincesType');
 const { Publication, CommentThread, sequelize } = require("../models").mah;
 
 const {
@@ -20,7 +20,13 @@ const {
 const UserType = new ObjectGraph({
   name: "User",
   description: "Usuario que puede ser agencia o un usuario común",
-  fields: _.assign(attributeFields(User))
+  fields: _.assign(attributeFields(User), 
+    {
+      Province: {
+        type: ProvincesType, 
+        resolve: resolver(User.Province)
+      }
+    })
 });
 const UserTypeWithResume = new ObjectGraph({
   name: "UserResume",
@@ -65,8 +71,10 @@ const UserMutations = {
       agencyAdress: {type: Gstring},
       agencyEmail: {type: Gstring},
       agencyPhone: {type: Gstring},
+      province_id: {type: Int},
+      town_id: {type: Int},
     },
-    resolve: (value, { userId, name, address, phone, MAHtoken, agencyName, agencyAdress, agencyEmail, agencyPhone}) => {
+    resolve: (value, { userId, name, address, phone, MAHtoken, agencyName, agencyAdress, agencyEmail, agencyPhone, province_id, town_id}) => {
       if(userId){
       const adminId = jwtDecode(MAHtoken).id;
       return User.findById(adminId).then(us => {
@@ -100,6 +108,12 @@ const UserMutations = {
               if (agencyPhone) {
                 UpdateData.agencyPhone = agencyPhone;
               }
+              if (province_id) {
+                UpdateData.province_id = province_id;
+              }
+              if (town_id) {
+                UpdateData.town_id = town_id;
+              }
               return us.update(UpdateData).then(usUp => usUp);
             }
           })
@@ -131,6 +145,12 @@ const UserMutations = {
             }
             if (agencyPhone) {
               UpdateData.agencyPhone = agencyPhone;
+            }
+            if (province_id) {
+              UpdateData.province_id = province_id;
+            }
+            if (town_id) {
+              UpdateData.town_id = town_id;
             }
             return us.update(UpdateData).then(usUp => usUp);
           }

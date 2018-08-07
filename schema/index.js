@@ -3,7 +3,7 @@ const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
 const _ = require('lodash');
-const { UserError } = require('graphql-errors');
+const { UserError, maskErrors } = require('graphql-errors');
 
 
 const { UserType, SearchUserResultType, SearchResumeType } = require('../gtypes/UserType');
@@ -695,7 +695,7 @@ const schema = new Schema({
           id: { type: new NotNull(Int) },
           MAHtoken: { type: new NotNull(Gstring) },
         },
-        resolve: resolver(CommentThread, {
+        resolve: resolver(CommentThread)/* , {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
             User.findById(userId)
@@ -709,7 +709,8 @@ const schema = new Schema({
                 return options;
               });
           },
-        }),
+          //after:(a,b)=>{console.log('a',a); console.log('b',b)}
+        }), */
       },
       CommentThread: {
         type: List(CommentThreadType),
@@ -885,7 +886,7 @@ const schema = new Schema({
           return User.findById(userId)
             .then((usr) => {
               if (usr && usr.isAdmin) {
-                return CommentThread.findAll()
+                return CommentThread.findAll({order: [['createdAt', 'DESC']]})
                   .then(ct => ct);
               }
               throw new UserError('Solo los administradores pueden acceder');
@@ -949,5 +950,5 @@ const schema = new Schema({
     },
   }),
 });
-
+maskErrors(schema);
 module.exports = schema;

@@ -8,7 +8,8 @@ const {
   PublicationState,
   HistoryState,
   User,
-  sequelize
+  Provinces,
+  sequelize,
 } = require("../models").mah;
 const { ImageGroupType } = require("./ImageGroupType");
 const { HistoryStateType } = require("./HistoryStateType");
@@ -126,6 +127,7 @@ const PublicationMutation = {
       state: { type: Gstring },
       order: { type: Gstring },
       user_id: { type: Int },
+      province: {type: Gstring},
       userType: { type: Gstring }
     },
     resolve: (_nada, args) => {
@@ -135,7 +137,12 @@ const PublicationMutation = {
       const LIMIT = 9;
       const doubleInclude= false;
       options.where = { [Op.and]: {} };
-
+    
+      options.include = [
+        {model: User,
+        include :[Provinces]
+        }
+      ]
       if (args.text) {
         options.where = { [Op.or]: {}, [Op.and]: {} };
         args.text = _.upperFirst(_.lowerCase(args.text));
@@ -176,51 +183,44 @@ const PublicationMutation = {
           brand: args.brand
         });
       }
-      if (args.userType) {        
+      if (args.province) {    
+        options.include[0].include[0].where = {name : args.province}
+      }
+      if (args.userType) { 
         if (args.userType === "Agencia") {
-          if (_.isEmpty(options.include)) {
-            options.include = [
-              {
-                model: User,
-                where: { isAgency: true, isAdmin: false }
-              }
-            ];
-          }else{
-            options.include.push(
-              {
-                model: User,
-                where: { isAgency: true, isAdmin: false }
-              }
-            )
-          }
-        }else{
-          if (_.isEmpty(options.include)) {
-            options.include = [
-              {
-                model: User,
-                where: { isAgency: false }
-              }
-            ];
-          }else{
-            options.include.push(
-              {
-                model: User,
-                where: { isAgency: false }
-              }
-            )
-          }
-        }
+        options.include[0].where = { isAgency: true, isAdmin: false }
+      }else{
+        options.include[0].where = {isAgency: false}
+      }
       }
       if (args.state) {
-        options.include = [
-          {
-            model: PublicationState,
-            where: {
-              stateName: args.state
+        if (args.state === "Activas") {
+          options.include.push
+            ({
+              model: PublicationState,
+              where: {
+                [Op.or]: [
+                  { stateName: "Publicada" },
+                  { stateName: "Destacada" },
+                  { stateName: "Vendida" },
+                  { stateName: "Apto para garantía" }
+                ]
+              },
+              through: { where: { active: true } }
+            })
+        }else{
+          options.include.push(
+            {
+              model: PublicationState,
+              where: {
+                stateName: args.state,
+              },
+              through: { where: { active: true } },
             },
-            through: { where: { active: true } }
-          }
-        ];
+          );
+        }
+      }else{
+        options.include.push({model: PublicationState})
       }
       if (args.carState) {
         options.where[Op.and] = Object.assign(options.where[Op.and], {
@@ -371,8 +371,9 @@ const PublicationMutation = {
                   return pub.setPublicationStates([oldPs[0], newPs], {
                     through: { active: true }
                   });
+                  return pub;
                 })
-                .then(() => pub);
+                .then((pub) => pub);
             });
         });
       });

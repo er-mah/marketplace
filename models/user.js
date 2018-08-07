@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = (models) => {
     User.Publication = User.hasMany(models.mah.Publication, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+    User.Province = User.belongsTo(models.mah.Provinces, {foreignKey:'province_id', onDelete:'CASCADE'})
+    User.Town = User.belongsTo(models.mah.Town, {foreignKey:'town_id', onDelete:'CASCADE'})
   };
 
   return User;

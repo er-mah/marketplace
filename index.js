@@ -142,7 +142,9 @@ const {
   uploadSliders,
   getSliders,
   deleteSlider,
-  getToken
+  getProvinces,
+  getTowns,
+  getToken,
 } = require('./routes');
 const multer = require('multer');
 
@@ -257,7 +259,9 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/getFiltersAndTotalResult',
     /^\/images/,
     '/requestCredit',
-    '/getSliders'
+    '/getSliders',
+    '/getProvinces',
+    '/getTowns'
   ],
 }));
 
@@ -296,7 +300,8 @@ app.post('/registerUser', registerUser);
 app.post('/requestCredit', requestCredit);
 app.get('/getSliders', getSliders);
 app.get('/deleteSlider/:id', deleteSlider);
-app.get('/getToken', getToken);
+app.get('/getProvinces', getProvinces);
+app.post('/getTowns', getTowns);
 app.post(
   '/uploadAgencyImages/:id',
   upload.fields([
@@ -310,6 +315,7 @@ app.post(
   upload.single('slider'),
   uploadSliders,
 );
+app.get('/getToken', getToken)
 // ===================================================================
 
 app.use(methodOverride());
