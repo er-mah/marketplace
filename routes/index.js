@@ -651,7 +651,7 @@ const createPublication = (req, res) => {
                   subject: 'Nueva Publicación!',
                   html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, `Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
                 };
-                sgMail.send(msgToAdmin);
+                !isAdmin && sgMail.send(msgToAdmin);
               });
             });
           })
