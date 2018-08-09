@@ -145,6 +145,12 @@ const {
   getProvinces,
   getTowns,
   getToken,
+  //123Seguros
+  addUserAndCarData,
+  get123Provinces,
+  get123Localities,
+  get123Token,
+  //--------------
 } = require('./routes');
 const multer = require('multer');
 
@@ -261,7 +267,11 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/requestCredit',
     '/getSliders',
     '/getProvinces',
-    '/getTowns'
+    '/getTowns',
+    '/addUserAndCarData',
+    '/get123Token',
+    '/get123Provinces',
+    '/get123Localities',
   ],
 }));
 
@@ -316,6 +326,11 @@ app.post(
   uploadSliders,
 );
 app.get('/getToken', getToken)
+//123Seguro
+app.post('/addUserAndCarData', addUserAndCarData)
+app.post('/get123Provinces', get123Provinces)
+app.post('/get123Localities', get123Localities)
+app.get('/get123Token', get123Token)
 // ===================================================================
 
 app.use(methodOverride());

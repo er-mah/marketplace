@@ -15,6 +15,8 @@ const { ImageGroupType } = require("./ImageGroupType");
 const { HistoryStateType } = require("./HistoryStateType");
 const { PublicationStateType } = require("./PublicationStateType");
 const { PublicationDetailType } = require("./PublicationDetailType");
+const { ProvincesType } = require("./ProvincesType");
+const { TownType } = require("./TownType");
 const { UserType } = require("./UserType");
 const {
   generateMailAgenciaoParticular,
@@ -94,6 +96,14 @@ const PublicationType = new ObjectGraph({
       User: {
         type: UserType,
         resolve: resolver(Publication.User)
+      },
+      Province: {
+          type: ProvincesType, 
+          resolve: resolver(Publication.Province)
+      },
+      Town : {
+        type: TownType,
+        resolve: resolver(Publication.Town)
       }
     }
   )
@@ -130,7 +140,7 @@ const PublicationMutation = {
       province: {type: Gstring},
       userType: { type: Gstring }
     },
-    resolve: (_nada, args) => {
+    resolve: async (_nada, args) => {
       const result = {};
       const { Op } = sequelize;
       const options = {};
@@ -139,9 +149,8 @@ const PublicationMutation = {
       options.where = { [Op.and]: {} };
     
       options.include = [
-        {model: User,
-        include :[Provinces]
-        }
+        {model: Provinces},
+        {model: User}
       ]
       if (args.text) {
         options.where = { [Op.or]: {}, [Op.and]: {} };
@@ -183,14 +192,11 @@ const PublicationMutation = {
           brand: args.brand
         });
       }
-      if (args.province) {    
-        options.include[0].include[0].where = {name : args.province}
-      }
       if (args.userType) { 
         if (args.userType === "Agencia") {
-        options.include[0].where = { isAgency: true, isAdmin: false }
+        options.include[1].where = { isAgency: true, isAdmin: false }
       }else{
-        options.include[0].where = {isAgency: false}
+        options.include[1].where = {isAgency: false}
       }
       }
       if (args.state) {
@@ -227,26 +233,17 @@ const PublicationMutation = {
           carState: args.carState
         });
       }
-      if (args.state === "Activas") {
-        options.include = [
-          {
-            model: PublicationState,
-            where: {
-              [Op.or]: [
-                { stateName: "Publicada" },
-                { stateName: "Destacada" },
-                { stateName: "Vendida" },
-                { stateName: "Apto para garantía" }
-              ]
-            },
-            through: { where: { active: true } }
-          }
-        ];
-      }
 
       if (args.page) {
         options.limit = LIMIT;
         options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
+      }
+      if(args.province){
+        const provinceIns = await Provinces.findOne({where:{name:args.province}})
+        const province_id = provinceIns.dataValues.id
+        options.where[Op.and] = Object.assign(options.where[Op.and], {
+          province_id
+        });
       }
       return Publication.findAndCountAll(options).then(({ rows, count }) => {
         const searchMorePubs = () => {

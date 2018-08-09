@@ -6,6 +6,7 @@ const { User, PublicationState } = require("../models").mah;
 const jwtDecode = require("jwt-decode");
 const bcrypt = require("bcrypt-nodejs");
 const {ProvincesType} = require('./ProvincesType');
+const {TownType} = require('./TownType');
 const { Publication, CommentThread, sequelize } = require("../models").mah;
 
 const {
@@ -26,7 +27,14 @@ const UserType = new ObjectGraph({
         type: ProvincesType, 
         resolve: resolver(User.Province)
       }
-    })
+    },
+    {
+      Town: {
+        type: TownType, 
+        resolve: resolver(User.Town)
+      }
+    }
+  )
 });
 const UserTypeWithResume = new ObjectGraph({
   name: "UserResume",

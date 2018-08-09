@@ -385,6 +385,8 @@ const createPublication = (req, res) => {
   let userId = null;
   let isAdmin = false;
   let userMail = '';
+  let userProvince = null;
+  let userTown = null;
   if (req.headers.authorization) {
     userId = decode(req.headers.authorization.slice(7)).id;
     User.findById(userId).then((usr) => {
@@ -392,12 +394,20 @@ const createPublication = (req, res) => {
         isAdmin = true;
         userId = req.body.userId;
         User.findById(userId)
-          .then((us) => { userMail = us.dataValues.email; })
+          .then((us) => {
+             userMail = us.dataValues.email; 
+             userProvince = us.dataValues.province_id;
+             userTown = us.dataValues.town_id;
+            })
           .catch(()=>res.status(400).send('Cree publicaciones para un usuario desde el superAdmin'));
           return false;
       } else {
         User.findById(userId)
-          .then((us) => { userMail = us.dataValues.email; });
+          .then((us) => { 
+            userMail = us.dataValues.email; 
+            userProvince = us.dataValues.province_id;
+            userTown = us.dataValues.town_id;
+          });
       }
     });
   }
@@ -568,6 +578,8 @@ const createPublication = (req, res) => {
                 name,
                 email,
                 phone,
+                province_id:userProvince,
+                town_id:userTown,
                 user_id: userId,
                 publicationDetail: {
                   Alimentacion,
@@ -651,7 +663,7 @@ const createPublication = (req, res) => {
                   subject: 'Nueva Publicación!',
                   html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, `Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
                 };
-                sgMail.send(msgToAdmin);
+                !isAdmin && sgMail.send(msgToAdmin);
               });
             });
           })
@@ -1118,7 +1130,7 @@ const uploadAgencyImages = (req, res) => {
       });
   });
 };
-const getFiltersAndTotalResult = (req, res) => {
+const getFiltersAndTotalResult = async(req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
@@ -1142,9 +1154,7 @@ const getFiltersAndTotalResult = (req, res) => {
     [Op.and]: { carState },
   };
   options.include = [
-    {model: User,
-    include :[Provinces]
-    }
+    {model: Provinces},{model:User}
   ]
 
   if (fuel) {
@@ -1161,8 +1171,12 @@ const getFiltersAndTotalResult = (req, res) => {
   if (brand) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
   }
-  if (province) {    
-    options.include[0].include[0].where = {name : province}
+  if(province){
+    const provinceIns = await Provinces.findOne({where:{name:province}})
+    const province_id = provinceIns.dataValues.id
+    options.where[Op.and] = Object.assign(options.where[Op.and], {
+      province_id
+    });
   }
   if (state) {
     if (state === "Activas") {
@@ -1195,9 +1209,9 @@ const getFiltersAndTotalResult = (req, res) => {
   }
   if (userType) {        
     if (userType === "Agencia") {
-      options.include[0].where = { isAgency: true, isAdmin: false }
+      options.include[1].where = { isAgency: true, isAdmin: false }
     }else{
-      options.include[0].where = {isAgency: false}
+      options.include[1].where = {isAgency: false}
     }
   }
   Publication.findAll(options).then((results) => {
@@ -1221,10 +1235,9 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] = 0;
         } */
-        
-        if (row.key === 'User' && !_.isNull(row.value)){
-          if(!_.isNull(row.value.Province)){
-          newObj['province'][row.value.Province.dataValues.name] = 0
+        if (row.key === 'Province' && !_.isNull(row.value)){
+          if(!_.isNull(row.value.dataValues)){
+          newObj['province'][row.value.dataValues.name] = 0
           }
         }
         if (row.key === 'User' && _.isNull(row.value)) {
@@ -1251,16 +1264,16 @@ const getFiltersAndTotalResult = (req, res) => {
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
         } */
-        if (row.key === 'User' && !_.isNull(row.value)){
-          if(!_.isNull(row.value.Province)){
-          newObj['province'][row.value.Province.dataValues.name] += 1
+        if (row.key === 'Province' && !_.isNull(row.value)){
+          if(!_.isNull(row.value.dataValues)){
+          newObj['province'][row.value.dataValues.name] += 1
         }
         }
-        if (row.key === 'User' && row.value === null) {
+        if (row.key === 'User' && _.isNull(row.value)) {
           row.key = 'userType';
           row.value = 'Particular';
           newObj[row.key][row.value] += 1;
-        } else if (row.key === 'User' && row.value !== null) {
+        } else if (row.key === 'User' && !_.isNull(row.value)) {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] += 1;
@@ -1464,19 +1477,111 @@ const getToken = (req,res)=>{
   });
 }
 
-//Integración 123Seguro
-const addUserAndCarData = async (req,res)=>{
-  const {vehiculo_id, anio,} = req.body
+//Integración 123Seguro=====================================================================================================================
+const get123TokenHelper = () =>{
+  
+}
+const get123Token = (req,res)=>{
   try{
     fetch('https://oauth-staging.123seguro.com/auth/login?email=admin@123seguro.com.ar&password=123seguro',{method:'POST'})
     .then((res)=>res.json())
-    .then((response)=>res.send(response))
+    .then((response)=> res.send({status:'ok', token:response.token}))
   }catch(e){
     res.status(400).send({status:'error', message: e.message})
   }
 }
+const addUserAndCarData = (req,res)=>{
+  const {
+    token,
+    nombre, apellido, mail, telefono, edad, // crear Usuario
+    localidad_id, //crear Domicilio 11163
+    anio, vehiculo_id, //crear auto 120198
+    } = req.body
+  const canal_id = 1;
+  let options = {
+    method: "POST",
+    headers:{
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  }
+  const urlCreateUser='https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios';
+  const getUrlCreateDirection= (usuario_id) =>`https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios/${usuario_id}/direcciones`;
+  const getUrlCreateCar = (usuario_id) => `https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios/${usuario_id}/autos`;
+  //createUser-------------------------------------
+  options.body=JSON.stringify({
+    nombre,
+    apellido,
+    mail,
+    telefono,
+    edad
+  })
+  fetch(urlCreateUser, options)
+    .then((response)=>response.json())
+    .catch(e=>res.status(400).send({status:'error', message: e.message}))
+    .then((resData)=>{
+      const usuario_id = resData.user.id
+      //createDirection-------------------------------------
+      options.body=JSON.stringify({
+        localidad_id
+      })
+      fetch(getUrlCreateDirection(usuario_id), options)
+        .then((response)=>response.json())
+        .catch(e=>res.status(400).send({status:'error', message: e.message}))
+        .then(()=>{
+        //createCar-------------------------------------
+        options.body=JSON.stringify({
+          anio, vehiculo_id, canal_id
+        })
+        fetch(getUrlCreateCar(usuario_id),options)
+          .then((response)=>response.json())
+          .catch(e=>res.status(400).send({status:'error', message: e.message}))
+          .then((resData)=>{
+            console.log(resData);
+            res.send({status:'ok',data:{ producto_id: resData.id} })
+          })
+          .catch(e=>res.status(400).send({status:'error', message: e.message}))
+        })
+        .catch(e=>res.status(400).send({status:'error', message: e.message}))
+    })
+    .catch(e=>res.status(400).send({status:'error', message: e.message}))
 
-//====================
+
+}
+const getQuotes = (req, res)=>{
+  const {producto_id} = req.body;
+  const companies = ['allianz', 'chubb', 'mapfre', 'meridional', 'provincia', 'prudencia', 'sancor', 'sura', 'zurich'];
+}
+const get123Provinces = (req, res)=>{
+  const {token} = req.body;
+  const urlGetProvinces= 'https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/provincias';
+  const options = {
+    method: "GET",
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    }
+  }
+  fetch(urlGetProvinces, options)
+  .then(resp=>resp.json())
+  .then(resData=>res.send({status:'ok', data:resData}))
+  .catch(e=>res.send({status:'error', message: e.message}))
+}
+const get123Localities = (req, res)=>{
+  const {token, province_id} = req.body;
+  const urlGetLocalities= `https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/provincias/${province_id}/localidades`;
+  const options = {
+    method: "GET",
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    }
+  }
+  fetch(urlGetLocalities, options)
+  .then(resp=>resp.json())
+  .then(resData=>res.send({status:'ok', data:resData}))
+  .catch(e=>res.send({status:'error', message: e.message}))
+}
+
+//======================================================================================================================================
 
 const getProvinces =(req,res)=>{
   Provinces.findAll()
@@ -1510,6 +1615,10 @@ module.exports = {
   getToken,
   //123 seguro
   addUserAndCarData,
+  get123Provinces,
+  get123Localities,
+  get123Token,
+  //---
   getProvinces,
   getTowns,
   getToken,
