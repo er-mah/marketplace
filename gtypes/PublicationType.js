@@ -298,17 +298,22 @@ const PublicationMutation = {
         }
         return pub
           .getPublicationStates({ through: { where: { active: true } } })
-          .then(oldPs => {
-            if (
-              oldPs[0].dataValues.stateName === "Vendida" ||
-              oldPs[0].dataValues.stateName === "Pendiente" ||
-              oldPs[0].dataValues.stateName === "Suspendida" ||
-              oldPs[0].dataValues.stateName === "Eliminada" ||
-              oldPs[0].dataValues.stateName === "Vencida"
-            ) {
-              throw new UserError(
-                "Esta publicación ya está vendida o no se ecuentra activa actualmente."
-              );
+          .then( async oldPs => {
+            if(_.isEmpty(oldPs)){
+              oldPs = await pub.getPublicationStates()
+            }
+            if(!_.isEmpty(oldPs)){
+              if (
+                oldPs[0].dataValues.stateName === "Vendida" ||
+                oldPs[0].dataValues.stateName === "Pendiente" ||
+                oldPs[0].dataValues.stateName === "Suspendida" ||
+                oldPs[0].dataValues.stateName === "Eliminada" ||
+                oldPs[0].dataValues.stateName === "Vencida"
+              ) {
+                throw new UserError(
+                  "Esta publicación ya está vendida o no se ecuentra activa actualmente."
+                );
+              }
             }
             oldPs[0].HistoryState = {
               active: false
@@ -334,7 +339,7 @@ const PublicationMutation = {
     },
     resolve: (_nada, args) => {
       const userID = decode(args.MAHtoken).id;
-      User.findById(userID).then(usr => {
+      return User.findById(userID).then(usr => {
         if (!usr.isAdmin) {
           throw new UserError(
             "Solo los administradores pueden realizar esta acción"
@@ -348,11 +353,16 @@ const PublicationMutation = {
           }
           return pub
             .getPublicationStates({ through: { where: { active: true } } })
-            .then(oldPs => {
-              if (oldPs[0].dataValues.stateName === args.stateName) {
-                throw new UserError(
-                  `Esta publicación ya está en estado ${args.stateName}.`
-                );
+            .then( async oldPs => {
+              if(_.isEmpty(oldPs)){
+                oldPs = await pub.getPublicationStates()
+              }
+              if(!_.isEmpty(oldPs)){
+                if (oldPs[0].dataValues.stateName === args.stateName) {
+                  throw new UserError(
+                    `Esta publicación ya está en estado ${args.stateName}.`
+                  );
+                }
               }
               oldPs[0].HistoryState = {
                 active: false
@@ -367,10 +377,9 @@ const PublicationMutation = {
                   }
                   return pub.setPublicationStates([oldPs[0], newPs], {
                     through: { active: true }
-                  });
-                  return pub;
+                  })
                 })
-                .then((pub) => pub);
+                .then(() =>pub);
             });
         });
       });
@@ -393,17 +402,22 @@ const PublicationMutation = {
         }
         return pub
           .getPublicationStates({ through: { where: { active: true } } })
-          .then(oldPs => {
-            if (
-              oldPs[0].dataValues.stateName === "Destacada" ||
-              oldPs[0].dataValues.stateName === "Pendiente" ||
-              oldPs[0].dataValues.stateName === "Suspendida" ||
-              oldPs[0].dataValues.stateName === "Eliminada" ||
-              oldPs[0].dataValues.stateName === "Vencida"
-            ) {
-              throw new UserError(
-                "Esta publicación ya está destacada o no se ecuentra activa actualmente."
-              );
+          .then( async oldPs => {
+            if(_.isEmpty(oldPs)){
+              oldPs = await pub.getPublicationStates()
+            }
+            if(!_.isEmpty(oldPs)){
+              if (
+                oldPs[0].dataValues.stateName === "Destacada" ||
+                oldPs[0].dataValues.stateName === "Pendiente" ||
+                oldPs[0].dataValues.stateName === "Suspendida" ||
+                oldPs[0].dataValues.stateName === "Eliminada" ||
+                oldPs[0].dataValues.stateName === "Vencida"
+              ) {
+                throw new UserError(
+                  "Esta publicación ya está destacada o no se ecuentra activa actualmente."
+                );
+              }
             }
             oldPs[0].HistoryState = {
               active: false
@@ -444,17 +458,22 @@ const PublicationMutation = {
           }
           return pub
             .getPublicationStates({ through: { where: { active: true } } })
-            .then(oldPs => {
-              if (
-                oldPs[0].dataValues.stateName === "Destacada" ||
-                oldPs[0].dataValues.stateName === "Pendiente" ||
-                oldPs[0].dataValues.stateName === "Suspendida" ||
-                oldPs[0].dataValues.stateName === "Eliminada" ||
-                oldPs[0].dataValues.stateName === "Vencida"
-              ) {
-                throw new UserError(
-                  "Esta publicación ya está destacada o no se ecuentra activa actualmente."
-                );
+            .then(async oldPs => {
+              if(_.isEmpty(oldPs)){
+                oldPs = await pub.getPublicationStates()
+              }
+              if(!_.isEmpty(oldPs)){
+                if (
+                  oldPs[0].dataValues.stateName === "Destacada" ||
+                  oldPs[0].dataValues.stateName === "Pendiente" ||
+                  oldPs[0].dataValues.stateName === "Suspendida" ||
+                  oldPs[0].dataValues.stateName === "Eliminada" ||
+                  oldPs[0].dataValues.stateName === "Vencida"
+                ) {
+                  throw new UserError(
+                    "Esta publicación ya está destacada o no se ecuentra activa actualmente."
+                  );
+                }
               }
               oldPs[0].HistoryState = {
                 active: false
@@ -496,13 +515,18 @@ const PublicationMutation = {
           }
           return pub
             .getPublicationStates({ through: { where: { active: true } } })
-            .then(oldPs => {
-              if (
-                oldPs[0].dataValues.stateName !== "Destacada"
-              ) {
-                throw new UserError(
-                  "Esta publicación no está destacada actualmente."
-                );
+            .then(async oldPs => {
+              if(_.isEmpty(oldPs)){
+                oldPs = await pub.getPublicationStates()
+              }
+              if(!_.isEmpty(oldPs)){
+                if (
+                  oldPs[0].dataValues.stateName !== "Destacada"
+                ) {
+                  throw new UserError(
+                    "Esta publicación no está destacada actualmente."
+                  );
+                }
               }
               oldPs[0].HistoryState = {
                 active: false
@@ -544,17 +568,22 @@ const PublicationMutation = {
             } else {
               return pub
                 .getPublicationStates({ through: { where: { active: true } } })
-                .then(oldPs => {
-                  if (
-                    oldPs[0].dataValues.stateName === "Publicada" ||
-                    oldPs[0].dataValues.stateName === "Destacada" ||
-                    oldPs[0].dataValues.stateName === "Vendida" ||
-                    oldPs[0].dataValues.stateName === "Archivada" ||
-                    oldPs[0].dataValues.stateName === "Vencida" ||
-                    oldPs[0].dataValues.stateName === "Eliminada" ||
-                    oldPs[0].dataValues.stateName === "Apto para garantía"
-                  ) {
-                    throw new UserError("Esta publicación ya está activa.");
+                .then(async oldPs => {
+                  if(_.isEmpty(oldPs)){
+                    oldPs = await pub.getPublicationStates()
+                  }
+                  if(!_.isEmpty(oldPs)){
+                    if (
+                      oldPs[0].dataValues.stateName === "Publicada" ||
+                      oldPs[0].dataValues.stateName === "Destacada" ||
+                      oldPs[0].dataValues.stateName === "Vendida" ||
+                      oldPs[0].dataValues.stateName === "Archivada" ||
+                      oldPs[0].dataValues.stateName === "Vencida" ||
+                      oldPs[0].dataValues.stateName === "Eliminada" ||
+                      oldPs[0].dataValues.stateName === "Apto para garantía"
+                    ) {
+                      throw new UserError("Esta publicación ya está activa.");
+                    }
                   }
                   oldPs[0].HistoryState = {
                     active: false
@@ -631,15 +660,20 @@ const PublicationMutation = {
             } else {
               return pub
                 .getPublicationStates({ through: { where: { active: true } } })
-                .then(oldPs => {
-                  if (oldPs[0].dataValues.stateName === "Suspendida") {
-                    throw new UserError("Esta publicación ya está suspendida.");
+                .then(async oldPs => {
+                  if(_.isEmpty(oldPs)){
+                    oldPs = await pub.getPublicationStates()
                   }
-                  if (oldPs[0].dataValues.stateName === "Vendida") {
-                    throw new UserError("Esta publicación ya ha sido vendida.");
-                  }
-                  if (oldPs[0].dataValues.stateName === "Vencida") {
-                    throw new UserError("Esta publicación ya está vencida.");
+                  if(!_.isEmpty(oldPs)){
+                    if (oldPs[0].dataValues.stateName === "Suspendida") {
+                      throw new UserError("Esta publicación ya está suspendida.");
+                    }
+                    if (oldPs[0].dataValues.stateName === "Vendida") {
+                      throw new UserError("Esta publicación ya ha sido vendida.");
+                    }
+                    if (oldPs[0].dataValues.stateName === "Vencida") {
+                      throw new UserError("Esta publicación ya está vencida.");
+                    }
                   }
                   oldPs[0].HistoryState = {
                     active: false
