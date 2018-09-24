@@ -321,8 +321,10 @@ app.post(
   uploadAgencyImages,
 );
 app.post(
-  '/uploadSliders/:id',
-  upload.single('slider'),
+  '/uploadSliders/',
+  upload.fields([
+    { name: 'slider', maxCount: 1 }, { name: 'sliderResponsive', maxCount: 1 }
+  ]),
   uploadSliders,
 );
 app.get('/getToken', getToken)

@@ -1433,26 +1433,39 @@ const requestCredit = (req,res)=>{
   res.status(200).send({status: 'ok'});
 }
 const uploadSliders = (req, res) => {
-  const slider = req.file
-  const sliderNumber = req.params.id;
+  let {slider, sliderResponsive} = req.files
+  slider = slider[0];
+  sliderResponsive = sliderResponsive[0];
+  const {sliderNumber} = req.body;
   const sliderName = `slider${sliderNumber}`
   optimizeImage(slider)
   .then(()=>{
-    Sliders.upsert({
+   return Sliders.upsert({
       id: sliderNumber,
       name:sliderName,
       image: `opt-${slider.filename}`,
     })
-      .then((result)=>{
-        res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
-      })
-      .catch((err)=>{
-        res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
-      })
+  })
+  .then(()=> 
+  optimizeImage(sliderResponsive))
+  .then(()=>{
+    let id= sliderNumber + 1;
+    return Sliders.upsert({
+      id,
+      name:sliderName,
+      image: `opt-${sliderResponsive.filename}`,
+    })
+  })
+  .then((result)=>{
+    res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
+  })
+  .catch((err)=>{
+    console.log(err)
+    res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
   })
 };
 const getSliders = (req,res)=>{
-  Sliders.findAll({limit: 3})
+  Sliders.findAll()
   .then((result)=>{
     res.status(200).send({status:'ok', data: result})
   })
