@@ -1,10 +1,12 @@
+require('dotenv').config();
 const jsonwt = require('jsonwebtoken');
 const { split } = require('split-object');
 const decode = require('jwt-decode');
 const moment = require('moment');
 const sharp = require('sharp');
 const PythonShell = require('python-shell');
-const fetch = require('node-fetch')
+const fetch = require('node-fetch');
+const bcrypt = require('bcrypt-nodejs');
 const {
   User,
   Publication,
@@ -45,7 +47,7 @@ const login = (req, res) => {
         return false;
       }
       try {
-        if((_.isNull(user.password))){
+        if ((_.isNull(user.password))) {
           res.status(401).send({
             status: 'error',
             message: 'Usted ya se encuentra registrado a través de una red social. Ingrese presionando el botón correspondiente.',
@@ -59,7 +61,7 @@ const login = (req, res) => {
           });
           return false;
         }
-      } catch (e) {        
+      } catch (e) {
         if (e === 'Not a valid BCrypt hash.') {
           User.findOne({ where: { email } })
             .then((us) => {
@@ -94,12 +96,11 @@ const login = (req, res) => {
             message: 'Tu contraseña ha expirado, te enviaremos un mail para que la actualices.',
           });
           return false;
-        }else{
-          return res.status(500).send({
-            status: 'error',
-            message: e
-          });
         }
+        return res.status(500).send({
+          status: 'error',
+          message: e,
+        });
       }
       let userType;
       if (user.agencyName) {
@@ -291,7 +292,7 @@ const removeOldFile = (file) => {
 const optimizeImage = file => sharp(`./images/${file.filename}`)
   .jpeg({
     quality: 60,
-    chromaSubsampling: '4:4:4'
+    chromaSubsampling: '4:4:4',
   })
   .toFile(`./images/opt-${file.filename}`)
   .then(() => removeOldFile(file));
@@ -372,10 +373,10 @@ const createPublication = (req, res) => {
     AsientosTermicos,
     RunFlat,
   } = req.body;
-  let{price,kms} = req.body
+  let { price, kms } = req.body;
 
-  if(!price){price=null}
-  if(!kms){kms=null}
+  if (!price) { price = null; }
+  if (!kms) { kms = null; }
   const imageGroup = req.files;
   if (imageGroup.length === 0) {
     res.status(400).send('Por favor elija aunque sea una imágen');
@@ -385,6 +386,8 @@ const createPublication = (req, res) => {
   let userId = null;
   let isAdmin = false;
   let userMail = '';
+  let userProvince = null;
+  let userTown = null;
   if (req.headers.authorization) {
     userId = decode(req.headers.authorization.slice(7)).id;
     User.findById(userId).then((usr) => {
@@ -392,13 +395,20 @@ const createPublication = (req, res) => {
         isAdmin = true;
         userId = req.body.userId;
         User.findById(userId)
-          .then((us) => { userMail = us.dataValues.email; })
-          .catch(()=>res.status(400).send('Cree publicaciones para un usuario desde el superAdmin'));
-          return false;
-      } else {
-        User.findById(userId)
-          .then((us) => { userMail = us.dataValues.email; });
+          .then((us) => {
+            userMail = us.dataValues.email;
+            userProvince = us.dataValues.province_id;
+            userTown = us.dataValues.town_id;
+          })
+          .catch(() => res.status(400).send('Cree publicaciones para un usuario desde el superAdmin'));
+        return false;
       }
+      User.findById(userId)
+        .then((us) => {
+          userMail = us.dataValues.email;
+          userProvince = us.dataValues.province_id;
+          userTown = us.dataValues.town_id;
+        });
     });
   }
   let fuel;
@@ -533,7 +543,7 @@ const createPublication = (req, res) => {
                     to: miautoEmail,
                     from: miautoEmail,
                     subject: 'Nueva Publicación anónima!',
-                    html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación anónima', null, `Una nueva publicación anónima está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
+                    html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación anónima', null, 'Una nueva publicación anónima está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
                   };
                   sgMail.send(msgToAdmin);
                 });
@@ -568,6 +578,8 @@ const createPublication = (req, res) => {
                 name,
                 email,
                 phone,
+                province_id: userProvince,
+                town_id: userTown,
                 user_id: userId,
                 publicationDetail: {
                   Alimentacion,
@@ -649,7 +661,7 @@ const createPublication = (req, res) => {
                   to: miautoEmail,
                   from: miautoEmail,
                   subject: 'Nueva Publicación!',
-                  html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, `Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.`),
+                  html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, 'Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
                 };
                 !isAdmin && sgMail.send(msgToAdmin);
               });
@@ -676,10 +688,10 @@ const editPublication = (req, res) => {
     if (req.body[row.key] === 'NO') req.body[row.key] = false;
     if (req.body[row.key] === '.') req.body[row.key] = false;
   });
-  let{price,kms} = req.body
+  let { price, kms } = req.body;
 
-  if(!price){price=null}
-  if(!kms){kms=null}
+  if (!price) { price = null; }
+  if (!kms) { kms = null; }
   const {
     publication_id,
     brand,
@@ -1118,11 +1130,11 @@ const uploadAgencyImages = (req, res) => {
       });
   });
 };
-const getFiltersAndTotalResult = (req, res) => {
+const getFiltersAndTotalResult = async (req, res) => {
   req.body = req.body.search;
   let { text } = req.body;
   const {
-    carState, fuel, year, state, userType, modelName, brand, province
+    carState, fuel, year, state, userType, modelName, brand, province,
   } = req.body;
   const { Op } = sequelize;
   text = _.upperFirst(_.lowerCase(text));
@@ -1142,17 +1154,15 @@ const getFiltersAndTotalResult = (req, res) => {
     [Op.and]: { carState },
   };
   options.include = [
-    {model: User,
-    include :[Provinces]
-    }
-  ]
+    { model: Provinces }, { model: User },
+  ];
 
   if (fuel) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
   }
   if (modelName) {
     options.where[Op.and] = Object.assign(options.where[Op.and], {
-      modelName: modelName
+      modelName,
     });
   }
   if (year) {
@@ -1161,43 +1171,44 @@ const getFiltersAndTotalResult = (req, res) => {
   if (brand) {
     options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
   }
-  if (province) {    
-    options.include[0].include[0].where = {name : province}
+  if (province) {
+    const provinceIns = await Provinces.findOne({ where: { name: province } });
+    const province_id = provinceIns.dataValues.id;
+    options.where[Op.and] = Object.assign(options.where[Op.and], {
+      province_id,
+    });
   }
   if (state) {
-    if (state === "Activas") {
-      options.include.push
-        ({
-          model: PublicationState,
-          where: {
-            [Op.or]: [
-              { stateName: "Publicada" },
-              { stateName: "Destacada" },
-              { stateName: "Vendida" },
-              { stateName: "Apto para garantía" }
-            ]
-          },
-          through: { where: { active: true } }
-        })
-    }else{
-      options.include.push(
-        {
-          model: PublicationState,
-          where: {
-            stateName: state,
-          },
-          through: { where: { active: true } },
+    if (state === 'Activas') {
+      options.include.push({
+        model: PublicationState,
+        where: {
+          [Op.or]: [
+            { stateName: 'Publicada' },
+            { stateName: 'Destacada' },
+            { stateName: 'Vendida' },
+            { stateName: 'Apto para garantía' },
+          ],
         },
-      );
+        through: { where: { active: true } },
+      });
+    } else {
+      options.include.push({
+        model: PublicationState,
+        where: {
+          stateName: state,
+        },
+        through: { where: { active: true } },
+      });
     }
-  }else{
-  options.include.push({model: PublicationState})
+  } else {
+    options.include.push({ model: PublicationState });
   }
-  if (userType) {        
-    if (userType === "Agencia") {
-      options.include[0].where = { isAgency: true, isAdmin: false }
-    }else{
-      options.include[0].where = {isAgency: false}
+  if (userType) {
+    if (userType === 'Agencia') {
+      options.include[1].where = { isAgency: true, isAdmin: false };
+    } else {
+      options.include[1].where = { isAgency: false };
     }
   }
   Publication.findAll(options).then((results) => {
@@ -1216,15 +1227,14 @@ const getFiltersAndTotalResult = (req, res) => {
         if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName' || row.key === 'brand') {
           newObj[row.key][row.value] = 0;
         }
-      /*   if (row.key === 'PublicationStates') {
+        /*   if (row.key === 'PublicationStates') {
           row.key = 'state';
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] = 0;
         } */
-        
-        if (row.key === 'User' && !_.isNull(row.value)){
-          if(!_.isNull(row.value.Province)){
-          newObj['province'][row.value.Province.dataValues.name] = 0
+        if (row.key === 'Province' && !_.isNull(row.value)) {
+          if (!_.isNull(row.value.dataValues)) {
+            newObj.province[row.value.dataValues.name] = 0;
           }
         }
         if (row.key === 'User' && _.isNull(row.value)) {
@@ -1235,7 +1245,7 @@ const getFiltersAndTotalResult = (req, res) => {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] = 0;
-        } 
+        }
         return newObj;
       });
     });
@@ -1246,25 +1256,25 @@ const getFiltersAndTotalResult = (req, res) => {
     }
     results.map(({ dataValues }) => {
       split(dataValues).map((row) => {
-       /*  if (row.key === 'PublicationStates') {
+        /*  if (row.key === 'PublicationStates') {
           row.key = 'state';
           row.value = _.last(row.value).dataValues.stateName;
           newObj[row.key][row.value] += 1;
         } */
-        if (row.key === 'User' && !_.isNull(row.value)){
-          if(!_.isNull(row.value.Province)){
-          newObj['province'][row.value.Province.dataValues.name] += 1
+        if (row.key === 'Province' && !_.isNull(row.value)) {
+          if (!_.isNull(row.value.dataValues)) {
+            newObj.province[row.value.dataValues.name] += 1;
+          }
         }
-        }
-        if (row.key === 'User' && row.value === null) {
+        if (row.key === 'User' && _.isNull(row.value)) {
           row.key = 'userType';
           row.value = 'Particular';
           newObj[row.key][row.value] += 1;
-        } else if (row.key === 'User' && row.value !== null) {
+        } else if (row.key === 'User' && !_.isNull(row.value)) {
           row.key = 'userType';
           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
           newObj[row.key][row.value] += 1;
-        } 
+        }
         switch (row.key) {
           case 'fuel':
             newObj[row.key][row.value] += 1;
@@ -1346,7 +1356,7 @@ const recoverPassword = (req, res) => {
       }
       const hash = User.generateHash(Math.random().toString());
       us.update({
-        password: hash,
+        password_hash: hash,
       })
         .then(() => {
           const data = {
@@ -1367,7 +1377,35 @@ const recoverPassword = (req, res) => {
         });
     });
 };
-const requestCredit = (req,res)=>{
+const changePassword = (req, res) => {
+  const { id } = decode(req.headers.authorization.slice(7));
+  User.findById(id)
+    .then((us) => {
+      if (!us.isAdmin) {
+        res.status(400).send({ status: 'error', message: 'Solo  administradores pueden realizar esta acción' });
+      } else {
+        const { userId, newPassword } = req.body;
+        User.findById(userId)
+          .then((us) => {
+            if (!us) {
+              res.status(400).send({ status: 'error', message: 'Usuario no encontrado' });
+            } else {
+              const newPass = bcrypt.hashSync(
+                newPassword,
+                bcrypt.genSaltSync(8),
+                null,
+              );
+              return us
+                .update({
+                  password: newPass,
+                })
+                .then(() => res.send({ status: 'ok', message: 'Contraseña actualizada con éxito' }));
+            }
+          });
+      }
+    });
+};
+const requestCredit = (req, res) => {
   const datos = req.body;
   let html = '';
   datos.DNI = datos.dni;
@@ -1377,17 +1415,17 @@ const requestCredit = (req,res)=>{
   datos.Domicilio = datos.address;
   delete datos.address;
   datos.Ingresos = datos.ganancy;
-  delete datos.ganancy;  
+  delete datos.ganancy;
   datos.MontoAFinanciar = datos.financyAmount;
-  delete datos.financyAmount;  
+  delete datos.financyAmount;
   datos.DestinoDelCredito = datos.creditReason;
-  delete datos.creditReason;    
+  delete datos.creditReason;
   datos.Telefono = datos.phone;
-  delete datos.phone;    
+  delete datos.phone;
   datos.Mensaje = datos.message;
   delete datos.message;
-  if (datos.personalShopper){
-    const carData={}
+  if (datos.personalShopper) {
+    const carData = {};
     carData.Año = datos.year;
     delete datos.year;
     carData.Precio = datos.price;
@@ -1399,100 +1437,200 @@ const requestCredit = (req,res)=>{
     carData.Observaciones = datos.observation;
     delete datos.observation;
     datos.Trabajo = datos.job;
-    delete datos.job
+    delete datos.job;
     delete datos.personalShopper;
-    html = generateForAdmin(datos, carData, 'personalShopper')
-  }else{
-    html = generateForAdmin(datos,null, 'solicitudCredito')
+    html = generateForAdmin(datos, carData, 'personalShopper');
+  } else {
+    html = generateForAdmin(datos, null, 'solicitudCredito');
   }
 
   const msg = {
     to: 'contacto@miautohoy.com',
     from: datos.email,
     subject: 'Solicitud de Crédito',
-    html: html
+    html,
   };
-  //return false;
+  // return false;
   sgMail.send(msg)
     .catch((err) => {
       console.log(err);
     });
-  res.status(200).send({status: 'ok'});
-}
-const uploadSliders = (req, res) => {
-  const slider = req.file
-  const sliderNumber = req.params.id;
-  const sliderName = `slider${sliderNumber}`
-  optimizeImage(slider)
-  .then(()=>{
-    Sliders.upsert({
-      id: sliderNumber,
-      name:sliderName,
-      image: `opt-${slider.filename}`,
-    })
-      .then((result)=>{
-        res.status(200).send({status:'ok', message:'Sliders actualizados con éxito',data:result})
-      })
-      .catch((err)=>{
-        res.status(400).send({status:'error', message:'No se han podido actualizar los sliders', data: err})
-      })
-  })
+  res.status(200).send({ status: 'ok' });
 };
-const getSliders = (req,res)=>{
-  Sliders.findAll({limit: 3})
-  .then((result)=>{
-    res.status(200).send({status:'ok', data: result})
-  })
-  .catch((err)=>{
-    res.status(400).send({status:'error', message:'Hubo un problema, intente mas tarde.', data: err})
-  })
-}
-const deleteSlider = (req,res)=>{
-  const sliderNumber = req.params.id
+const uploadSliders = (req, res) => {
+  let { slider, sliderResponsive } = req.files;
+  slider = slider[0];
+  sliderResponsive = sliderResponsive[0];
+  const { sliderNumber } = req.body;
+  const sliderName = `slider${sliderNumber}`;
+  optimizeImage(slider)
+    .then(() => Sliders.upsert({
+      id: sliderNumber,
+      name: sliderName,
+      image: `opt-${slider.filename}`,
+    }))
+    .then(() =>
+      optimizeImage(sliderResponsive))
+    .then(() => {
+      const id = sliderNumber + 1;
+      return Sliders.upsert({
+        id,
+        name: sliderName,
+        image: `opt-${sliderResponsive.filename}`,
+      });
+    })
+    .then((result) => {
+      res.status(200).send({ status: 'ok', message: 'Sliders actualizados con éxito', data: result });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send({ status: 'error', message: 'No se han podido actualizar los sliders', data: err });
+    });
+};
+const getSliders = (req, res) => {
+  Sliders.findAll()
+    .then((result) => {
+      res.status(200).send({ status: 'ok', data: result });
+    })
+    .catch((err) => {
+      res.status(400).send({ status: 'error', message: 'Hubo un problema, intente mas tarde.', data: err });
+    });
+};
+const deleteSlider = (req, res) => {
+  const sliderNumber = req.params.id;
   Sliders.findById(sliderNumber)
-  .then((sld)=>sld.destroy()  
-    .then(()=>res.status(200).send({status:'ok'}))
-    .catch((err)=>res.status(400).send({status:'error', message: err.message}))
-  )
-  .catch((err)=>res.status(400).send({status:'error', message: err.message}))
-  
-}
-const getToken = (req,res)=>{
-  PythonShell.run(`service-account.py`,{scriptPath:__dirname, pythonPath:'/usr/bin/python'}, function (err,results) {
+    .then(sld => sld.destroy()
+      .then(() => res.status(200).send({ status: 'ok' }))
+      .catch(err => res.status(400).send({ status: 'error', message: err.message })))
+    .catch(err => res.status(400).send({ status: 'error', message: err.message }));
+};
+const getToken = (req, res) => {
+  PythonShell.run('service-account.py', { scriptPath: __dirname, pythonPath: '/usr/bin/python' }, (err, results) => {
     if (err) throw err;
-    res.status(200).send({status:'ok', message:results})
+    res.status(200).send({ status: 'ok', message: results });
   });
-}
-const getProvinces =(req,res)=>{
-  Provinces.findAll()
-    .then((provs)=>res.send({status:'ok', data:provs}))
-    .catch((e)=>res.status(400).send({status: 'error', message:e.message}))
-}
-const getTowns = (req,res)=>{
-  const province_id = req.body
-  Town.findAll({where:province_id})
-  .then((towns)=>res.send({status:'ok', data:towns}))
-  .catch((e)=>res.status(400).send({status: 'error', message:e.message}))
-}
+};
 
-//Integración 123Seguro
-const addUserAndCarData = async (req,res)=>{
-  const {vehiculo_id, anio,} = req.body
-  try{
-    fetch('https://oauth-staging.123seguro.com/auth/login?email=admin@123seguro.com.ar&password=123seguro',{method:'POST'})
-    .then((res)=>res.json())
-    .then((response)=>res.send(response))
-  }catch(e){
-    res.status(400).send({status:'error', message: e.message})
+// Integración 123Seguro=====================================================================================================================
+const get123TokenHelper = () => {
+
+};
+const get123Token = (req, res) => {
+  try {
+    fetch('https://oauth-staging.123seguro.com/auth/login?email=admin@123seguro.com.ar&password=123seguro', { method: 'POST' })
+      .then(res => res.json())
+      .then(response => res.send({ status: 'ok', token: response.token }));
+  } catch (e) {
+    res.status(400).send({ status: 'error', message: e.message });
   }
-}
+};
+const addUserAndCarData = (req, res) => {
+  const {
+    token,
+    nombre, apellido, mail, telefono, edad, // crear Usuario
+    localidad_id, // crear Domicilio 11163
+    anio, vehiculo_id, // crear auto 120198
+  } = req.body;
+  const canal_id = 1;
+  const options = {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+  const urlCreateUser = 'https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios';
+  const getUrlCreateDirection = usuario_id => `https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios/${usuario_id}/direcciones`;
+  const getUrlCreateCar = usuario_id => `https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/usuarios/${usuario_id}/autos`;
+  // createUser-------------------------------------
+  options.body = JSON.stringify({
+    nombre,
+    apellido,
+    mail,
+    telefono,
+    edad,
+  });
+  fetch(urlCreateUser, options)
+    .then(response => response.json())
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }))
+    .then((resData) => {
+      const usuario_id = resData.user.id;
+      // createDirection-------------------------------------
+      options.body = JSON.stringify({
+        localidad_id,
+      });
+      fetch(getUrlCreateDirection(usuario_id), options)
+        .then(response => response.json())
+        .catch(e => res.status(400).send({ status: 'error', message: e.message }))
+        .then(() => {
+        // createCar-------------------------------------
+          options.body = JSON.stringify({
+            anio, vehiculo_id, canal_id,
+          });
+          fetch(getUrlCreateCar(usuario_id), options)
+            .then(response => response.json())
+            .catch(e => res.status(400).send({ status: 'error', message: e.message }))
+            .then((resData) => {
+              console.log(resData);
+              res.send({ status: 'ok', data: { producto_id: resData.id } });
+            })
+            .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+        })
+        .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+    })
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+};
+const getQuotes = (req, res) => {
+  const { producto_id } = req.body;
+  const companies = ['allianz', 'chubb', 'mapfre', 'meridional', 'provincia', 'prudencia', 'sancor', 'sura', 'zurich'];
+};
+const get123Provinces = (req, res) => {
+  const { token } = req.body;
+  const urlGetProvinces = 'https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/provincias';
+  const options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  fetch(urlGetProvinces, options)
+    .then(resp => resp.json())
+    .then(resData => res.send({ status: 'ok', data: resData }))
+    .catch(e => res.send({ status: 'error', message: e.message }));
+};
+const get123Localities = (req, res) => {
+  const { token, province_id } = req.body;
+  const urlGetLocalities = `https://test.123cotizarservice-ci.123seguro.com/api/v1/AR/auto/resources/provincias/${province_id}/localidades`;
+  const options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  fetch(urlGetLocalities, options)
+    .then(resp => resp.json())
+    .then(resData => res.send({ status: 'ok', data: resData }))
+    .catch(e => res.send({ status: 'error', message: e.message }));
+};
 
-//====================
+//= =====================================================================================================================================
 
+const getProvinces = (req, res) => {
+  Provinces.findAll()
+    .then(provs => res.send({ status: 'ok', data: provs }))
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+};
+const getTowns = (req, res) => {
+  const province_id = req.body;
+  Town.findAll({ where: province_id })
+    .then(towns => res.send({ status: 'ok', data: towns }))
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+};
 module.exports = {
   login,
   loginAdmin,
   recoverPassword,
+  changePassword,
   createPublication,
   uploadAgencyImages,
   getFiltersAndTotalResult,
@@ -1507,6 +1645,13 @@ module.exports = {
   uploadSliders,
   getSliders,
   deleteSlider,
+  getToken,
+  // 123 seguro
+  addUserAndCarData,
+  get123Provinces,
+  get123Localities,
+  get123Token,
+  //---
   getProvinces,
   getTowns,
   getToken,

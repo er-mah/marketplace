@@ -29,6 +29,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'publication_id',
       onDelete: 'CASCADE',
     });
+    Publication.Province = Publication.belongsTo(models.mah.Provinces, {foreignKey:'province_id', onDelete:'CASCADE'})
+    Publication.Town = Publication.belongsTo(models.mah.Town, {foreignKey:'town_id', onDelete:'CASCADE'})
   };
   return Publication;
 };

@@ -6,6 +6,7 @@ const { User, PublicationState } = require("../models").mah;
 const jwtDecode = require("jwt-decode");
 const bcrypt = require("bcrypt-nodejs");
 const {ProvincesType} = require('./ProvincesType');
+const {TownType} = require('./TownType');
 const { Publication, CommentThread, sequelize } = require("../models").mah;
 
 const {
@@ -26,7 +27,14 @@ const UserType = new ObjectGraph({
         type: ProvincesType, 
         resolve: resolver(User.Province)
       }
-    })
+    },
+    {
+      Town: {
+        type: TownType, 
+        resolve: resolver(User.Town)
+      }
+    }
+  )
 });
 const UserTypeWithResume = new ObjectGraph({
   name: "UserResume",
@@ -194,7 +202,7 @@ const UserMutations = {
       newPassword: { type: new NotNull(Gstring) }
     },
     resolve: (value, { oldPassword, newPassword }) =>
-      User.findOne({ where: { password: oldPassword } }).then(us => {
+      User.findOne({ where: { password_hash: oldPassword } }).then(us => {
         if (!us) {
           throw new UserError("Este link ya no es válido.");
         } else {

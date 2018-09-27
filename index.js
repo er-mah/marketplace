@@ -128,6 +128,7 @@ const {
   login,
   loginAdmin,
   recoverPassword,
+  changePassword,
   createPublication,
   editPublication,
   uploadAgencyImages,
@@ -145,6 +146,12 @@ const {
   getProvinces,
   getTowns,
   getToken,
+  //123Seguros
+  addUserAndCarData,
+  get123Provinces,
+  get123Localities,
+  get123Token,
+  //--------------
 } = require('./routes');
 const multer = require('multer');
 
@@ -261,7 +268,11 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/requestCredit',
     '/getSliders',
     '/getProvinces',
-    '/getTowns'
+    '/getTowns',
+    '/addUserAndCarData',
+    '/get123Token',
+    '/get123Provinces',
+    '/get123Localities',
   ],
 }));
 
@@ -280,6 +291,7 @@ app.use((req, res, next) => {
 app.post('/login', login);
 app.post('/loginAdmin', loginAdmin);
 app.post('/recoverPassword', recoverPassword);
+app.post('/changePassword', changePassword);
 app.post(
   '/createPublication',
   upload.array('imageGroup', 8),
@@ -311,11 +323,18 @@ app.post(
   uploadAgencyImages,
 );
 app.post(
-  '/uploadSliders/:id',
-  upload.single('slider'),
+  '/uploadSliders/',
+  upload.fields([
+    { name: 'slider', maxCount: 1 }, { name: 'sliderResponsive', maxCount: 1 }
+  ]),
   uploadSliders,
 );
 app.get('/getToken', getToken)
+//123Seguro
+app.post('/addUserAndCarData', addUserAndCarData)
+app.post('/get123Provinces', get123Provinces)
+app.post('/get123Localities', get123Localities)
+app.get('/get123Token', get123Token)
 // ===================================================================
 
 app.use(methodOverride());
