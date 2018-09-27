@@ -1,3 +1,4 @@
+require("dotenv").config();
 const jsonwt = require('jsonwebtoken');
 const { split } = require('split-object');
 const decode = require('jwt-decode');
