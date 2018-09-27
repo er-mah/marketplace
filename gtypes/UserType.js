@@ -202,7 +202,7 @@ const UserMutations = {
       newPassword: { type: new NotNull(Gstring) }
     },
     resolve: (value, { oldPassword, newPassword }) =>
-      User.findOne({ where: { password: oldPassword } }).then(us => {
+      User.findOne({ where: { password_hash: oldPassword } }).then(us => {
         if (!us) {
           throw new UserError("Este link ya no es válido.");
         } else {

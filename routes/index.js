@@ -1360,7 +1360,7 @@ const recoverPassword = (req, res) => {
       }
       const hash = User.generateHash(Math.random().toString());
       us.update({
-        password: hash,
+        password_hash: hash,
       })
         .then(() => {
           const data = {
