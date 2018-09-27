@@ -128,6 +128,7 @@ const {
   login,
   loginAdmin,
   recoverPassword,
+  changePassword,
   createPublication,
   editPublication,
   uploadAgencyImages,
@@ -290,6 +291,7 @@ app.use((req, res, next) => {
 app.post('/login', login);
 app.post('/loginAdmin', loginAdmin);
 app.post('/recoverPassword', recoverPassword);
+app.post('/changePassword', changePassword);
 app.post(
   '/createPublication',
   upload.array('imageGroup', 8),
