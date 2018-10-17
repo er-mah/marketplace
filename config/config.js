@@ -28,6 +28,7 @@ module.exports = {
       tauto: 'tautos',
       mah_test: 'mah_test',
     },
+    //logging: 'true',
   },
   testpsql: {
     username: 'postgres',

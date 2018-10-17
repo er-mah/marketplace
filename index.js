@@ -132,7 +132,6 @@ const {
   createPublication,
   editPublication,
   uploadAgencyImages,
-  getFiltersAndTotalResult,
   getImages,
   getSoldPublications,
   registerAgency,
@@ -263,7 +262,6 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/createPublication',
     '/registerAgency',
     '/registerUser',
-    '/getFiltersAndTotalResult',
     /^\/images/,
     '/requestCredit',
     '/getSliders',
@@ -302,7 +300,6 @@ app.post(
   upload.array('imageGroup', 8),
   editPublication,
 );
-app.post('/getFiltersAndTotalResult', getFiltersAndTotalResult);
 app.get('/getSoldPublications', getSoldPublications);
 app.get('/getImages/:publication_id', getImages);
 app.get('/checkFacebookLogin/:email', checkFacebookLogin);
