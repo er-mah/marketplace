@@ -1130,178 +1130,175 @@ const uploadAgencyImages = (req, res) => {
       });
   });
 };
-const getFiltersAndTotalResult = async (req, res) => {
-  req.body = req.body.search;
-  let { text } = req.body;
-  const {
-    carState, fuel, year, state, userType, modelName, brand, province,
-  } = req.body;
-  const { Op } = sequelize;
-  text = _.upperFirst(_.lowerCase(text));
-  text += '%';
-  const LIMIT = 9;
-  let hasNextPage = true;
-  const options = {};
-  options.where = {
-    [Op.or]: [
-      { brand: { [Op.like]: text } },
-      { group: { [Op.like]: text } },
-      { modelName: { [Op.like]: text } },
-      { kms: { [Op.like]: text } },
-      { fuel: { [Op.like]: text } },
-      { name: { [Op.like]: text } },
-    ],
-    [Op.and]: { carState },
-  };
-  options.include = [
-    { model: Provinces }, { model: User },
-  ];
+// const getFiltersAndTotalResult = async (req, res) => {
+//   req.body = req.body.search;
+//   let { text } = req.body;
+//   const {
+//     carState, fuel, year, state, userType, modelName, brand, province,
+//   } = req.body;
+//   const { Op } = sequelize;
+//   text = _.upperFirst(_.lowerCase(text));
+//   text = text.split(' ');
+//   text = text.map(row => `%${row}%`);
+//   text = text.join(' ');
+//   const LIMIT = 9;
+//   let hasNextPage = true;
+//   const options = {};
+//   options.where = {
+//     [Op.or]: [
+//       { words: { [Op.like]: text } },
+//     ],
+//     [Op.and]: {},
+//   };
+//   options.include = [
+//     { model: Provinces }, { model: User },
+//   ];
 
-  if (fuel) {
-    options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
-  }
-  if (modelName) {
-    options.where[Op.and] = Object.assign(options.where[Op.and], {
-      modelName,
-    });
-  }
-  if (year) {
-    options.where[Op.and] = Object.assign(options.where[Op.and], { year });
-  }
-  if (brand) {
-    options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
-  }
-  if (province) {
-    const provinceIns = await Provinces.findOne({ where: { name: province } });
-    const province_id = provinceIns.dataValues.id;
-    options.where[Op.and] = Object.assign(options.where[Op.and], {
-      province_id,
-    });
-  }
-  if (state) {
-    if (state === 'Activas') {
-      options.include.push({
-        model: PublicationState,
-        where: {
-          [Op.or]: [
-            { stateName: 'Publicada' },
-            { stateName: 'Destacada' },
-            { stateName: 'Vendida' },
-            { stateName: 'Apto para garantía' },
-          ],
-        },
-        through: { where: { active: true } },
-      });
-    } else {
-      options.include.push({
-        model: PublicationState,
-        where: {
-          stateName: state,
-        },
-        through: { where: { active: true } },
-      });
-    }
-  } else {
-    options.include.push({ model: PublicationState });
-  }
-  if (userType) {
-    if (userType === 'Agencia') {
-      options.include[1].where = { isAgency: true, isAdmin: false };
-    } else {
-      options.include[1].where = { isAgency: false };
-    }
-  }
-  Publication.findAll(options).then((results) => {
-    if (results === null) {
-      results = {};
-    }
-    const newObj = {};
-    newObj.fuel = {};
-    newObj.year = {};
-    newObj.brand = {};
-    newObj.userType = {};
-    newObj.modelName = {};
-    newObj.province = {};
-    results.map(({ dataValues }) => {
-      split(dataValues).map((row) => {
-        if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName' || row.key === 'brand') {
-          newObj[row.key][row.value] = 0;
-        }
-        /*   if (row.key === 'PublicationStates') {
-          row.key = 'state';
-          row.value = _.last(row.value).dataValues.stateName;
-          newObj[row.key][row.value] = 0;
-        } */
-        if (row.key === 'Province' && !_.isNull(row.value)) {
-          if (!_.isNull(row.value.dataValues)) {
-            newObj.province[row.value.dataValues.name] = 0;
-          }
-        }
-        if (row.key === 'User' && _.isNull(row.value)) {
-          row.key = 'userType';
-          row.value = 'Particular';
-          newObj[row.key][row.value] = 0;
-        } else if (row.key === 'User' && !_.isNull(row.value)) {
-          row.key = 'userType';
-          row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
-          newObj[row.key][row.value] = 0;
-        }
-        return newObj;
-      });
-    });
-    if (results.length < LIMIT) {
-      hasNextPage = false;
-    } else {
-      hasNextPage = true;
-    }
-    results.map(({ dataValues }) => {
-      split(dataValues).map((row) => {
-        /*  if (row.key === 'PublicationStates') {
-          row.key = 'state';
-          row.value = _.last(row.value).dataValues.stateName;
-          newObj[row.key][row.value] += 1;
-        } */
-        if (row.key === 'Province' && !_.isNull(row.value)) {
-          if (!_.isNull(row.value.dataValues)) {
-            newObj.province[row.value.dataValues.name] += 1;
-          }
-        }
-        if (row.key === 'User' && _.isNull(row.value)) {
-          row.key = 'userType';
-          row.value = 'Particular';
-          newObj[row.key][row.value] += 1;
-        } else if (row.key === 'User' && !_.isNull(row.value)) {
-          row.key = 'userType';
-          row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
-          newObj[row.key][row.value] += 1;
-        }
-        switch (row.key) {
-          case 'fuel':
-            newObj[row.key][row.value] += 1;
-            break;
-          case 'modelName':
-            newObj[row.key][row.value] += 1;
-            break;
-          case 'year':
-            newObj[row.key][row.value] += 1;
-            break;
-          case 'brand':
-            newObj[row.key][row.value] += 1;
-            break;
-          default:
-            return '';
-        }
-      });
-    });
-    res
-      .status(200)
-      .send(ResponseObj('ok', null, {
-        filters: newObj,
-        totalResults: results.length,
-        hasNextPage,
-      }));
-  });
-};
+//   if (fuel) {
+//     options.where[Op.and] = Object.assign(options.where[Op.and], { fuel });
+//   }
+//   if (modelName) {
+//     options.where[Op.and] = Object.assign(options.where[Op.and], {
+//       modelName,
+//     });
+//   }
+//   if (year) {
+//     options.where[Op.and] = Object.assign(options.where[Op.and], { year });
+//   }
+//   if (brand) {
+//     options.where[Op.and] = Object.assign(options.where[Op.and], { brand });
+//   }
+//   if (province) {
+//     const provinceIns = await Provinces.findOne({ where: { name: province } });
+//     const province_id = provinceIns.dataValues.id;
+//     options.where[Op.and] = Object.assign(options.where[Op.and], {
+//       province_id,
+//     });
+//   }
+//   if (state) {
+//     if (state === 'Activas') {
+//       options.include.push({
+//         model: PublicationState,
+//         where: {
+//           [Op.or]: [
+//             { stateName: 'Publicada' },
+//             { stateName: 'Destacada' },
+//             { stateName: 'Vendida' },
+//             { stateName: 'Apto para garantía' },
+//           ],
+//         },
+//         through: { where: { active: true } },
+//       });
+//     } else {
+//       options.include.push({
+//         model: PublicationState,
+//         where: {
+//           stateName: state,
+//         },
+//         through: { where: { active: true } },
+//       });
+//     }
+//   } else {
+//     options.include.push({ model: PublicationState });
+//   }
+//   if (userType) {
+//     if (userType === 'Agencia') {
+//       options.include[1].where = { isAgency: true, isAdmin: false };
+//     } else {
+//       options.include[1].where = { isAgency: false };
+//     }
+//   }
+//   Publication.findAll(options).then((results) => {
+//     if (results === null) {
+//       results = {};
+//     }
+//     const newObj = {};
+//     newObj.fuel = {};
+//     newObj.year = {};
+//     newObj.brand = {};
+//     newObj.userType = {};
+//     newObj.modelName = {};
+//     newObj.province = {};
+//     results.map(({ dataValues }) => {
+//       split(dataValues).map((row) => {
+//         if (row.key === 'fuel' || row.key === 'year' || row.key === 'state' || row.key === 'modelName' || row.key === 'brand') {
+//           newObj[row.key][row.value] = 0;
+//         }
+//         /*   if (row.key === 'PublicationStates') {
+//           row.key = 'state';
+//           row.value = _.last(row.value).dataValues.stateName;
+//           newObj[row.key][row.value] = 0;
+//         } */
+//         if (row.key === 'Province' && !_.isNull(row.value)) {
+//           if (!_.isNull(row.value.dataValues)) {
+//             newObj.province[row.value.dataValues.name] = 0;
+//           }
+//         }
+//         if (row.key === 'User' && _.isNull(row.value)) {
+//           row.key = 'userType';
+//           row.value = 'Particular';
+//           newObj[row.key][row.value] = 0;
+//         } else if (row.key === 'User' && !_.isNull(row.value)) {
+//           row.key = 'userType';
+//           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
+//           newObj[row.key][row.value] = 0;
+//         }
+//         return newObj;
+//       });
+//     });
+//     if (results.length < LIMIT) {
+//       hasNextPage = false;
+//     } else {
+//       hasNextPage = true;
+//     }
+//     results.map(({ dataValues }) => {
+//       split(dataValues).map((row) => {
+//         /*  if (row.key === 'PublicationStates') {
+//           row.key = 'state';
+//           row.value = _.last(row.value).dataValues.stateName;
+//           newObj[row.key][row.value] += 1;
+//         } */
+//         if (row.key === 'Province' && !_.isNull(row.value)) {
+//           if (!_.isNull(row.value.dataValues)) {
+//             newObj.province[row.value.dataValues.name] += 1;
+//           }
+//         }
+//         if (row.key === 'User' && _.isNull(row.value)) {
+//           row.key = 'userType';
+//           row.value = 'Particular';
+//           newObj[row.key][row.value] += 1;
+//         } else if (row.key === 'User' && !_.isNull(row.value)) {
+//           row.key = 'userType';
+//           row.value = row.value.dataValues.isAgency ? 'Agencia' : 'Particular';
+//           newObj[row.key][row.value] += 1;
+//         }
+//         switch (row.key) {
+//           case 'fuel':
+//             newObj[row.key][row.value] += 1;
+//             break;
+//           case 'modelName':
+//             newObj[row.key][row.value] += 1;
+//             break;
+//           case 'year':
+//             newObj[row.key][row.value] += 1;
+//             break;
+//           case 'brand':
+//             newObj[row.key][row.value] += 1;
+//             break;
+//           default:
+//             return '';
+//         }
+//       });
+//     });
+//     res
+//       .status(200)
+//       .send(ResponseObj('ok', null, {
+//         filters: newObj,
+//         totalResults: results.length,
+//         hasNextPage,
+//       }));
+//   });
+// };
 const getSoldPublications = (req, res) => {
   const userId = decode(req.headers.authorization.slice(7)).id;
 
@@ -1512,9 +1509,6 @@ const getToken = (req, res) => {
 };
 
 // Integración 123Seguro=====================================================================================================================
-const get123TokenHelper = () => {
-
-};
 const get123Token = (req, res) => {
   try {
     fetch('https://oauth-staging.123seguro.com/auth/login?email=admin@123seguro.com.ar&password=123seguro', { method: 'POST' })
@@ -1527,11 +1521,12 @@ const get123Token = (req, res) => {
 const addUserAndCarData = (req, res) => {
   const {
     token,
-    nombre, apellido, mail, telefono, edad, // crear Usuario
+    nombre, apellido, mail, telefono, // crear Usuario
     localidad_id, // crear Domicilio 11163
     anio, vehiculo_id, // crear auto 120198
   } = req.body;
   const canal_id = 1;
+  let usuario_id = 0;
   const options = {
     method: 'POST',
     headers: {
@@ -1548,35 +1543,37 @@ const addUserAndCarData = (req, res) => {
     apellido,
     mail,
     telefono,
-    edad,
   });
   fetch(urlCreateUser, options)
     .then(response => response.json())
     .catch(e => res.status(400).send({ status: 'error', message: e.message }))
     .then((resData) => {
-      const usuario_id = resData.user.id;
+      console.log('1', resData);
+      usuario_id = resData.user.id;
       // createDirection-------------------------------------
       options.body = JSON.stringify({
         localidad_id,
       });
-      fetch(getUrlCreateDirection(usuario_id), options)
-        .then(response => response.json())
-        .catch(e => res.status(400).send({ status: 'error', message: e.message }))
-        .then(() => {
-        // createCar-------------------------------------
-          options.body = JSON.stringify({
-            anio, vehiculo_id, canal_id,
-          });
-          fetch(getUrlCreateCar(usuario_id), options)
-            .then(response => response.json())
-            .catch(e => res.status(400).send({ status: 'error', message: e.message }))
-            .then((resData) => {
-              console.log(resData);
-              res.send({ status: 'ok', data: { producto_id: resData.id } });
-            })
-            .catch(e => res.status(400).send({ status: 'error', message: e.message }));
-        })
-        .catch(e => res.status(400).send({ status: 'error', message: e.message }));
+      return fetch(getUrlCreateDirection(usuario_id), options);
+    })
+    .then(response => response.json())
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }))
+    .then(() => {
+      console.log('2');
+      // createCar-------------------------------------
+      options.body = JSON.stringify({
+        anio, vehiculo_id, canal_id,
+      });
+      return fetch(getUrlCreateCar(usuario_id), options);
+    })
+    .then(response => response.json())
+    .catch(e => res.status(400).send({ status: 'error', message: e.message }))
+    .then((resData) => {
+      console.log('3', resData);
+      if (resData.success === false) {
+        return res.status(400).send({ status: 'error', error: resData.errors });
+      }
+      res.send({ status: 'ok', data: { producto_id: resData.id } });
     })
     .catch(e => res.status(400).send({ status: 'error', message: e.message }));
 };
@@ -1633,7 +1630,6 @@ module.exports = {
   changePassword,
   createPublication,
   uploadAgencyImages,
-  getFiltersAndTotalResult,
   getSoldPublications,
   registerAgency,
   registerUser,
