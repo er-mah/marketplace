@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     codia: DataTypes.INTEGER,
     name: DataTypes.STRING,
     email: DataTypes.STRING,
+    words: DataTypes.TEXT,
     phone: DataTypes.STRING,
   }, {
     paranoid: true,
