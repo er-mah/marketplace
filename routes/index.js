@@ -442,229 +442,230 @@ const createPublication = (req, res) => {
               throw new Error('Solo le permitimos una publicación a los usuarios no registrados.');
             }
           })
-          .then(() => ImageGroup.create(imageData)
-            .then((resp) => {
-              Publication.create(
-                {
-                  brand,
-                  group,
-                  modelName,
-                  kms: kms || null,
-                  price: price || null,
-                  year,
-                  fuel,
-                  observation,
-                  carState,
-                  codia,
-                  imageGroup_id: resp.id,
-                  name,
-                  email,
-                  phone,
-                  province_id,
-                  town_id,
-                  user_id: userId,
-                  publicationDetail: {
-                    Alimentacion,
-                    Motor,
-                    Puertas,
-                    Clasificacion,
-                    Cabina,
-                    Carga,
-                    PesoTotal,
-                    VelocidadMax,
-                    Potencia,
-                    Direccion,
-                    AireAcondicionado,
-                    Traccion,
-                    Importado,
-                    Caja,
-                    FrenosAbs,
-                    Airbag,
-                    Climatizador,
-                    FarosAntiniebla,
-                    TechoCorredizo,
-                    SensorEstacionamiento,
-                    AirbagLateral,
-                    AirbagCabezaConductor,
-                    AirbagCortina,
-                    AirbagRodilla,
-                    FijacionISOFIX,
-                    ControlDeTraccion,
-                    ControlDeEstabilidad,
-                    ControlDeDescenso,
-                    SistemaArranqueEnPendiente,
-                    ControlDinamicoConduccion,
-                    BloqueoDiferencial,
-                    RepartidorElectronicoDeFrenado,
-                    AsistenteDeFrenadoEmergencia,
-                    ReguladorParFrenado,
-                    Largo,
-                    Ancho,
-                    Alto,
-                    TapizadoCuero,
-                    AsientosElectronicos,
-                    ComputadoraABordo,
-                    FarosDeXenon,
-                    LLantasDeAleacion,
-                    TechoPanoramico,
-                    SensorDeLluvia,
-                    SensorCrepuscular,
-                    IndicadorPresionNeumaticos,
-                    VolanteConLevas,
-                    Bluetooth,
-                    AsientosTermicos,
-                    RunFlat,
-                  },
-                },
-                {
-                  include: [
-                    {
-                      model: PublicationDetail,
-                      as: 'publicationDetail',
-                    },
-                  ],
-                },
-              ).then((publication) => {
-                PublicationState.findOne({
-                  where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
-                }).then((ps) => {
-                  publication.setPublicationStates(ps, { through: { active: true } });
-                  res
-                    .status(200)
-                    .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
-                  const msg = {
-                    to: publication.email,
-                    from: miautoEmail,
-                    subject: 'Publicación creada!',
-                    html: generateSinRegistro(publication, 'newPublication'),
-                  };
-                  sgMail.send(msg);
-                  const msgToAdmin = {
-                    to: miautoEmail,
-                    from: miautoEmail,
-                    subject: 'Nueva Publicación anónima!',
-                    html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación anónima', null, 'Una nueva publicación anónima está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
-                  };
-                  sgMail.send(msgToAdmin);
-                });
-              });
-            })
-            .catch((e) => {
-              res.status(400).send(e.message);
-              console.log(e);
-            })
-            .catch(() => {
-              res.status(400).send('No existe un usuario con ese id');
-            }))
-          .catch((e) => {
-            res.status(400).send(e.message);
-          });
-      } else {
-        return ImageGroup.create(imageData)
-          .then((resp) => {
-            Publication.create(
-              {
-                brand,
-                group,
-                modelName,
-                kms,
-                price,
-                year,
-                fuel,
-                observation,
-                carState,
-                codia,
-                imageGroup_id: resp.id,
-                name,
-                email,
-                phone,
-                province_id: userProvince,
-                town_id: userTown,
-                user_id: userId,
-                publicationDetail: {
-                  Alimentacion,
-                  Motor,
-                  Puertas,
-                  Clasificacion,
-                  Cabina,
-                  Carga,
-                  PesoTotal,
-                  VelocidadMax,
-                  Potencia,
-                  Direccion,
-                  AireAcondicionado,
-                  Traccion,
-                  Importado,
-                  Caja,
-                  FrenosAbs,
-                  Airbag,
-                  Climatizador,
-                  FarosAntiniebla,
-                  TechoCorredizo,
-                  SensorEstacionamiento,
-                  AirbagLateral,
-                  AirbagCabezaConductor,
-                  AirbagCortina,
-                  AirbagRodilla,
-                  FijacionISOFIX,
-                  ControlDeTraccion,
-                  ControlDeEstabilidad,
-                  ControlDeDescenso,
-                  SistemaArranqueEnPendiente,
-                  ControlDinamicoConduccion,
-                  BloqueoDiferencial,
-                  RepartidorElectronicoDeFrenado,
-                  AsistenteDeFrenadoEmergencia,
-                  ReguladorParFrenado,
-                  Largo,
-                  Ancho,
-                  Alto,
-                  TapizadoCuero,
-                  AsientosElectronicos,
-                  ComputadoraABordo,
-                  FarosDeXenon,
-                  LLantasDeAleacion,
-                  TechoPanoramico,
-                  SensorDeLluvia,
-                  SensorCrepuscular,
-                  IndicadorPresionNeumaticos,
-                  VolanteConLevas,
-                  Bluetooth,
-                  AsientosTermicos,
-                  RunFlat,
-                },
+          .then(() => ImageGroup.create(imageData))
+          .then(resp => Publication.create(
+            {
+              brand,
+              group,
+              modelName,
+              kms: kms || null,
+              price: price || null,
+              year,
+              fuel,
+              observation,
+              carState,
+              codia,
+              imageGroup_id: resp.id,
+              name,
+              email,
+              phone,
+              words: `${brand} ${group} ${modelName} ${kms} ${price} ${year} ${name} ${email} ${observation}`,
+              province_id,
+              town_id,
+              user_id: userId,
+              publicationDetail: {
+                Alimentacion,
+                Motor,
+                Puertas,
+                Clasificacion,
+                Cabina,
+                Carga,
+                PesoTotal,
+                VelocidadMax,
+                Potencia,
+                Direccion,
+                AireAcondicionado,
+                Traccion,
+                Importado,
+                Caja,
+                FrenosAbs,
+                Airbag,
+                Climatizador,
+                FarosAntiniebla,
+                TechoCorredizo,
+                SensorEstacionamiento,
+                AirbagLateral,
+                AirbagCabezaConductor,
+                AirbagCortina,
+                AirbagRodilla,
+                FijacionISOFIX,
+                ControlDeTraccion,
+                ControlDeEstabilidad,
+                ControlDeDescenso,
+                SistemaArranqueEnPendiente,
+                ControlDinamicoConduccion,
+                BloqueoDiferencial,
+                RepartidorElectronicoDeFrenado,
+                AsistenteDeFrenadoEmergencia,
+                ReguladorParFrenado,
+                Largo,
+                Ancho,
+                Alto,
+                TapizadoCuero,
+                AsientosElectronicos,
+                ComputadoraABordo,
+                FarosDeXenon,
+                LLantasDeAleacion,
+                TechoPanoramico,
+                SensorDeLluvia,
+                SensorCrepuscular,
+                IndicadorPresionNeumaticos,
+                VolanteConLevas,
+                Bluetooth,
+                AsientosTermicos,
+                RunFlat,
               },
-              {
-                include: [
-                  {
-                    model: PublicationDetail,
-                    as: 'publicationDetail',
-                  },
-                ],
-              },
-            ).then((publication) => {
-              PublicationState.findOne({
-                where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
-              }).then((ps) => {
+            },
+            {
+              include: [
+                {
+                  model: PublicationDetail,
+                  as: 'publicationDetail',
+                },
+              ],
+            },
+          ))
+          .then(publication =>
+            PublicationState.findOne({
+              where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+            })
+              .then((ps) => {
                 publication.setPublicationStates(ps, { through: { active: true } });
                 res
                   .status(200)
                   .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
                 const msg = {
-                  to: userMail,
+                  to: publication.email,
                   from: miautoEmail,
                   subject: 'Publicación creada!',
-                  html: generateMailAgenciaoParticular(publication, 'newPublication'),
+                  html: generateSinRegistro(publication, 'newPublication'),
                 };
                 sgMail.send(msg);
                 const msgToAdmin = {
                   to: miautoEmail,
                   from: miautoEmail,
-                  subject: 'Nueva Publicación!',
-                  html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, 'Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
+                  subject: 'Nueva Publicación anónima!',
+                  html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación anónima', null, 'Una nueva publicación anónima está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
                 };
-                !isAdmin && sgMail.send(msgToAdmin);
-              });
+                sgMail.send(msgToAdmin);
+              }))
+          .catch((e) => {
+            res.status(400).send(e.message);
+            console.log(e);
+          })
+          .catch((e) => {
+            res.status(400).send(e.message);
+            console.log(e);
+          })
+          .catch((e) => {
+            res.status(400).send(e.message);
+          });
+      } else {
+        return ImageGroup.create(imageData)
+          .then(resp => Publication.create(
+            {
+              brand,
+              group,
+              modelName,
+              kms: kms || null,
+              price: price || null,
+              year,
+              fuel,
+              observation,
+              carState,
+              codia,
+              imageGroup_id: resp.id,
+              name,
+              email,
+              phone,
+              province_id: userProvince,
+              town_id: userTown,
+              user_id: userId,
+              words: `${brand} ${group} ${modelName} ${kms} ${price} ${year} ${name} ${email} ${observation} `,
+              publicationDetail: {
+                Alimentacion,
+                Motor,
+                Puertas,
+                Clasificacion,
+                Cabina,
+                Carga,
+                PesoTotal,
+                VelocidadMax,
+                Potencia,
+                Direccion,
+                AireAcondicionado,
+                Traccion,
+                Importado,
+                Caja,
+                FrenosAbs,
+                Airbag,
+                Climatizador,
+                FarosAntiniebla,
+                TechoCorredizo,
+                SensorEstacionamiento,
+                AirbagLateral,
+                AirbagCabezaConductor,
+                AirbagCortina,
+                AirbagRodilla,
+                FijacionISOFIX,
+                ControlDeTraccion,
+                ControlDeEstabilidad,
+                ControlDeDescenso,
+                SistemaArranqueEnPendiente,
+                ControlDinamicoConduccion,
+                BloqueoDiferencial,
+                RepartidorElectronicoDeFrenado,
+                AsistenteDeFrenadoEmergencia,
+                ReguladorParFrenado,
+                Largo,
+                Ancho,
+                Alto,
+                TapizadoCuero,
+                AsientosElectronicos,
+                ComputadoraABordo,
+                FarosDeXenon,
+                LLantasDeAleacion,
+                TechoPanoramico,
+                SensorDeLluvia,
+                SensorCrepuscular,
+                IndicadorPresionNeumaticos,
+                VolanteConLevas,
+                Bluetooth,
+                AsientosTermicos,
+                RunFlat,
+              },
+            },
+            {
+              include: [
+                {
+                  model: PublicationDetail,
+                  as: 'publicationDetail',
+                },
+              ],
+            },
+          ))
+          .then((publication) => {
+            PublicationState.findOne({
+              where: { stateName: isAdmin ? 'Publicada' : 'Pendiente' },
+            }).then((ps) => {
+              publication.setPublicationStates(ps, { through: { active: true } });
+              res
+                .status(200)
+                .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
+              const msg = {
+                to: userMail,
+                from: miautoEmail,
+                subject: 'Publicación creada!',
+                html: generateMailAgenciaoParticular(publication, 'newPublication'),
+              };
+              sgMail.send(msg);
+              const msgToAdmin = {
+                to: miautoEmail,
+                from: miautoEmail,
+                subject: 'Nueva Publicación!',
+                html: generateForAdmin('Hola!', 'Se ha creado una nueva publicación', null, 'Una nueva publicación está en estado Pendiente en el administrador, ingresa a https://www.miautohoy.com/superAdminPublications?stateName=Pendiente para revisarla.'),
+              };
+              if (!isAdmin) { sgMail.send(msgToAdmin); }
             });
           })
           .catch((e) => {
@@ -811,6 +812,7 @@ const editPublication = (req, res) => {
             phone,
             province_id,
             town_id,
+            words: `${brand} ${group} ${modelName} ${kms} ${price} ${year} ${name} ${email} ${observation} `,
             user_id: userId,
             publicationDetail: {
               Alimentacion,
@@ -918,6 +920,7 @@ const editPublication = (req, res) => {
                       province_id,
                       town_id,
                       user_id: userId,
+                      words: `${brand} ${group} ${modelName} ${kms} ${price} ${year} ${name} ${email} ${observation} `,
                       publicationDetail: {
                         Alimentacion,
                         Motor,
