@@ -7,10 +7,19 @@ const jwt = require('express-jwt');
 const bodyParser = require('body-parser');
 const schedule = require('node-schedule');
 const moment = require('moment');
-const _ = require('lodash')
+const _ = require('lodash');
 const methodOverride = require('method-override');
+const { thumb } = require('node-thumbnail');
 
-
+// thumb({
+//   source: 'imagesEjemplo', // could be a filename: dest/path/image.jpg
+//   destination: 'thumbs',
+//   concurrency: 4,
+//   width: 290,
+//   ignore: true
+// }, (files, err, stdout, stderr) => {
+//   console.log('All done!');
+// });
 //  SCHEDULER
 const {
   Publication,
@@ -72,7 +81,7 @@ const j = schedule.scheduleJob(rule, () => {
         if ((_.isUndefined(data.email) || _.isNull(data.email)) && data.user_id){
           return User.findById(data.user_id, {attributes: ['email']})
             .then((us)=>{
-              mailArray.push(getUserEmail(us.dataValues.mail))              
+              mailArray.push(getUserEmail(us.dataValues.mail))
             })
         }else{
           userMail = data.email
@@ -145,11 +154,12 @@ const {
   getProvinces,
   getTowns,
   getToken,
-  //123Seguros
+  // 123Seguros
   addUserAndCarData,
   get123Provinces,
   get123Localities,
   get123Token,
+  get123Quotes,
   //--------------
 } = require('./routes');
 const multer = require('multer');
@@ -269,6 +279,7 @@ app.use(jwt({ secret: 'MAH2018!#' }).unless({
     '/getTowns',
     '/addUserAndCarData',
     '/get123Token',
+    '/get123Quotes',
     '/get123Provinces',
     '/get123Localities',
   ],
@@ -322,16 +333,17 @@ app.post(
 app.post(
   '/uploadSliders/',
   upload.fields([
-    { name: 'slider', maxCount: 1 }, { name: 'sliderResponsive', maxCount: 1 }
+    { name: 'slider', maxCount: 1 }, { name: 'sliderResponsive', maxCount: 1 },
   ]),
   uploadSliders,
 );
-app.get('/getToken', getToken)
-//123Seguro
-app.post('/addUserAndCarData', addUserAndCarData)
-app.post('/get123Provinces', get123Provinces)
-app.post('/get123Localities', get123Localities)
-app.get('/get123Token', get123Token)
+app.get('/getToken', getToken);
+// 123Seguro
+app.post('/addUserAndCarData', addUserAndCarData);
+app.get('/get123Provinces', get123Provinces);
+app.post('/get123Localities', get123Localities);
+app.post('/get123Quotes', get123Quotes);
+app.get('/get123Token', get123Token);
 // ===================================================================
 
 app.use(methodOverride());

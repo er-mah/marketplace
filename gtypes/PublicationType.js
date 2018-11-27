@@ -326,7 +326,7 @@ const PublicationMutation = {
             if (
               count > rows.length &&
                 rows.length < LIMIT &&
-                args.page <= Math.ceil(count / 9, 10)
+                args.page < Math.ceil(count / 9, 10)
             ) {
               return searchMorePubs();
             }
@@ -341,7 +341,7 @@ const PublicationMutation = {
         if (
           count > rows.length &&
           rows.length < LIMIT &&
-          args.page <= Math.ceil(count / 9, 10)
+          args.page < Math.ceil(count / 9, 10)
         ) {
           return searchMorePubs();
         }

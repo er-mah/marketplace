@@ -35,14 +35,14 @@ module.exports = {
               AFTER INSERT OR UPDATE ON "Publications"
               FOR EACH ROW EXECUTE PROCEDURE updateWords();
             `, { transaction: t }))
-        .then(() =>
-          queryInterface.sequelize.query(`
-          CREATE EXTENSION pg_trgm
-            `, { transaction: t }))
-        .then(() =>
-          queryInterface.sequelize.query(`
-          CREATE EXTENSION btree_gin
-            `, { transaction: t }))
+        // .then(() =>
+        //   queryInterface.sequelize.query(`
+        //   CREATE EXTENSION pg_trgm
+        //     `, { transaction: t }))
+        // .then(() =>
+        //   queryInterface.sequelize.query(`
+        //   CREATE EXTENSION btree_gin
+        //     `, { transaction: t }))
         .then(() =>
           queryInterface.sequelize.query(`
           CREATE INDEX index_issues_on_words_trigram ON "Publications" USING gin (words);

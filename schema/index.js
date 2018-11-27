@@ -326,21 +326,20 @@ const schema = new Schema({
           MAHtoken: {
             type: new NotNull(Gstring),
           },
-          id:{type: Int}
+          id: { type: Int },
         },
         resolve: (_nada, args) => {
           const userId = decode(args.MAHtoken).id;
-          if(args.id){
+          if (args.id) {
             return User.findById(userId)
-            .then(us=>{
-              if(us.isAdmin){
-                return User.findById(args.id)
-                .then(us=>us)
-                .catch((error)=>{throw new UserError(error)})
-              }else{
-                throw new UserError('Solo los administradores pueden acceder')
-              }
-            })
+              .then((us) => {
+                if (us.isAdmin) {
+                  return User.findById(args.id)
+                    .then(us => us)
+                    .catch((error) => { throw new UserError(error); });
+                }
+                throw new UserError('Solo los administradores pueden acceder');
+              });
           }
           return User.findById(userId)
             .then(us => us);
@@ -394,7 +393,7 @@ const schema = new Schema({
           },
           userType: {
             type: Gstring,
-          }
+          },
 
         },
         resolve: (_nada, args) => {
@@ -404,11 +403,11 @@ const schema = new Schema({
             options.limit = LIMIT;
             options.offset = args.page === 1 ? 0 : (args.page - 1) * LIMIT;
           }
-          if(args.userType){
-            if(args.userType ==='Agencia'){
-              options.where= {isAgency: true}
-            }else{
-              options.where= {isAgency: false}
+          if (args.userType) {
+            if (args.userType === 'Agencia') {
+              options.where = { isAgency: true };
+            } else {
+              options.where = { isAgency: false };
             }
           }
           return User.findAndCountAll(options)
@@ -620,8 +619,7 @@ const schema = new Schema({
           limit: args.limit,
         })
           .then(({ rows, count }) => {
-            
-            const fillWithNormalPubs = (numberOfPubs, findedPubs) =>{
+            const fillWithNormalPubs = (numberOfPubs, findedPubs) => {
               const limit = numberOfPubs;
               return Publication.findAll({
                 order: sequelize.options.dialect === 'mysql' ? sequelize.fn('RAND') : sequelize.fn('RANDOM'),
@@ -636,11 +634,11 @@ const schema = new Schema({
                 ],
                 limit,
               })
-              .then((rows) => {
-                const result = _.concat(findedPubs, rows)
-                return result;
-              });
-            }
+                .then((rows) => {
+                  const result = _.concat(findedPubs, rows);
+                  return result;
+                });
+            };
 
             const searchMorePubs = () => {
               args.limit += 5;
@@ -661,9 +659,9 @@ const schema = new Schema({
                   if (count > rows.length && rows.length < 4) {
                     return searchMorePubs();
                   }
-                  if(rows.length < 12){
-                    const numberOfPubs = 12 - rows.length
-                    return fillWithNormalPubs(numberOfPubs,rows)
+                  if (rows.length < 12) {
+                    const numberOfPubs = 12 - rows.length;
+                    return fillWithNormalPubs(numberOfPubs, rows);
                   }
                   return rows;
                 });
@@ -672,9 +670,9 @@ const schema = new Schema({
             if (count > rows.length && rows.length < 4) {
               return searchMorePubs();
             }
-            if(rows.length < 12){
-              const numberOfPubs = 12 - rows.length
-              return fillWithNormalPubs(numberOfPubs, rows)
+            if (rows.length < 12) {
+              const numberOfPubs = 12 - rows.length;
+              return fillWithNormalPubs(numberOfPubs, rows);
             }
             return rows;
           }),
@@ -695,7 +693,7 @@ const schema = new Schema({
           id: { type: new NotNull(Int) },
           MAHtoken: { type: new NotNull(Gstring) },
         },
-        resolve: resolver(CommentThread)/* , {
+        resolve: resolver(CommentThread), /* , {
           before: (options, args) => {
             const userId = decode(args.MAHtoken).id;
             User.findById(userId)
@@ -853,7 +851,7 @@ const schema = new Schema({
             include: [{
               model: PublicationState,
               where: { [Op.or]: { stateName: ['Destacada'] } },
-              through: { where: { active: true } },              
+              through: { where: { active: true } },
             }],
           })
             .then(res => res);
@@ -886,7 +884,7 @@ const schema = new Schema({
           return User.findById(userId)
             .then((usr) => {
               if (usr && usr.isAdmin) {
-                return CommentThread.findAll({order: [['createdAt', 'DESC']]})
+                return CommentThread.findAll({ order: [['createdAt', 'DESC']] })
                   .then(ct => ct);
               }
               throw new UserError('Solo los administradores pueden acceder');
