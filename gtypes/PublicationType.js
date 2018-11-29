@@ -326,7 +326,7 @@ const PublicationMutation = {
             if (
               count > rows.length &&
                 rows.length < LIMIT &&
-                args.page <= Math.ceil(count / 9, 10)
+                args.page < Math.ceil(count / 9, 10)
             ) {
               return searchMorePubs();
             }
@@ -341,7 +341,7 @@ const PublicationMutation = {
         if (
           count > rows.length &&
           rows.length < LIMIT &&
-          args.page <= Math.ceil(count / 9, 10)
+          args.page < Math.ceil(count / 9, 10)
         ) {
           return searchMorePubs();
         }
@@ -648,6 +648,7 @@ const PublicationMutation = {
                       };
                       const msg = {
                         to: us.email,
+                        cc: [us.ownerEmail, us.agencyEmail],
                         from: miautoEmail,
                         subject: 'Publicación aprobada!',
                         html: generateMailAgenciaoParticular(
@@ -750,6 +751,7 @@ const PublicationMutation = {
                       };
                       const msg = {
                         to: us.email,
+                        cc: [us.ownerEmail, us.agencyEmail],
                         from: miautoEmail,
                         subject: 'Publicación desaprobada',
                         html: generateMailAgenciaoParticular(

@@ -101,7 +101,7 @@ const CommentThreadMutations = {
                       };
                       sgMail.send(msg);
                     } else {
-                      User.findById(pub.user_id, { attributes: ['email'] })
+                      User.findById(pub.user_id, { attributes: ['email', 'agencyEmail', 'ownerEmail'] })
                         .then((pubUser) => {
                           const data = {
                             name: usr.name,
@@ -111,6 +111,7 @@ const CommentThreadMutations = {
                           };
                           const msg = {
                             to: pubUser.email,
+                            cc: [pubUser.agencyEmail, pubUser.ownerEmail],
                             from: miautoEmail,
                             subject: `${usr.name} te ha consultado!`,
                             html: generateMailAgenciaoParticular(data, 'newCT'),
@@ -142,7 +143,7 @@ const CommentThreadMutations = {
             }],
           })
             .then((cmt) => {
-              User.findById(pub.user_id, { attributes: ['email'] })
+              User.findById(pub.user_id, { attributes: ['email', 'agencyEmail', 'ownerEmail'] })
                 .then((pubUser) => {
                   if (!pubUser) {
                     const data = {
@@ -170,6 +171,7 @@ const CommentThreadMutations = {
                     };
                     const msg = {
                       to: pubUser.email,
+                      cc: [pubUser.agencyEmail, pubUser.ownerEmail],
                       from: miautoEmail,
                       subject: `${jwtDecode(chatToken).name} te ha consultado!`,
                       html: generateMailAgenciaoParticular(data, 'newCT'),

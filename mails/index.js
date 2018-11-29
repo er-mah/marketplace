@@ -43,7 +43,7 @@ const generateMailAgenciaoParticular = (data, tipoMail) => {
       break;
     }
     case 'newPublication': {
-      saludo = `Hola ${data.name}`;
+      saludo = 'Hola!';
       intro = 'Tu publicación se encuentra en estado Pendiente';
       body = `El Equipo de Mi Auto Hoy está verificando tu publicación ${data.brand} - ${data.modelName}. Si esta es correcta a la brevedad será publicada y visible para todos.`;
       break;
