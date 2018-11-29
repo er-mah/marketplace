@@ -648,6 +648,7 @@ const PublicationMutation = {
                       };
                       const msg = {
                         to: us.email,
+                        cc: [us.ownerEmail, us.agencyEmail],
                         from: miautoEmail,
                         subject: 'Publicación aprobada!',
                         html: generateMailAgenciaoParticular(
@@ -750,6 +751,7 @@ const PublicationMutation = {
                       };
                       const msg = {
                         to: us.email,
+                        cc: [us.ownerEmail, us.agencyEmail],
                         from: miautoEmail,
                         subject: 'Publicación desaprobada',
                         html: generateMailAgenciaoParticular(

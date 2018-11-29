@@ -391,6 +391,8 @@ const createPublication = (req, res) => {
   let userId = null;
   let isAdmin = false;
   let userMail = '';
+  let agencyEmail = '';
+  let ownerEmail = '';
   let userProvince = null;
   let userTown = null;
   if (req.headers.authorization) {
@@ -401,6 +403,8 @@ const createPublication = (req, res) => {
         userId = req.body.userId;
         User.findById(userId)
           .then((us) => {
+            agencyEmail = us.dataValues.agencyEmail;
+            ownerEmail = us.dataValues.ownerEmail;
             userMail = us.dataValues.email;
             userProvince = us.dataValues.province_id;
             userTown = us.dataValues.town_id;
@@ -410,6 +414,8 @@ const createPublication = (req, res) => {
       }
       User.findById(userId)
         .then((us) => {
+          agencyEmail = us.dataValues.agencyEmail;
+          ownerEmail = us.dataValues.ownerEmail;
           userMail = us.dataValues.email;
           userProvince = us.dataValues.province_id;
           userTown = us.dataValues.town_id;
@@ -659,6 +665,7 @@ const createPublication = (req, res) => {
                 .send('Felicitaciones, tu publicación fue creada exitosamente, permanecerá en estado pendiente hasta que sea aprobada por Mi Auto Hoy');
               const msg = {
                 to: userMail,
+                cc: [agencyEmail, ownerEmail],
                 from: miautoEmail,
                 subject: 'Publicación creada!',
                 html: generateMailAgenciaoParticular(publication, 'newPublication'),
