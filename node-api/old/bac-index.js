@@ -12,6 +12,7 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const { thumb } = require('node-thumbnail');
 
+// TODO CHECK ESTO
 // thumb({
 //   source: 'imagesEjemplo', // could be a filename: dest/path/image.jpg
 //   destination: 'thumbs',
@@ -21,13 +22,14 @@ const { thumb } = require('node-thumbnail');
 // }, (files, err, stdout, stderr) => {
 //   console.log('All done!');
 // });
+
 //  SCHEDULER
 const {
   Publication,
   PublicationState,
   HistoryState,
   User,
-} = require('./models').mah;
+} = require('../src/models').mah;
 
 const rule = new schedule.RecurrenceRule();
 rule.hour = 3;
@@ -135,7 +137,7 @@ const j2 = schedule.scheduleJob(rule2, () => {
 const { graphiqlExpress } = require('apollo-server-express');
 /* const socketioJwt = require('socketio-jwt'); */
 const cors = require('cors');
-const schema = require('./schema');
+const schema = require('../src/schema');
 const {
   login,
   loginAdmin,
@@ -157,7 +159,7 @@ const {
   getProvinces,
   getTowns,
   getToken,
-} = require('./routes');
+} = require('../src/routes');
 
 const {
   // 123 seguro
@@ -174,7 +176,7 @@ const {
   get123Models,
   get123Canales,
   //---
-} = require('./integrations/123seguros');
+} = require('../src/integrations/123seguros');
 
 const {
   getMeliAuthURL,
@@ -192,7 +194,7 @@ const {
   getQuestionsMeli,
   answerMeli,
   deleteQuestionMeli,
-} = require('./integrations/meli');
+} = require('../src/integrations/meli');
 
 const multer = require('multer');
 
