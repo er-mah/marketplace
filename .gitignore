@@ -5,3 +5,4 @@ package-lock.json
 images/
 seederGenerators/results/
 newrelic_agent.log
+node-api/.idea/
