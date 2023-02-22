@@ -44,7 +44,7 @@ const {
   PublicationState,
   HistoryState,
   User,
-} = require('./models').mah;
+} = require('./src/app/models').mah;
 
 
 
