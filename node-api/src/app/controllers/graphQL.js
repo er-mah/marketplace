@@ -1,5 +1,5 @@
 const Graphql = require("graphql").graphql;
-const schema = require("../schema");
+const schema = require("../schemas");
 
 export const httpGraphQLHandler = (req, res) => {
     const { query, variables, rootVals } = req.query;

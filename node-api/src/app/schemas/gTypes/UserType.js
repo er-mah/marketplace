@@ -2,12 +2,12 @@ const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 const graphql = require('graphql');
-const { User, PublicationState } = require('../models').mah;
+const { User, PublicationState } = require('../../models').mah;
 const jwtDecode = require('jwt-decode');
 const bcrypt = require('bcrypt-nodejs');
 const { ProvincesType } = require('./ProvincesType');
 const { TownType } = require('./TownType');
-const { Publication, CommentThread, sequelize } = require('../models').mah;
+const { Publication, CommentThread, sequelize } = require('../../models').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,

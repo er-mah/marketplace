@@ -1,5 +1,5 @@
 const jsonwt = require("jsonwebtoken");
-const { generateForAdmin } = require("../mails");
+const { generateForAdmin } = require("../../mails");
 const sgMail = require("@sendgrid/mail");
 
 const { User } = require("../models").mah;

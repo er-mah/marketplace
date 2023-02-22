@@ -11,10 +11,10 @@ const { PubSub, withFilter } = require('graphql-subscriptions');
 const { PublicationType } = require('./PublicationType');
 const {
   CommentThread, User, Publication, Message,
-} = require('../models').mah;
+} = require('../../models').mah;
 /* eslint camelcase: 0 */
 const pubsub = new PubSub();
-const { generateMailAgenciaoParticular, generateSinRegistro } = require('../mails');
+const { generateMailAgenciaoParticular, generateSinRegistro } = require('../../../mails');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);

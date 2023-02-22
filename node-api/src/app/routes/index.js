@@ -1,6 +1,6 @@
 import {graphiqlExpress} from "apollo-server-express";
 import graphqlHTTP from "express-graphql";
-import schema from "../schema";
+import schema from "../schemas";
 
 const express = require("express");
 
@@ -24,6 +24,8 @@ const { getProvinces, getTowns } = require("../controllers/addressInfo");
 
 
 export const router = express.Router();
+
+// TODO: We can refactor this
 
 router.post("/login", login);
 router.post("/loginAdmin", loginAdmin);

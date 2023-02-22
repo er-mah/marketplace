@@ -1,4 +1,4 @@
-const { generateMailAgenciaoParticular } = require("../mails");
+const { generateMailAgenciaoParticular } = require("../../mails");
 const sgMail = require("@sendgrid/mail");
 const decode = require("jwt-decode");
 const bcrypt = require("bcrypt-nodejs");

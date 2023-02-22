@@ -1,4 +1,3 @@
-
 const graphql = require('graphql');
 const { resolver } = require('graphql-sequelize');
 const decode = require('jwt-decode');
@@ -6,38 +5,38 @@ const _ = require('lodash');
 const { UserError, maskErrors } = require('graphql-errors');
 
 
-const { UserType, SearchUserResultType, SearchResumeType } = require('../gtypes/UserType');
-const { GruposType } = require('../gtypes/GruposType');
-const { Tautos30type } = require('../gtypes/Tautos30type');
-const { DetailsType } = require('../gtypes/DetailsType');
-const { TechnicalDataType } = require('../gtypes/TechnicalDataType');
-const { AdditionalsType } = require('../gtypes/AdditionalsType');
-const { PublicationType } = require('../gtypes/PublicationType');
-const { PublicationStateType } = require('../gtypes/PublicationStateType');
-const { CommentThreadType } = require('../gtypes/CommentThreadType');
-const { MessageType } = require('../gtypes/MessageType');
-const { PageTextsType } = require('../gtypes/PageTextType');
-const { RatesType } = require('../gtypes/RatesType');
+const { UserType, SearchUserResultType, SearchResumeType } = require('./gTypes/UserType');
+const { GruposType } = require('./gTypes/GruposType');
+const { Tautos30type } = require('./gTypes/Tautos30type');
+const { DetailsType } = require('./gTypes/DetailsType');
+const { TechnicalDataType } = require('./gTypes/TechnicalDataType');
+const { AdditionalsType } = require('./gTypes/AdditionalsType');
+const { PublicationType } = require('./gTypes/PublicationType');
+const { PublicationStateType } = require('./gTypes/PublicationStateType');
+const { CommentThreadType } = require('./gTypes/CommentThreadType');
+const { MessageType } = require('./gTypes/MessageType');
+const { PageTextsType } = require('./gTypes/PageTextType');
+const { RatesType } = require('./gTypes/RatesType');
 
-const { infoAutoResolver } = require('../helpers');
+const { infoAutoResolver } = require('../../helpers');
 
 
 const {
   createCommentThread,
   deleteCommentThread,
-} = require('../gtypes/CommentThreadType').CommentThreadMutations;
+} = require('./gTypes/CommentThreadType').CommentThreadMutations;
 const {
   addMessage,
   deleteMessage,
   markThreadAsReaded,
-} = require('../gtypes/MessageType').MessageMutations;
+} = require('./gTypes/MessageType').MessageMutations;
 const {
   modifyUserData,
   updatePassword,
   resetPassword,
   deleteUser,
   searchUser,
-} = require('../gtypes/UserType').UserMutations;
+} = require('./gTypes/UserType').UserMutations;
 
 const {
   searchPublication,
@@ -48,18 +47,18 @@ const {
   adminUnHighlightPublication,
   aprovePublication,
   disaprovePublication,
-} = require('../gtypes/PublicationType').PublicationMutation;
+} = require('./gTypes/PublicationType').PublicationMutation;
 
-const { messageAdded } = require('../gtypes/MessageType').MessageSubscriptions;
+const { messageAdded } = require('./gTypes/MessageType').MessageSubscriptions;
 const {
   threadAdded,
-} = require('../gtypes/CommentThreadType').CommentThreadSubscriptions;
+} = require('./gTypes/CommentThreadType').CommentThreadSubscriptions;
 const {
   updateText,
-} = require('../gtypes/PageTextType').PageTextMutations;
+} = require('./gTypes/PageTextType').PageTextMutations;
 const {
   updateRates,
-} = require('../gtypes/RatesType').RateMutations;
+} = require('./gTypes/RatesType').RateMutations;
 
 const {
   User,

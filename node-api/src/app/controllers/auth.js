@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { generateMailAgenciaoParticular } = require("../mails");
+const { generateMailAgenciaoParticular } = require("../../mails");
 const sgMail = require("@sendgrid/mail");
 const jsonwt = require("jsonwebtoken");
 

@@ -1,16 +1,16 @@
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { Town } = require('../models').mah;
+const { Provinces } = require('../../models').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,
 } = graphql;
 
-const TownType = new ObjectGraph({
-  name: 'Town',
+const ProvincesType = new ObjectGraph({
+  name: 'Provinces',
   description: 'Provincias',
-  fields: _.assign(attributeFields(Town)),
+  fields: _.assign(attributeFields(Provinces)),
 });
 
-module.exports = { TownType };
+module.exports = { ProvincesType };

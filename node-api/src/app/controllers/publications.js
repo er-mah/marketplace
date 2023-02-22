@@ -1,11 +1,11 @@
 const { split } = require("split-object");
 const decode = require("jwt-decode");
-const { prepareArrayToSharp } = require("../helpers");
+const { prepareArrayToSharp } = require("../../helpers");
 const {
   generateSinRegistro,
   generateForAdmin,
   generateMailAgenciaoParticular,
-} = require("../mails");
+} = require("../../mails");
 const sgMail = require("@sendgrid/mail");
 const moment = require("moment/moment");
 

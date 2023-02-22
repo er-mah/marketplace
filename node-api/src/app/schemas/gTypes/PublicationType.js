@@ -11,7 +11,7 @@ const {
   User,
   Provinces,
   sequelize,
-} = require('../models').mah;
+} = require('../../models').mah;
 const { ImageGroupType } = require('./ImageGroupType');
 const { HistoryStateType } = require('./HistoryStateType');
 const { PublicationStateType } = require('./PublicationStateType');
@@ -22,7 +22,7 @@ const { UserType } = require('./UserType');
 const {
   generateMailAgenciaoParticular,
   generateSinRegistro,
-} = require('../mails');
+} = require('../../../mails');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
