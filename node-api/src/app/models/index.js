@@ -1,57 +1,114 @@
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
+import { PublicationHistoryModel } from "./publicationHistory.js";
+import { ConversationMessageModel } from "./conversationMessage.js";
+import { ProvinceModel } from "./province.js";
+import { PublicationModel } from "./publication.js";
+import { PublicationStateModel } from "./publicationState.js";
+import { LocalityModel } from "./locality.js";
+import { UserModel } from "./user.js";
+import { PublicationPhotosModel } from "./publicationPhotos.js";
+import { ConversationThreadModel } from "./conversationThread.js";
+import { AgencyModel } from "./agency.js";
+import { DepartmentModel } from "./department.js";
 
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(`${__dirname}/../config/config.js`)[env];
-const db = {};
-db.mah = {};
-db.tauto = {};
-let sequelizeMah;
-let sequelizeTauto;
+// Make relationships here to avoid circular refrences
 
-if (config.mah_db && config.tauto_db) {
-  sequelizeMah = new Sequelize(config.mah_db.url, config.mah_db);
-  sequelizeTauto = new Sequelize(config.tauto_db.url, config.tauto_db);
-} else {
-  sequelizeMah = new Sequelize(config.databases.mah_test, config.username, config.password, config);
-  sequelizeTauto = new Sequelize(config.databases.tauto, config.username, config.password, config);
-}
+AgencyModel.users = AgencyModel.hasMany(UserModel);
 
-
-fs
-  .readdirSync(__dirname)
-  .filter(file => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-  .forEach((file) => {
-    const model = sequelizeMah.import(path.join(__dirname, file));
-    db.mah[model.name] = model;
-  });
-
-Object.keys(db.mah).forEach((modelName) => {
-  if (db.mah[modelName].associate) {
-    db.mah[modelName].associate(db);
-  }
+ConversationMessageModel.user = ConversationMessageModel.belongsTo(UserModel, {
+  foreignKey: "from_id",
 });
 
-db.mah.sequelize = sequelizeMah;
-db.Sequelize = Sequelize;
-
-fs
-  .readdirSync(`${__dirname}/modelsTauto`)
-  .filter(file => (file.indexOf('./modelsTauto') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-  .forEach((file) => {
-    const model = sequelizeTauto.import(path.join(`${__dirname}/modelsTauto`, file));
-    db.tauto[model.name] = model;
-  });
-
-Object.keys(db.tauto).forEach((modelName) => {
-  if (db.tauto[modelName].associate) {
-    db.tauto[modelName].associate(db);
+ConversationThreadModel.messages = ConversationThreadModel.hasMany(
+  ConversationMessageModel,
+  {
+    foreignKey: "commentThread_id",
+    as: "messages",
+    onDelete: "CASCADE",
   }
+);
+ConversationThreadModel.participant1 = ConversationThreadModel.belongsTo(
+  UserModel,
+  {
+    foreignKey: "participant1_id",
+  }
+);
+ConversationThreadModel.participant2 = ConversationThreadModel.belongsTo(
+  UserModel,
+  {
+    foreignKey: "participant2_id",
+  }
+);
+ConversationThreadModel.publication = ConversationThreadModel.belongsTo(
+  PublicationModel,
+  {
+    foreignKey: "publication_id",
+    onDelete: "CASCADE",
+  }
+);
+
+DepartmentModel.province = DepartmentModel.belongsTo(ProvinceModel);
+DepartmentModel.hasMany(LocalityModel);
+
+LocalityModel.department = LocalityModel.belongsTo(DepartmentModel);
+
+ProvinceModel.hasMany(DepartmentModel);
+
+PublicationModel.conversation = PublicationModel.hasMany(
+  ConversationThreadModel,
+  {
+    onDelete: "CASCADE",
+  }
+);
+
+PublicationModel.photos = PublicationModel.belongsTo(PublicationPhotosModel);
+
+PublicationModel.user = PublicationModel.belongsTo(UserModel);
+
+PublicationModel.state = PublicationModel.belongsToMany(PublicationStateModel, {
+  through: PublicationHistoryModel,
+  foreignKey: "publication_id",
+  onDelete: "CASCADE",
+});
+PublicationModel.locality = PublicationModel.belongsTo(LocalityModel);
+
+PublicationHistoryModel.publication = PublicationHistoryModel.belongsTo(
+  PublicationModel,
+  {
+    onDelete: "CASCADE",
+  }
+);
+PublicationHistoryModel.state = PublicationHistoryModel.belongsTo(
+  PublicationStateModel
+);
+
+PublicationPhotosModel.hasOne(PublicationModel);
+
+PublicationStateModel.publication = PublicationStateModel.belongsToMany(
+  PublicationModel,
+  {
+    through: PublicationHistoryModel, // Intermediate table between PublicationState and Publication
+    foreignKey: "publication_history_id",
+    onDelete: "CASCADE",
+  }
+);
+
+UserModel.provincialDepartemnt = UserModel.hasOne(DepartmentModel);
+UserModel.publications = UserModel.hasMany(PublicationModel, {
+  onDelete: "CASCADE",
 });
 
-db.tauto.sequelize = sequelizeTauto;
-db.Sequelize = Sequelize;
+UserModel.agency = UserModel.hasOne(AgencyModel);
 
-module.exports = db;
+export {
+  UserModel,
+  PublicationModel,
+  AgencyModel,
+  PublicationHistoryModel,
+  ConversationMessageModel,
+  ProvinceModel,
+  PublicationStateModel,
+  LocalityModel,
+  DepartmentModel,
+  PublicationPhotosModel,
+  ConversationThreadModel,
+};

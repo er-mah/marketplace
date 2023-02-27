@@ -1,39 +1,51 @@
+import { DataTypes } from "sequelize";
+import { db } from "../../config/db.js";
 
+import {
+  ConversationThreadModel,
+  LocalityModel,
+  PublicationHistoryModel,
+  PublicationPhotosModel,
+  PublicationStateModel,
+  UserModel,
+} from "./index.js";
 
-module.exports = (sequelize, DataTypes) => {
-  const Publication = sequelize.define('Publication', {
-    brand: DataTypes.STRING,
-    group: DataTypes.STRING,
-    modelName: DataTypes.STRING,
+// This model represents a vehicle publication
+export const PublicationModel = db.define(
+  "Publication",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    vehicleBrand: DataTypes.STRING,
+    vehicleModel: DataTypes.STRING,
+    vehicleYear: DataTypes.INTEGER,
+    vehicleVersion: DataTypes.INTEGER,
+    vehicleState: DataTypes.ENUM("Nuevo", "Usado"),
+    vehicleGroup: DataTypes.ENUM(
+      "Alta gama",
+      "Ciudad",
+      "Familia",
+      "Todo terreno",
+      "Utilitario"
+    ),
     kms: DataTypes.STRING,
     price: DataTypes.FLOAT,
-    year: DataTypes.INTEGER,
-    fuel: DataTypes.STRING,
-    observation: DataTypes.TEXT,
-    imageGroup_id: DataTypes.INTEGER,
-    carState: DataTypes.ENUM('Nuevo', 'Usado'),
-    codia: DataTypes.INTEGER,
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
+    fuel: DataTypes.ENUM(
+      "Diesel",
+      "Nafta",
+      "Nafta/Gnc",
+      "Turbo Diesel",
+      "Otro"
+    ),
+    ownerDetails: DataTypes.TEXT,
+    infoAutoDetails: DataTypes.JSON,
     words: DataTypes.TEXT,
-    phone: DataTypes.STRING,
-    ml_detail: DataTypes.STRING,
-    ml_id: DataTypes.STRING,
-  }, {
+    slug: DataTypes.STRING,
+  },
+  {
     paranoid: true,
-  });
-  Publication.associate = (models) => {
-    Publication.commentThread = Publication.hasMany(models.mah.CommentThread, { foreignKey: 'publication_id', onDelete: 'CASCADE' });
-    Publication.ImageGroup = Publication.belongsTo(models.mah.ImageGroup, { foreignKey: 'imageGroup_id' });
-    Publication.PublicationDetail = Publication.belongsTo(models.mah.PublicationDetail, { foreignKey: 'publicationDetail_id', as: 'publicationDetail', onDelete: 'CASCADE' });
-    Publication.User = Publication.belongsTo(models.mah.User, { foreignKey: 'user_id' });
-    Publication.state = Publication.belongsToMany(models.mah.PublicationState, {
-      through: models.mah.HistoryState,
-      foreignKey: 'publication_id',
-      onDelete: 'CASCADE',
-    });
-    Publication.Province = Publication.belongsTo(models.mah.Provinces, {foreignKey:'province_id', onDelete:'CASCADE'})
-    Publication.Town = Publication.belongsTo(models.mah.Town, {foreignKey:'town_id', onDelete:'CASCADE'})
-  };
-  return Publication;
-};
+  }
+);

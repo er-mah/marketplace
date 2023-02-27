@@ -1,7 +1,17 @@
+import { db } from "../../config/db.js";
+import { DataTypes } from "sequelize";
 
+import { PublicationModel } from "./index.js";
 
-module.exports = (sequelize, DataTypes) => {
-  const ImageGroup = sequelize.define('ImageGroup', {
+// This model represents a group of images
+export const PublicationPhotosModel = db.define(
+  "PublicationPhotos",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     image1: DataTypes.STRING,
     image2: DataTypes.STRING,
     image3: DataTypes.STRING,
@@ -22,8 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     image18: DataTypes.STRING,
     image19: DataTypes.STRING,
     image20: DataTypes.STRING,
-  }, {
+  },
+  {
     timestamps: false,
-  });
-  return ImageGroup;
-};
+    paranoid: true,
+  }
+);
