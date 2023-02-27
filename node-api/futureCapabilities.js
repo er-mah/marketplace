@@ -30,7 +30,7 @@ const moment = require('moment');
 // TODO FIX SCHEDULER
 /*
 Este código programa una tarea recurrente que se ejecuta todos los días a las 3:01 am.
-Cuando se ejecuta, recupera todas las entradas de la tabla HistoryState donde la columna active es
+Cuando se ejecuta, recupera todas las entradas de la tabla PublicationHistory donde la columna active es
 verdadera e incluye la columna PublicationState. Luego, se itera sobre cada fila recuperada y se calcula
 la diferencia en días entre la fecha actual y la fecha en que se creó la publicación asociada. Si la diferencia es mayor
 a 60 días, entonces la publicación se marca como vencida cambiando su estado a "Vencida". Finalmente,
@@ -85,7 +85,7 @@ const j = schedule.scheduleJob(rule, () => {
 
 
 // SCHEDULER OLD
-/* HistoryState.findAll({
+/* PublicationHistory.findAll({
   where: { active: true },
   include: [PublicationState],
 }).then((res) => {
@@ -121,7 +121,7 @@ const rule2 = new schedule.RecurrenceRule();
 rule2.hour = 11;
 rule2.minute = 42;
 const j2 = schedule.scheduleJob(rule2, () => {
-  HistoryState.findAll({
+  PublicationHistory.findAll({
     where: { active: true },
     include: [PublicationState],
   }).then((res) => {
