@@ -13,7 +13,7 @@ import express from "express";
 
 import {} from "./app/models/index.js";
 import { db } from "./config/db.js";
-import { morganHttpLoggerMdw } from "./middlewares/index.js";
+//import { morganHttpLoggerMdw } from "./middlewares/index.js";
 import { bulkDataInsert } from "./seeders/index.js";
 
 function loadEnvVariables() {
@@ -37,10 +37,9 @@ async function start() {
     await db.sync();
 
     await bulkDataInsert();
-    console.log("\nSeeding complete!");
 
     // Middlewares
-    app.use(morganHttpLoggerMdw);
+    // todo: app.use(morganHttpLoggerMdw);
 
     /*
       app.use(jwtMdw);
