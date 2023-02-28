@@ -1,51 +1,93 @@
 import { DataTypes } from "sequelize";
 import { db } from "../../config/db.js";
 
-import {
-  ConversationThreadModel,
-  LocalityModel,
-  PublicationHistoryModel,
-  PublicationPhotosModel,
-  PublicationStateModel,
-  UserModel,
-} from "./index.js";
-
 // This model represents a vehicle publication
 export const PublicationModel = db.define(
   "Publication",
   {
     id: {
-      type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
     },
-    vehicleBrand: DataTypes.STRING,
-    vehicleModel: DataTypes.STRING,
-    vehicleYear: DataTypes.INTEGER,
-    vehicleVersion: DataTypes.INTEGER,
-    vehicleState: DataTypes.ENUM("Nuevo", "Usado"),
-    vehicleGroup: DataTypes.ENUM(
-      "Alta gama",
-      "Ciudad",
-      "Familia",
-      "Todo terreno",
-      "Utilitario"
-    ),
+    vehicle_brand: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vehicle_model: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vehicle_year: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vehicle_version: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vehicle_codia_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    vehicle_state: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        customValidator: (value) => {
+          const enums = ["Nuevo", "Usado"];
+          if (!enums.includes(value)) {
+            throw new Error("not a valid option");
+          }
+        },
+      },
+    },
+    vehicle_group: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        customValidator: (value) => {
+          const enums = [
+            "Alta gama",
+            "Ciudad",
+            "Familia",
+            "Todo terreno",
+            "Utilitario",
+            "Otro",
+          ];
+          if (!enums.includes(value)) {
+            throw new Error("not a valid option");
+          }
+        },
+      },
+    },
     kms: DataTypes.STRING,
     price: DataTypes.FLOAT,
-    fuel: DataTypes.ENUM(
-      "Diesel",
-      "Nafta",
-      "Nafta/Gnc",
-      "Turbo Diesel",
-      "Otro"
-    ),
-    ownerDetails: DataTypes.TEXT,
-    infoAutoDetails: DataTypes.JSON,
+    fuel: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        customValidator: (value) => {
+          const enums = [
+            "Diesel",
+            "Nafta",
+            "Nafta/Gnc",
+            "Turbo Diesel",
+            "Otro",
+          ];
+          if (!enums.includes(value)) {
+            throw new Error("not a valid option");
+          }
+        },
+      },
+    },
+    owner_observations: DataTypes.TEXT,
+    info_auto_specs: DataTypes.JSON,
     words: DataTypes.TEXT,
     slug: DataTypes.STRING,
   },
   {
     paranoid: true,
+    timestamps: true,
   }
 );

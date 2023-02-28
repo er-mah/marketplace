@@ -1,31 +1,38 @@
-import { PublicationHistoryModel } from "./publicationHistory.js";
+import { PublicationChangesModel } from "./publicationChange.js";
 import { ConversationMessageModel } from "./conversationMessage.js";
 import { ProvinceModel } from "./province.js";
 import { PublicationModel } from "./publication.js";
 import { PublicationStateModel } from "./publicationState.js";
 import { LocalityModel } from "./locality.js";
 import { UserModel } from "./user.js";
-import { PublicationPhotosModel } from "./publicationPhotos.js";
+import { PublicationPhotoAlbumModel } from "./publicationPhotoAlbum.js";
 import { ConversationThreadModel } from "./conversationThread.js";
 import { AgencyModel } from "./agency.js";
 import { DepartmentModel } from "./department.js";
 
-// Make relationships here to avoid circular refrences
+// RELATIONSHIPS
+// They are here to avoid circular references
 
-AgencyModel.users = AgencyModel.hasMany(UserModel);
+// An agency can be managed by different users
+AgencyModel.users = AgencyModel.hasMany(UserModel, {
+  foreignKey: "agency_id",
+});
 
+// A message is emitted by a user
 ConversationMessageModel.user = ConversationMessageModel.belongsTo(UserModel, {
   foreignKey: "from_id",
 });
 
+// A conversation has messages
 ConversationThreadModel.messages = ConversationThreadModel.hasMany(
   ConversationMessageModel,
   {
-    foreignKey: "commentThread_id",
+    foreignKey: "comment_thread_id",
     as: "messages",
     onDelete: "CASCADE",
   }
 );
+// A conversation has associated participants
 ConversationThreadModel.participant1 = ConversationThreadModel.belongsTo(
   UserModel,
   {
@@ -38,6 +45,8 @@ ConversationThreadModel.participant2 = ConversationThreadModel.belongsTo(
     foreignKey: "participant2_id",
   }
 );
+
+// A conversation has an associated publication
 ConversationThreadModel.publication = ConversationThreadModel.belongsTo(
   PublicationModel,
   {
@@ -46,69 +55,81 @@ ConversationThreadModel.publication = ConversationThreadModel.belongsTo(
   }
 );
 
-DepartmentModel.province = DepartmentModel.belongsTo(ProvinceModel);
-DepartmentModel.hasMany(LocalityModel);
+// A locality has a department
+LocalityModel.department = LocalityModel.belongsTo(DepartmentModel, {
+  foreignKey: "department_id",
+});
 
-LocalityModel.department = LocalityModel.belongsTo(DepartmentModel);
+// A department has a province
+DepartmentModel.province = DepartmentModel.belongsTo(ProvinceModel, {
+  foreignKey: "province_id",
+});
 
-ProvinceModel.hasMany(DepartmentModel);
+// A department can have multiple localities
+DepartmentModel.hasMany(LocalityModel, { foreignKey: "department_id" });
 
+// A province can have multiple departments
+ProvinceModel.hasMany(DepartmentModel, { foreignKey: "province_id" });
+
+// A publication can have multiple conversations
 PublicationModel.conversation = PublicationModel.hasMany(
   ConversationThreadModel,
   {
     onDelete: "CASCADE",
+    foreignKey: "publication_id",
   }
 );
 
-PublicationModel.photos = PublicationModel.belongsTo(PublicationPhotosModel);
+// A publication can have a group of photos
+PublicationModel.photos = PublicationModel.belongsTo(
+  PublicationPhotoAlbumModel,
+  {
+    foreignKey: "photo_album_id",
+  }
+);
 
-PublicationModel.user = PublicationModel.belongsTo(UserModel);
-
-PublicationModel.state = PublicationModel.belongsToMany(PublicationStateModel, {
-  through: PublicationHistoryModel,
-  foreignKey: "publication_id",
-  onDelete: "CASCADE",
+// A publication must be associated to a user
+PublicationModel.user = PublicationModel.belongsTo(UserModel, {
+  foreignKey: "user_id",
 });
-PublicationModel.locality = PublicationModel.belongsTo(LocalityModel);
 
-PublicationHistoryModel.publication = PublicationHistoryModel.belongsTo(
-  PublicationModel,
-  {
-    onDelete: "CASCADE",
-  }
+// A publication can have a locality
+PublicationModel.locality = PublicationModel.belongsTo(LocalityModel, {
+  foreignKey: "locality_id",
+});
+
+// Many publications can have many states -> Intermediate table: PublicationChangesModel
+// We make available the changes register from "stateChanges"
+PublicationModel.stateChanges = PublicationModel.belongsToMany(
+  PublicationStateModel,
+  { through: PublicationChangesModel, foreignKey: "publication_id" }
 );
-PublicationHistoryModel.state = PublicationHistoryModel.belongsTo(
-  PublicationStateModel
-);
+PublicationStateModel.belongsToMany(PublicationModel, {
+  through: PublicationChangesModel,
+  foreignKey: "state_id",
+});
 
-PublicationPhotosModel.hasOne(PublicationModel);
+// A user is from a locality
+UserModel.locality = UserModel.belongsTo(LocalityModel, {
+  foreignKey: "locality_id",
+});
 
-PublicationStateModel.publication = PublicationStateModel.belongsToMany(
-  PublicationModel,
-  {
-    through: PublicationHistoryModel, // Intermediate table between PublicationState and Publication
-    foreignKey: "publication_history_id",
-    onDelete: "CASCADE",
-  }
-);
-
-UserModel.provincialDepartemnt = UserModel.hasOne(DepartmentModel);
+// A user has publications
 UserModel.publications = UserModel.hasMany(PublicationModel, {
   onDelete: "CASCADE",
+  foreignKey: "user_id",
 });
-
-UserModel.agency = UserModel.hasOne(AgencyModel);
 
 export {
   UserModel,
   PublicationModel,
   AgencyModel,
-  PublicationHistoryModel,
+  PublicationChangesModel,
   ConversationMessageModel,
   ProvinceModel,
   PublicationStateModel,
   LocalityModel,
   DepartmentModel,
-  PublicationPhotosModel,
+  PublicationPhotoAlbumModel,
   ConversationThreadModel,
 };

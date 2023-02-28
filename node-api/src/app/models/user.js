@@ -2,8 +2,6 @@ import { DataTypes } from "sequelize";
 import { db } from "../../config/db.js";
 import bcrypt from "bcrypt";
 
-import { AgencyModel, DepartmentModel, PublicationModel } from "./index.js";
-
 // TODO: CHANGE THIS LIBRARY -> bcrypt or bcryptjs
 
 // This model represents a user that uses the system
@@ -11,9 +9,9 @@ export const UserModel = db.define(
   "User",
   {
     id: {
-      type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
     },
     email: {
       type: DataTypes.STRING,
@@ -24,24 +22,25 @@ export const UserModel = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    firstName: {
+    first_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastName: {
+    last_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     address: DataTypes.STRING,
     phone: DataTypes.STRING,
-    profileImage: DataTypes.STRING,
+    profile_image: DataTypes.STRING,
     dni: DataTypes.STRING,
-    isAdmin: DataTypes.BOOLEAN,
-    isAgencyRepresentative: DataTypes.BOOLEAN,
-    isEmailVerified: DataTypes.BOOLEAN,
-    isAccountDisabled: DataTypes.BOOLEAN,
+    is_admin: DataTypes.BOOLEAN,
+    is_agency_representative: DataTypes.BOOLEAN,
+    is_email_verified: DataTypes.BOOLEAN,
+    is_account_disabled: DataTypes.BOOLEAN,
   },
   {
+    timestamps: true,
     paranoid: true,
   }
 );

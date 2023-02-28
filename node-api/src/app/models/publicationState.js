@@ -1,8 +1,6 @@
 import { db } from "../../config/db.js";
 import { DataTypes } from "sequelize";
 
-import { PublicationHistoryModel, PublicationModel } from "./index.js";
-
 /* Todo: delete this
 * DETERMINA EL ESTADO DE LAS PUBLICACIONES
 1	Pendiente
@@ -18,14 +16,14 @@ import { PublicationHistoryModel, PublicationModel } from "./index.js";
 
 // This model holds the different states a publication can have
 export const PublicationStateModel = db.define(
-  "PublicationState",
+  "Publication State",
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    stateName: DataTypes.STRING,
+    state_name: DataTypes.STRING,
   },
   {
     timestamps: false,

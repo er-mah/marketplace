@@ -1,38 +1,36 @@
 import { DataTypes } from "sequelize";
 import { db } from "../../config/db.js";
 
-
-import { UserModel } from "./index.js";
-
 // This model represents an agency profile
 export const AgencyModel = db.define(
   "Agency",
   {
     id: {
-      type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
     },
-    agencyName: {
+    agency_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    agencyAddress: {
+    agency_address: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    agencyEmail: {
+    agency_email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
-    agencyPhone: {
+    agency_phone: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    bannerImage: DataTypes.STRING,
+    banner_image: DataTypes.STRING,
   },
   {
+    timestamps: true,
     paranoid: true,
   }
 );

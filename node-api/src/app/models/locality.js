@@ -1,6 +1,5 @@
 import { db } from "../../config/db.js";
-
-import {DataTypes} from "sequelize";
+import { DataTypes } from "sequelize";
 
 // This model represents a locality of a department
 export const LocalityModel = db.define("Locality", {

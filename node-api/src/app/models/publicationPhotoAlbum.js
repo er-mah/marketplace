@@ -1,11 +1,9 @@
 import { db } from "../../config/db.js";
 import { DataTypes } from "sequelize";
 
-import { PublicationModel } from "./index.js";
-
 // This model represents a group of images
-export const PublicationPhotosModel = db.define(
-  "PublicationPhotos",
+export const PublicationPhotoAlbumModel = db.define(
+  "Publication Photo Album",
   {
     id: {
       type: DataTypes.INTEGER,
