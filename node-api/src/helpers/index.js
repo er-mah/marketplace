@@ -1,3 +1,4 @@
+/*
 const fs = require('fs');
 const sharp = require('sharp');
 const fetch = require('node-fetch');
@@ -224,3 +225,8 @@ const prepareArrayToSharp = (imageGroup) => {
 
 
 module.exports = { customFetch, infoAutoResolver, prepareArrayToSharp };
+
+* */
+import {passwordsUtils} from "./passwordsUtils.js";
+
+export {passwordsUtils}

@@ -1,9 +1,14 @@
-import {graphiqlExpress} from "apollo-server-express";
-import graphqlHTTP from "express-graphql";
-import schema from "../schemas";
+// TODO: Migrate apollo-server-express v1.4.0 to apollo/server
+import express from "express";
 
-const express = require("express");
+import {auth} from "./authRouter.js";
 
+
+import { loginController, loginAdmin } from "../controllers/old/auth.js";
+import passport from "passport";
+//import {changePassword, recoverPassword} from "../controllers/accountRecovery.js";
+
+/*
 
 const { loginAdmin, login } = require("../controllers/auth");
 const { recoverPassword, changePassword } = require("../controllers/accountRecovery");
@@ -23,28 +28,22 @@ const { uploadSliders, getSliders, deleteSlider } = require("../controllers/slid
 const { getProvinces, getTowns } = require("../controllers/addressInfo");
 
 
-export const router = express.Router();
+ */
 
-// TODO: We can refactor this
+export const router = express.Router(); // TODO: We can refactor this
 
-router.post("/login", login);
-router.post("/loginAdmin", loginAdmin);
-router.post("/recoverPassword", recoverPassword);
-router.post("/changePassword", changePassword);
+
+/*
 router.post("/publication", upload.array("imageGroup", 8), createPublication);
 router.patch("/publication", upload.array("imageGroup", 8), editPublication);
 router.get("/getSoldPublications", getSoldPublications);
 router.get("/getImages/:publication_id", getImages);
 // TODO FIX FACEBOOK LOGIN
-// router.get('/checkFacebookLogin/:email', checkFacebookLogin);
-// router.post('/loginOrRegisterFacebook/', loginOrRegisterFacebook);
 router.post("/registerAgency", registerAgency);
 router.post("/registerUser", registerUser);
 router.post("/requestCredit", requestCredit);
 router.get("/getSliders", getSliders);
 router.get("/deleteSlider/:id", deleteSlider);
-router.get("/getProvinces", getProvinces);
-router.get("/getTowns/:province_id", getTowns);
 router.post(
   "/uploadAgencyImages/:id",
   upload.fields([
@@ -61,39 +60,53 @@ router.post(
   ]),
   uploadSliders
 );
-// TODO GOOGLE ANALYTICS???
-//router.get("/getToken", getToken);
-router.use(
-    "/graphiql",
-    graphiqlExpress({
-        endpointURL: "/graphql",
-        subscriptionsEndpoint: "wss://api.miautohoy.com/subscriptions",
-    })
-)
-router.post("/", httpGraphQLHandler);
+
+//router.get("/getToken", getToken); TODO GOOGLE ANALYTICS???
+
+
 
 router.use("/images", express.static(`${__dirname}/images`));
 router.use("/logo", express.static(`${__dirname}/mails/logo.png`));
-router.use("/graphql", graphqlHTTP({ schema }));
+
+// TODO FIX Migrate apollo-server-express v1.4.0 to apollo/server
+router.use("/graphql", graphiqlExpress({
+    endpointURL: '/graphql',
+    subscriptionsEndpoint: 'wss://api.miautohoy.com/subscriptions',
+}));
+
+router.post("/", httpGraphQLHandler);
+router.use(
+    "/graphiql",
+    graphiqlExpress({
+      endpointURL: "/graphql",
+      subscriptionsEndpoint: "wss://api.miautohoy.com/subscriptions",
+    })
+)
+
+ */
+
+router.get("/", (req, res) => {
+  res.send('TechMo Marketplace API')
+})
 
 
 export const openRoutes = [
-    "/logo",
-    "/subscriptions",
-    "/graphql",
-    "/login",
-    "/loginAdmin",
-    "/get123Canales",
-    /^\/checkFacebookLogin/,
-    "/loginOrRegisterFacebook",
-    "/recoverPassword",
-    "/createPublication",
-    "/registerAgency",
-    "/registerUser",
-    /^\/images/,
-    "/requestCredit",
-    "/getSliders",
-    "/getProvinces",
-    /^\/getTowns/,
-    "/addUserAndCarData",
+  "/logo",
+  "/subscriptions",
+  "/graphql",
+  "/login",
+  "/loginAdmin",
+  "/get123Canales",
+  /^\/checkFacebookLogin/,
+  "/loginOrRegisterFacebook",
+  "/recoverPassword",
+  "/createPublication",
+  "/registerAgency",
+  "/registerUser",
+  /^\/images/,
+  "/requestCredit",
+  "/getSliders",
+  "/getProvinces",
+  /^\/getTowns/,
+  "/addUserAndCarData",
 ];
