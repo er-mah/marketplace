@@ -1,8 +1,20 @@
-import {bodyParserMdw} from "./bodyParser";
-import {cors, corsMdw} from "./cors";
-import {clientErrorHandlerMdw, errorHandlerMdw, logErrorsMdw} from "./errorHandlers";
-import {jwtMdw} from "./jwt";
-import {morganHttpLoggerMdw} from "./logger";
-import {methodOverrideMdw} from "./methodOverride";
+import { corsMdw } from "./cors.js";
+import {
+  clientErrorHandlerMdw,
+  errorHandlerMdw,
+  logErrorsMdw,
+} from "./errorHandlers.js";
 
-export {bodyParserMdw, cors, corsMdw, clientErrorHandlerMdw, errorHandlerMdw, logErrorsMdw, jwtMdw, morganHttpLoggerMdw, methodOverrideMdw}
+import { morganHttpLoggerMdw } from "./logger.js";
+import { expressSessionInstance } from "./expressSession.js";
+import { passportMdw } from "./passport.js";
+
+export {
+  corsMdw,
+  clientErrorHandlerMdw,
+  errorHandlerMdw,
+  expressSessionInstance,
+  logErrorsMdw,
+  morganHttpLoggerMdw,
+  passportMdw,
+};

@@ -1,4 +1,4 @@
-const morgan = require("morgan");
+import morgan from "morgan";
 
 /*
 * Morgan - Request logger middleware
@@ -7,4 +7,7 @@ const morgan = require("morgan");
 * to the console or a file. This helps in debugging, analyzing and monitoring server requests and responses.
 *
 * */
-export const morganHttpLoggerMdw = morgan("dev");
+
+export const morganHttpLoggerMdw = () => {
+    return morgan("dev");
+};
