@@ -10,20 +10,20 @@ export const AgencyModel = db.define(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
     },
-    agency_name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    agency_address: {
+    address: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    agency_email: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
-    agency_phone: {
+    phone: {
       type: DataTypes.STRING,
       allowNull: false,
     },

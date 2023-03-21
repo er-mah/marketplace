@@ -10,9 +10,23 @@ export const PublicationChangesModel = db.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    active: DataTypes.BOOLEAN,
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
+    hooks: {
+      beforeCreate: async (attributes, options) => {
+        if (attributes.active) {
+          // If active is true, update the other registers
+          await PublicationChangesModel.update(
+            { active: false },
+            { where: { active: true } }
+          );
+        }
+      },
+    },
     timestamps: true,
   }
 );

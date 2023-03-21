@@ -9,12 +9,13 @@ import { PublicationPhotoAlbumModel } from "./publicationPhotoAlbum.js";
 import { ConversationThreadModel } from "./conversationThread.js";
 import { AgencyModel } from "./agency.js";
 import { DepartmentModel } from "./department.js";
+import { UserSessionModel } from "./userSession.js";
 
 // RELATIONSHIPS
 // They are here to avoid circular references
 
 // An agency can be managed by different users
-AgencyModel.users = AgencyModel.hasMany(UserModel, {
+AgencyModel.representatives = AgencyModel.hasMany(UserModel, {
   foreignKey: "agency_id",
 });
 
@@ -33,13 +34,13 @@ ConversationThreadModel.messages = ConversationThreadModel.hasMany(
   }
 );
 // A conversation has associated participants
-ConversationThreadModel.participant1 = ConversationThreadModel.belongsTo(
+ConversationThreadModel.participant_1 = ConversationThreadModel.belongsTo(
   UserModel,
   {
     foreignKey: "participant1_id",
   }
 );
-ConversationThreadModel.participant2 = ConversationThreadModel.belongsTo(
+ConversationThreadModel.participant_2 = ConversationThreadModel.belongsTo(
   UserModel,
   {
     foreignKey: "participant2_id",
@@ -72,7 +73,7 @@ DepartmentModel.hasMany(LocalityModel, { foreignKey: "department_id" });
 ProvinceModel.hasMany(DepartmentModel, { foreignKey: "province_id" });
 
 // A publication can have multiple conversations
-PublicationModel.conversation = PublicationModel.hasMany(
+PublicationModel.conversations = PublicationModel.hasMany(
   ConversationThreadModel,
   {
     onDelete: "CASCADE",
@@ -89,7 +90,7 @@ PublicationModel.photos = PublicationModel.belongsTo(
 );
 
 // A publication must be associated to a user
-PublicationModel.user = PublicationModel.belongsTo(UserModel, {
+PublicationModel.owner = PublicationModel.belongsTo(UserModel, {
   foreignKey: "user_id",
 });
 
@@ -100,13 +101,15 @@ PublicationModel.locality = PublicationModel.belongsTo(LocalityModel, {
 
 // Many publications can have many states -> Intermediate table: PublicationChangesModel
 // We make available the changes register from "stateChanges"
-PublicationModel.stateChanges = PublicationModel.belongsToMany(
-  PublicationStateModel,
-  { through: PublicationChangesModel, foreignKey: "publication_id" }
-);
+PublicationModel.belongsToMany(PublicationStateModel, {
+  through: PublicationChangesModel,
+  foreignKey: "publication_id",
+  as: "stateChanges",
+});
 PublicationStateModel.belongsToMany(PublicationModel, {
   through: PublicationChangesModel,
   foreignKey: "state_id",
+  as: "publicationsWithState",
 });
 
 // A user is from a locality
@@ -122,6 +125,7 @@ UserModel.publications = UserModel.hasMany(PublicationModel, {
 
 export {
   UserModel,
+  UserSessionModel,
   PublicationModel,
   AgencyModel,
   PublicationChangesModel,
