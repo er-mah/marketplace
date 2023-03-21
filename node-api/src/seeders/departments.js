@@ -2658,7 +2658,8 @@ export const insertDepartmentsSeeder = async () => {
       // Make bulk insert if there are no registers
       return await DepartmentModel.bulkCreate(departmentsToCreate, {
         ignoreDuplicates: true,
-      });
+      }).finally(() =>
+          console.log("\nSeeding publications finished!"));
     }
 
   } catch (e) {

@@ -48,7 +48,9 @@ export const insertPublicationStatesSeeder = async () => {
       // Make bulk insert if there are no registers
       return await PublicationStateModel.bulkCreate(statesToCreate, {
         ignoreDuplicates: true,
-      });
+      }).finally(() =>
+          console.log("\nSeeding publications finished!"));
+
     }
 
   } catch (e) {

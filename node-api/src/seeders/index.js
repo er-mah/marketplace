@@ -8,5 +8,4 @@ export const bulkDataInsert = async () => {
     await insertProvincesSeeder();
     await insertDepartmentsSeeder();
     await insertLocalitiesSeeder();
-    console.log("\nSeeding complete!");
 }

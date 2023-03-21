@@ -94659,7 +94659,8 @@ export const insertLocalitiesSeeder = async () => {
       // Make bulk insert if there are no registers
       return await LocalityModel.bulkCreate(localitiesToCreate, {
         ignoreDuplicates: true,
-      });
+      }).finally(() =>
+          console.log("\nSeeding publications finished!"));
     }
   } catch (e) {
     console.error("Error inserting localities: ", e);

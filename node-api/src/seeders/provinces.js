@@ -108,7 +108,8 @@ export const insertProvincesSeeder = async () => {
       // Make bulk insert if there are no registers
       return await ProvinceModel.bulkCreate(provincesToCreate, {
         ignoreDuplicates: true,
-      });
+      }).finally(() =>
+          console.log("\nSeeding provinces finished!"));
     }
   } catch (e) {
     console.error("Error inserting provinces: ", e);
