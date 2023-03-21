@@ -8,3 +8,5 @@ newrelic_agent.log
 node-api/.idea/
 
 postgres-db/.env
+
+node-api/.env
