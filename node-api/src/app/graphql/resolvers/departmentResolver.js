@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 
 export const department = {
   Query: {
-    getLocalitiesByDepartmentId: async (_, { id }) => {
+    getLocalitiesByDepartmentId: async (_parent, { args: { id } }, context) => {
       try {
         const department = await DepartmentModel.findOne({
           where: { id: id },

@@ -1,28 +1,14 @@
-import {
-  AgencyModel,
-  DepartmentModel,
-  ProvinceModel,
-} from "../../models/index.js";
+import { DepartmentModel, ProvinceModel } from "../../models/index.js";
 import { GraphQLError } from "graphql";
 
 export const province = {
   Query: {
-    getAgencyById: async (_, { id }) => {
-      try {
-        const agency = await AgencyModel.findByPk(id);
-        if (!agency) {
-          return Promise.reject(
-            new GraphQLError(`There are no departments with the ID: ${id}`)
-          );
-        }
-        return agency;
-      } catch (error) {
-        return Promise.reject(
-          new GraphQLError(`Error looking for agency: ${error.message}`)
-        );
+    getDepartmentsByProvinceId: async (_parent, { id }, context) => {
+      if (context.user) {
+        return Promise.reject(new GraphQLError(`User logged` + context.user));
+      } else {
+        return Promise.reject(new GraphQLError(`User not logged`));
       }
-    },
-    getDepartmentsByProvinceId: async (_, { id }) => {
       try {
         const province = await ProvinceModel.findOne({
           where: { id: id },
