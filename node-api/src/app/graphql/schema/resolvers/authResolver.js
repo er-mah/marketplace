@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
-import { LocalityModel, UserModel } from "../../models/index.js";
-import { JwtUtils, passwordsUtils } from "../../../helpers/index.js";
+import { UserModel } from "../../../models/index.js";
+import { JwtUtils, passwordsUtils } from "../../../../helpers/index.js";
 
 export const auth = {
   Mutation: {

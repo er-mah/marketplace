@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
-import { LocalityModel, UserModel } from "../../models/index.js";
-import { passwordsUtils } from "../../../helpers/index.js";
+import { LocalityModel, UserModel } from "../../../models/index.js";
+import { passwordsUtils } from "../../../../helpers/index.js";
 
 export const user = {
   BasicUser: {

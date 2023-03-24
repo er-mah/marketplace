@@ -1,4 +1,4 @@
-import { AgencyModel, UserModel } from "../../models/index.js";
+import { AgencyModel, UserModel } from "../../../models/index.js";
 import { GraphQLError } from "graphql";
 
 export const agency = {

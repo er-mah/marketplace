@@ -1,4 +1,4 @@
-import { DepartmentModel, ProvinceModel } from "../../models/index.js";
+import { DepartmentModel, ProvinceModel } from "../../../models/index.js";
 import { GraphQLError } from "graphql";
 
 export const province = {

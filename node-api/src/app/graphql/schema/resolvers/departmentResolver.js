@@ -1,4 +1,4 @@
-import { DepartmentModel, LocalityModel } from "../../models/index.js";
+import { DepartmentModel, LocalityModel } from "../../../models/index.js";
 import { GraphQLError } from "graphql";
 
 export const department = {
