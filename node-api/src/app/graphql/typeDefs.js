@@ -75,7 +75,7 @@ type Publication {
   price: Float
   fuel: String!
   owner_observations: String
-  info_auto_specs: [VehicleFeatures]!
+  info_auto_specs: ModelFeatures!
   words: String
   slug: String
   changes: [PublicationChanges]!
@@ -122,16 +122,22 @@ type PublicationState {
   state_name: String
 }
 
-"'Vehicle features' type defines the data type InfoAuto uses to associate characteristics"
-type VehicleFeatures {
+"'Vehicle feature' type defines the data type InfoAuto uses to associate characteristics"
+type VehicleFeature {
   id: ID
-  category_name: String
   description: String
   type: String
   position: Int
   length: Int
   value: String
   value_description: String
+}
+
+type ModelFeatures {
+    comfort: [VehicleFeature]!
+    technical_info: [VehicleFeature]!
+    engine_transmission:[VehicleFeature]!
+    safety:[VehicleFeature]!
 }
 
 "'User' represents the different users the system interacts with"
@@ -161,6 +167,46 @@ type BasicUser {
   first_name: String!
   last_name: String!
 }
+
+type AuthResponse {
+  id: ID!
+  token: String
+}
+
+
+type ModelsSearch {
+  models: [VehicleModel]!
+  pagination: Pagination!
+}
+type VehicleModel {
+  position: Int!
+  codia: Int!
+  brand: VehicleBrand!
+  group: VehicleGroup!
+  description: String!
+  photo_url: String!
+  prices_from: Int!
+  prices_to: Int!
+}
+type VehicleBrand {
+  id: Int!
+  name: String!
+}
+type VehicleGroup {
+  id: Int!
+  name: String!
+}
+
+type Pagination {
+  total: Int!
+  total_pages: Int!
+  first_page: Int
+  last_page: Int
+  page: Int!
+  next_page: Int
+  page_size: Int!
+}
+
 
 
 
@@ -195,6 +241,9 @@ type Query {
   "Get all users"
   getAllUsers: [User!]!
 
+  searchVehicleModel(query: String!, page: Int, pageSize: Int): ModelsSearch!
+  getVehicleModelFeatures(modelId: Int!): ModelFeatures!
+
 }
 
 type Mutation {
@@ -209,6 +258,7 @@ type Mutation {
     bannerImage: String!
     representativeIds: [ID]!
   ): Agency
+  
   "Update agency information"
   updateAgency(
     id: ID!
@@ -321,6 +371,7 @@ type Mutation {
     image19: String
     image20: String
   ): PublicationPhotoAlbum
+  
   "Update an existing publication photo album"
   updatePublicationPhotoAlbum(
     id: ID!
@@ -353,12 +404,12 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User!
   "Safe delete account user"
   deleteUser(id: ID!): User!
-  
-  
+
+
   # Authentication 
   "Register new user"
   register(input: RegisterInput!): BasicUser!
-  login(input: LoginInput!): BasicUser!
+  login(input: LoginInput!): AuthResponse
 }
 
 
@@ -374,6 +425,7 @@ input LoginInput {
   password: String!
 }
 
+
 input UpdateUserInput {
   email: String
   password: String
@@ -388,5 +440,4 @@ input UpdateUserInput {
   is_email_verified: Boolean
   is_account_disabled: Boolean
 }
-
 `;

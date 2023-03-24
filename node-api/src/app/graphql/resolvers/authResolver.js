@@ -1,8 +1,7 @@
 import { GraphQLError } from "graphql";
 
 import { LocalityModel, UserModel } from "../../models/index.js";
-import { passwordsUtils } from "../../../helpers/index.js";
-import {passportMdw} from "../../../middlewares/index.js";
+import { JwtUtils, passwordsUtils } from "../../../helpers/index.js";
 
 export const auth = {
   Mutation: {
@@ -15,9 +14,7 @@ export const auth = {
         await UserModel.findOne({ where: { email: email } }).then((user) => {
           if (user) {
             return Promise.reject(
-              new GraphQLError(
-                "There is already a user with the same email address."
-              )
+              new GraphQLError("This email address is already registered.")
             );
           }
         });
@@ -36,24 +33,31 @@ export const auth = {
         return Promise.reject(new GraphQLError(e.message));
       }
     },
-    login: async (_, { loginInput: { email, password } }, { req }) => {
-      return new Promise((resolve, reject) => {
-        passportMdw.authenticate("local", {},(err, user) => {
-          if (err) {
-            reject(new GraphQLError(err));
-          }
-          if (!user) {
-            reject(new GraphQLError("Invalid credentials"));
-          }
 
-          req.login(user, (err) => {
-            if (err) {
-              reject(new GraphQLError(err));
+    login: async (_, { input: { email, password } }, { req }) => {
+      return await UserModel.findOne({ where: { email: email } })
+        .then(async (user) => {
+            if (!user) {
+                return Promise.reject(new GraphQLError("Could not find user."));
             }
-            resolve(user);
-          });
+
+            const passwordsAreValid = await passwordsUtils.arePasswordsMatching(
+                password,
+                user.password
+            );
+
+            if (passwordsAreValid) {
+                return {
+                    id: user.id,
+                    token: await JwtUtils.issueJWT(user),
+                };
+            } else {
+                return Promise.reject(new GraphQLError("Wrong credentials."));
+            }
+        })
+        .catch((err) => {
+          return Promise.reject(new GraphQLError(err));
         });
-      });
     },
   },
 };
