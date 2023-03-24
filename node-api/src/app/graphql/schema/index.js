@@ -19,6 +19,7 @@ const resolvers = {
   Mutation: {
     //...messagesResolvers.Mutation,
     ...auth.Mutation,
+    ...publication.Mutation,
   },
 };
 

@@ -5,6 +5,7 @@ import { passwordsUtils } from "../helpers/index.js";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from "passport-jwt";
 import { config } from "dotenv";
+import AuthenticationError from "passport/lib/errors/authenticationerror.js";
 
 config();
 
@@ -17,10 +18,10 @@ export const options = {
   expiresIn: "1d",
 };
 
-const verifyValidUser = ({ sub }, done) => {
+const verifyValidUser = (jwtPayload, done) => {
   // After the token is verified with `jsonwebtoken` library, we check if we found a valid user in the database
-    // `sub` is the user id from the database. JWT payload also has iat and exp
-  UserModel.findOne({ where: { id: sub } })
+  // `sub` is the user id from the database. JWT payload also has iat and exp
+  UserModel.findOne({ where: { id: jwtPayload.sub } })
     .then((user) => {
       // Grab the user for passport to attach it to request.user
       if (user) {
@@ -38,4 +39,33 @@ const jwtStrategy = new JwtStrategy(options, verifyValidUser);
 
 passport.use("jwt", jwtStrategy);
 
-export { passport };
+
+
+function authenticateRequest(req, res, next) {
+    // Authenticate the request using the "jwt" strategy from Passport
+    passport.authenticate(
+        "jwt",
+        { session: false, optional: true },
+        (err, user) => {
+            if (err) {
+                // If there was an error during authentication, pass it on to the next middleware
+                return next(err);
+            }
+            // If authentication was successful, log in the user and pass control to the next middleware
+            req.logIn(user, { session: false }, (err) => {
+                if (err) {
+                    // If there was an error while logging in the user, pass it on to the next middleware
+                    return next(err);
+                }
+                next();
+            });
+        }
+    )(req, res, next);
+}
+function omitAuthenticationCheck(req, res, next) {
+    // All resolvers are public. We check if user is authenticated inside them.
+    return next();
+}
+
+
+export { passport, authenticateRequest, omitAuthenticationCheck };

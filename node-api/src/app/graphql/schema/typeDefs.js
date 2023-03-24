@@ -290,27 +290,28 @@ type Mutation {
 
   # Publication
   "Create a new publication"
-  createPublication(
-    vehicleYear: String!
-    vehicleBrand: String!
-    vehicleModel: String!
-    vehicleVersion: String!
-    vehicleCodiaId: Int!
-    vehicleState: String!
-    vehicleGroup: String!
-    localityId: ID!
-    kms: String
-    price: Float
-    fuel: String!
-    ownerObservations: String
-    "infoAutoSpecs: [VehicleFeatureInput]!"
-    words: String
-    slug: String!
-    "changes: [PublicationChangeInput]"
-    conversationThreadIds: [ID]
-    "photoAlbum: PublicationPhotoAlbumInput"
-    ownerId: ID!
-  ): Publication
+  createPublication: String
+  # createPublication(
+  #   vehicleYear: String!
+  #   vehicleBrand: String!
+  #   vehicleModel: String!
+  #   vehicleVersion: String!
+  #   vehicleCodiaId: Int!
+  #   vehicleState: String!
+  #   vehicleGroup: String!
+  #   localityId: ID!
+  #   kms: String
+  #   price: Float
+  #   fuel: String!
+  #   ownerObservations: String
+  #   "infoAutoSpecs: [VehicleFeatureInput]!"
+  #   words: String
+  #   slug: String!
+  #   "changes: [PublicationChangeInput]"
+  #   conversationThreadIds: [ID]
+  #   "photoAlbum: PublicationPhotoAlbumInput"
+  #   ownerId: ID!
+  # ): Publication
   "Update an existing publication"
   updatePublication(
     id: ID!
@@ -325,6 +326,7 @@ type Mutation {
     kms: String
     price: Float
     fuel: String
+    
     ownerObservations: String
     "infoAutoSpecs: [VehicleFeatureInput]"
     words: String
@@ -348,8 +350,8 @@ type Mutation {
   deletePublicationChange(id: ID!): Boolean
 
   # Publication photo album
-  "Create a new publication photo album"
-  createPublicationPhotoAlbum(
+  "Add photos to publication photo album"
+  addPhotosToPublication(
     image1: String
     image2: String
     image3: String
@@ -370,35 +372,8 @@ type Mutation {
     image18: String
     image19: String
     image20: String
-  ): PublicationPhotoAlbum
+  ): Publication
   
-  "Update an existing publication photo album"
-  updatePublicationPhotoAlbum(
-    id: ID!
-    image1: String
-    image2: String
-    image3: String
-    image4: String
-    image5: String
-    image6: String
-    image7: String
-    image8: String
-    image9: String
-    image10: String
-    image11: String
-    image12: String
-    image13: String
-    image14: String
-    image15: String
-    image16: String
-    image17: String
-    image18: String
-    image19: String
-    image20: String
-  ): PublicationPhotoAlbum
-  "Delete a publication photo album"
-  deletePublicationPhotoAlbum(id: ID!): Boolean
-
   # User
   "Update user information"
   updateUser(id: ID!, input: UpdateUserInput!): User!

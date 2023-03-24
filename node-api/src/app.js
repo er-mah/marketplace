@@ -21,7 +21,7 @@ import { bulkDataInsert } from "./seeders/index.js";
 import {} from "./app/models/index.js";
 import { db } from "./config/db.js";
 
-import { resolvers, typeDefs } from "./app/graphql/index.js";
+import { resolvers, typeDefs } from "./app/graphql/schema/index.js";
 
 import { router } from "./app/routes/index.js";
 import {
@@ -30,6 +30,7 @@ import {
 } from "@apollo/server/plugin/landingPage/default";
 import morgan from "morgan";
 import { expressSessionInstance, passport } from "./config/index.js";
+import {authenticateRequest, omitAuthenticationCheck} from "./config/passport.js";
 
 function loadEnvVariables() {
   config();
@@ -100,6 +101,8 @@ async function start() {
 
     app.use(
       "/techmogql",
+      authenticateRequest,
+      omitAuthenticationCheck,
       expressMiddleware(apolloServer, {
         context: async ({ req }) => {
           // Get authenticated user loaded in req object by passport-jwt

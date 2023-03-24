@@ -1,11 +1,11 @@
 // TODO: Migrate apollo-server-express v1.4.0 to apollo/server
 import express from "express";
 
-import {auth} from "./authRouter.js";
-
+import { auth } from "./authRouter.js";
 
 import { loginController, loginAdmin } from "../controllers/old/auth.js";
 import passport from "passport";
+import AuthenticationError from "passport/lib/errors/authenticationerror.js";
 //import {changePassword, recoverPassword} from "../controllers/accountRecovery.js";
 
 /*
@@ -33,8 +33,12 @@ const { getProvinces, getTowns } = require("../controllers/addressInfo");
 export const router = express.Router(); // TODO: We can refactor this
 
 // On every request made `/techmogql` the user from the token is stored by passport-jwt to req.user
-//router.post("/techmogql", passport.authenticate("jwt", { session: false }));
+//router.use(  "/techmogql",  passport.authenticate("jwt", { session: false, optional: true }));router.use(    "/techmogql",    apolloServer.getMiddleware());
 
+
+router.get("/", (req, res) => {
+  res.send("TechMo Marketplace API");
+});
 
 /*
 router.post("/publication", upload.array("imageGroup", 8), createPublication);
@@ -68,6 +72,8 @@ router.post(
 
 
 
+
+
 router.use("/images", express.static(`${__dirname}/images`));
 router.use("/logo", express.static(`${__dirname}/mails/logo.png`));
 
@@ -87,11 +93,6 @@ router.use(
 )
 
  */
-
-router.get("/", (req, res) => {
-  res.send('TechMo Marketplace API')
-})
-
 
 export const openRoutes = [
   "/logo",
