@@ -14,10 +14,7 @@ import {
   clientErrorHandlerMdw,
   corsMdw,
   errorHandlerMdw,
-  expressSessionInstance,
   logErrorsMdw,
-  morganHttpLoggerMdw,
-  passportMdw,
 } from "./middlewares/index.js";
 import { bulkDataInsert } from "./seeders/index.js";
 
@@ -31,6 +28,8 @@ import {
   ApolloServerPluginLandingPageLocalDefault,
   ApolloServerPluginLandingPageProductionDefault,
 } from "@apollo/server/plugin/landingPage/default";
+import morgan from "morgan";
+import { expressSessionInstance, passport } from "./config/index.js";
 
 function loadEnvVariables() {
   config();
@@ -76,7 +75,7 @@ async function start() {
     // Express session middleware
     app.use(await expressSessionInstance());
 
-    app.use(morganHttpLoggerMdw());
+    app.use(morgan("dev"));
 
     app.use(cors());
     app.use(express.json());
@@ -88,8 +87,8 @@ async function start() {
     app.use(errorHandlerMdw);
 
     // Passport.js - authentication middleware
-    app.use(passportMdw.initialize({})); // Reload middleware in every route --> in order it doesn't get stale
-    app.use(passportMdw.session({})); // Express session related
+    app.use(passport.initialize({})); // Reload middleware in every route --> in order it doesn't get stale
+    app.use(passport.session({})); // Express session related
 
     /*
     //app.use(jwtMdw);
@@ -102,7 +101,13 @@ async function start() {
     app.use(
       "/techmogql",
       expressMiddleware(apolloServer, {
-        context: async ({ req }) => ({ token: req.headers.token }),
+        context: async ({ req }) => {
+          // Get authenticated user loaded in req object by passport-jwt
+
+          const user = req.user || null;
+          // Return user in the context
+          return { user };
+        },
       })
     );
 

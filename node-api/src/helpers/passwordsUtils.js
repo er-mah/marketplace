@@ -7,7 +7,7 @@ export const passwordsUtils = {
     return await bcrypt.hash(password, this.saltRounds);
   },
 
-  async arePasswordsMatching(password, hashedPassword) {
-    return await bcrypt.compare(password, hashedPassword);
+  async arePasswordsMatching(plainTextPwd, hashedPassword) {
+    return await bcrypt.compare(plainTextPwd, hashedPassword);
   },
 };
