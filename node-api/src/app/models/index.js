@@ -5,7 +5,6 @@ import { PublicationModel } from "./publication.js";
 import { PublicationStateModel } from "./publicationState.js";
 import { LocalityModel } from "./locality.js";
 import { UserModel } from "./user.js";
-import { PublicationPhotoAlbumModel } from "./publicationPhotoAlbum.js";
 import { ConversationThreadModel } from "./conversationThread.js";
 import { AgencyModel } from "./agency.js";
 import { DepartmentModel } from "./department.js";
@@ -81,14 +80,6 @@ PublicationModel.conversations = PublicationModel.hasMany(
   }
 );
 
-// A publication can have a group of photos
-PublicationModel.photos = PublicationModel.belongsTo(
-  PublicationPhotoAlbumModel,
-  {
-    foreignKey: "photo_album_id",
-  }
-);
-
 // A publication must be associated to a user
 PublicationModel.owner = PublicationModel.belongsTo(UserModel, {
   foreignKey: "user_id",
@@ -134,6 +125,5 @@ export {
   PublicationStateModel,
   LocalityModel,
   DepartmentModel,
-  PublicationPhotoAlbumModel,
   ConversationThreadModel,
 };
