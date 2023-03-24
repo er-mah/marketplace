@@ -32,6 +32,9 @@ const { getProvinces, getTowns } = require("../controllers/addressInfo");
 
 export const router = express.Router(); // TODO: We can refactor this
 
+// On every request made `/techmogql` the user from the token is stored by passport-jwt to req.user
+//router.post("/techmogql", passport.authenticate("jwt", { session: false }));
+
 
 /*
 router.post("/publication", upload.array("imageGroup", 8), createPublication);

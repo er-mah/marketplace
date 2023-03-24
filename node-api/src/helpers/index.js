@@ -227,6 +227,7 @@ const prepareArrayToSharp = (imageGroup) => {
 module.exports = { customFetch, infoAutoResolver, prepareArrayToSharp };
 
 * */
-import {passwordsUtils} from "./passwordsUtils.js";
+import { passwordsUtils } from "./passwordsUtils.js";
+import { JwtUtils } from "./jwt.js";
 
-export {passwordsUtils}
+export { JwtUtils, passwordsUtils };

@@ -61,8 +61,26 @@ export const PublicationModel = db.define(
         },
       },
     },
-    kms: DataTypes.STRING,
-    price: DataTypes.FLOAT,
+    kms: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    currency: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        customValidator: (value) => {
+          const enums = ["USD", "ARS"];
+          if (!enums.includes(value)) {
+            throw new Error("not a valid option");
+          }
+        },
+      },
+    },
     fuel: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -1,5 +1,11 @@
-import {typeDefs} from "./typeDefs.js";
-import {agency, auth, department, province} from "./resolvers/index.js";
+import { typeDefs } from "./typeDefs.js";
+import {
+  agency,
+  auth,
+  department,
+  province,
+  publication,
+} from "./resolvers/index.js";
 
 // Resolver map: data resolution functions that resolve the fields solicited by te client
 const resolvers = {
@@ -8,6 +14,7 @@ const resolvers = {
     ...department.Query,
     ...province.Query,
     ...agency.Query,
+    ...publication.Query,
   },
   Mutation: {
     //...messagesResolvers.Mutation,
@@ -15,4 +22,4 @@ const resolvers = {
   },
 };
 
-export {resolvers, typeDefs}
+export { resolvers, typeDefs };
