@@ -10,3 +10,5 @@ node-api/.idea/
 postgres-db/.env
 
 node-api/.env
+
+react-web/.idea/
