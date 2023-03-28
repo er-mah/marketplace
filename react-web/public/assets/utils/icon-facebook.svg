@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-facebook</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M3,4 L3,6 L0,6 L0,9 L3,9 L3.023,16 L6.279,16 L6.279,9 L9,9 L10,6 L6.279,6 L6.279,4.481 C6.279,3.568 6.533,2.946 7.843,2.946 L9.513,2.945 L9.513,0.124 C9.224,0.086 8.232,0 7.08,0 C4.671,0 3,1.301 3,4 Z" id="path-1"></path>
+    </defs>
+    <g id="MAH" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="L&amp;F-Detalle" transform="translate(-929.000000, -492.000000)">
+            <g id="Group-6" transform="translate(931.000000, 492.000000)">
+                <g id="Page-1">
+                    <g id="icon-facebook" transform="translate(0.000000, 2.000000)">
+                        <path d="M19,38.276 C29.493,38.276 38,29.769 38,19.276 C38,8.783 29.493,0.276 19,0.276 C8.507,0.276 0,8.783 0,19.276 C0,29.769 8.507,38.276 19,38.276 Z" id="Stroke-1" stroke="#4A90E2" stroke-width="3"></path>
+                        <g id="Group-5" transform="translate(14.000000, 11.276000)">
+                            <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                            </mask>
+                            <g id="Clip-4"></g>
+                            <polygon id="Fill-3" fill="#4A90E2" mask="url(#mask-2)" points="-5 21 15 21 15 -5 -5 -5"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

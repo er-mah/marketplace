@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="17px" height="16px" viewBox="0 0 17 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-envelop2-red</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="17 16 17 0 0 0 1.89944156e-15 16 17 16"></polygon>
+    </defs>
+    <g id="MAH" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="L&amp;F-Panel-de-control---Concesionaria---Bandeja-de-entrada" transform="translate(-1194.000000, -455.000000)">
+            <g id="icon-envelop2-red" transform="translate(1194.000000, 455.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Clip-2"></g>
+                <path d="M8.5,10.0882724 L15.5288462,5.75031526 L8.5,1.69482976 L1.47115385,5.75031526 L8.5,10.0882724 Z M17,5.91172762 L17,14.3051702 C17,14.7625053 16.8365385,15.1593106 16.5096154,15.4955864 C16.1826923,15.8318621 15.7876603,16 15.3245192,16 L1.67548077,16 C1.21233974,16 0.817307692,15.8318621 0.490384615,15.4955864 C0.163461538,15.1593106 0,14.7625053 0,14.3051702 L0,5.91172762 C0,5.61580496 0.0749198718,5.33333333 0.224759615,5.06431274 C0.374599359,4.79529214 0.565304487,4.59352669 0.796875,4.45901639 L8.5,0 L16.203125,4.45901639 C16.4346955,4.59352669 16.6254006,4.79529214 16.7752404,5.06431274 C16.9250801,5.33333333 17,5.61580496 17,5.91172762 L17,5.91172762 Z" id="Fill-1" fill="#E40019" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>
