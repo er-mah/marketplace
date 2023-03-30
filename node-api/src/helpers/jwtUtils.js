@@ -1,7 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import { JWTopts } from "../config/index.js";
 
-export const JwtUtils = {
+export const jwtUtils = {
   issueJWT: async (user) => {
     // Define JWT payload
     const payload = {

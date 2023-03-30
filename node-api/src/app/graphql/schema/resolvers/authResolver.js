@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 
 import { UserModel } from "../../../models/index.js";
-import { JwtUtils, passwordsUtils } from "../../../../helpers/index.js";
+import { jwtUtils, passwordsUtils } from "../../../../helpers/index.js";
 
 export const auth = {
   Mutation: {
@@ -49,7 +49,7 @@ export const auth = {
             if (passwordsAreValid) {
                 return {
                     id: user.id,
-                    token: await JwtUtils.issueJWT(user),
+                    token: await jwtUtils.issueJWT(user),
                 };
             } else {
                 return Promise.reject(new GraphQLError("Wrong credentials."));

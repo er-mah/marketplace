@@ -14,13 +14,12 @@ export const PublicationModel = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    vehicle_model: {
+    vehicle_group: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     vehicle_year: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     vehicle_version: {
       type: DataTypes.STRING,
@@ -32,28 +31,26 @@ export const PublicationModel = db.define(
     },
     vehicle_state: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         customValidator: (value) => {
-          const enums = ["Nuevo", "Usado"];
+          const enums = ["nuevo", "usado"];
           if (!enums.includes(value)) {
             throw new Error("not a valid option");
           }
         },
       },
     },
-    vehicle_group: {
+    vehicle_segment: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         customValidator: (value) => {
           const enums = [
-            "Alta gama",
-            "Ciudad",
-            "Familia",
-            "Todo terreno",
-            "Utilitario",
-            "Otro",
+            "alta_gama",
+            "ciudad",
+            "familia",
+            "todo_terreno",
+            "utilitario",
+            "otro",
           ];
           if (!enums.includes(value)) {
             throw new Error("not a valid option");
@@ -63,18 +60,15 @@ export const PublicationModel = db.define(
     },
     kms: {
       type: DataTypes.FLOAT,
-      allowNull: false,
     },
     price: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     currency: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         customValidator: (value) => {
-          const enums = ["USD", "ARS"];
+          const enums = ["usd", "ars"];
           if (!enums.includes(value)) {
             throw new Error("not a valid option");
           }
@@ -83,15 +77,14 @@ export const PublicationModel = db.define(
     },
     fuel: {
       type: DataTypes.STRING,
-      allowNull: false,
       validate: {
         customValidator: (value) => {
           const enums = [
-            "Diesel",
-            "Nafta",
-            "Nafta/Gnc",
-            "Turbo Diesel",
-            "Otro",
+            "diesel",
+            "nafta",
+            "nafta_gnc",
+            "turbo_diesel",
+            "otro",
           ];
           if (!enums.includes(value)) {
             throw new Error("not a valid option");
@@ -102,7 +95,6 @@ export const PublicationModel = db.define(
     owner_observations: { type: DataTypes.TEXT },
     info_auto_specs: { type: DataTypes.JSON },
     photosUrls: { type: DataTypes.JSON },
-    words: { type: DataTypes.TEXT },
     slug: { type: DataTypes.STRING },
   },
   {

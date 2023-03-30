@@ -1,6 +1,6 @@
 import axios from "axios";
 import { config } from "dotenv";
-import { JwtUtils } from "../../../helpers/index.js";
+import { jwtUtils } from "../../../helpers/index.js";
 
 config();
 
@@ -67,9 +67,9 @@ export const InfoAutoService = {
     }
 
     // If the token is expired, we refresh the token
-    if (JwtUtils.isTokenExpired(this.accessToken)) {
+    if (jwtUtils.isTokenExpired(this.accessToken)) {
       // If refreshToken doesn't exist or refresh is expired, we get new tokens
-      if (!this.refreshToken || JwtUtils.isTokenExpired(this.refreshToken)) {
+      if (!this.refreshToken || jwtUtils.isTokenExpired(this.refreshToken)) {
         return await this.authenticate();
       } else {
         return await this.refreshAccessToken();
@@ -106,8 +106,6 @@ export const InfoAutoService = {
         Authorization: "Bearer " + (await this.getAccessToken()),
       },
     });
-
-
 
     let comfort = [];
     let technical_info = [];

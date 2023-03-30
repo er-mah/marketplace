@@ -228,6 +228,8 @@ module.exports = { customFetch, infoAutoResolver, prepareArrayToSharp };
 
 * */
 import { passwordsUtils } from "./passwordsUtils.js";
-import { JwtUtils } from "./jwt.js";
+import { jwtUtils } from "./jwtUtils.js";
+import {uriUtils} from "./uriUtils.js";
 
-export { JwtUtils, passwordsUtils };
+
+export { jwtUtils, passwordsUtils, uriUtils };

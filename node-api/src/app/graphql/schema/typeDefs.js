@@ -1,4 +1,5 @@
 export const typeDefs = `#graphql
+
 "'Agency' type represents the agency that has vehicle publications associated"
 type Agency {
   id: ID!
@@ -21,6 +22,8 @@ type ConversationMessage {
   content: String
   user: User!
 }
+
+
 
 "'ConversationThread' represents the communication between a seller and a person interested in a vehicle"
 type ConversationThread {
@@ -48,14 +51,39 @@ type Locality {
   name: String
   latitude: String
   longitude: String
-  #department: Department!
 }
 
 "'Province' represents an argentinian province"
 type Province {
   id: ID!
   name: String
-  #departments: [Department!]!
+}
+
+enum VehicleState {
+  nuevo
+  usado
+}
+
+enum VehicleSegment {
+  alta_gama
+  ciudad
+  familia
+  todo_terreno
+  utilitario
+  otro
+}
+
+enum Currency {
+  usd
+  ars
+}
+
+enum Fuel {
+  diesel
+  nafta
+  nafta_gnc
+  turbo_diesel
+  otro
 }
 
 "'Publication' type represents a vehicle publication that users can interact with"
@@ -63,58 +91,34 @@ type Publication {
   id: ID!
   created_at: String
   deleted_at: String
-  vehicle_year: String!
+  vehicle_year: String
   vehicle_brand: String!
-  vehicle_model: String!
   vehicle_version: String!
-  vehicle_codia_id: Int!
-  vehicle_state: String!
   vehicle_group: String!
-  location: Locality!
+  vehicle_codia_id: Int!
+  vehicle_state: VehicleState
+  vehicle_segment: VehicleSegment
+  location: Locality
   kms: String
   price: Float
-  fuel: String!
+  fuel: Fuel
   owner_observations: String
-  info_auto_specs: ModelFeatures!
+  info_auto_specs: ModelFeatures
   words: String
   slug: String
-  changes: [PublicationChanges]!
-  conversations_id: [Int]!
-  photos: [PublicationPhotoAlbum]!
-  owner: User!
+  changes: [PublicationChanges]
+  conversations_id: [Int]
+  photos: [String]
+  owner: BasicUser
 }
 
 "'PublicationChanges' represents a publication associated images"
 type PublicationChanges {
   id: ID!
-  active: Boolean
+  active: Boolean!
+  state: PublicationState!
   created_at: String
   deleted_at: String
-}
-
-"'PublicationPhotoAlbum' represents a publication associated images"
-type PublicationPhotoAlbum {
-  id: ID!
-  image1: String
-  image2: String
-  image3: String
-  image4: String
-  image5: String
-  image6: String
-  image7: String
-  image8: String
-  image9: String
-  image10: String
-  image11: String
-  image12: String
-  image13: String
-  image14: String
-  image15: String
-  image16: String
-  image17: String
-  image18: String
-  image19: String
-  image20: String
 }
 
 type PublicationState {
@@ -134,10 +138,10 @@ type VehicleFeature {
 }
 
 type ModelFeatures {
-    comfort: [VehicleFeature]!
-    technical_info: [VehicleFeature]!
-    engine_transmission:[VehicleFeature]!
-    safety:[VehicleFeature]!
+  comfort: [VehicleFeature]!
+  technical_info: [VehicleFeature]!
+  engine_transmission:[VehicleFeature]!
+  safety:[VehicleFeature]!
 }
 
 "'User' represents the different users the system interacts with"
@@ -182,7 +186,7 @@ type VehicleModel {
   position: Int!
   codia: Int!
   brand: VehicleBrand!
-  group: VehicleGroup!
+  group: VehicleSegment!
   description: String!
   photo_url: String!
   prices_from: Int!
@@ -258,7 +262,7 @@ type Mutation {
     bannerImage: String!
     representativeIds: [ID]!
   ): Agency
-  
+
   "Update agency information"
   updateAgency(
     id: ID!
@@ -290,28 +294,9 @@ type Mutation {
 
   # Publication
   "Create a new publication"
-  createPublication: String
-  # createPublication(
-  #   vehicleYear: String!
-  #   vehicleBrand: String!
-  #   vehicleModel: String!
-  #   vehicleVersion: String!
-  #   vehicleCodiaId: Int!
-  #   vehicleState: String!
-  #   vehicleGroup: String!
-  #   localityId: ID!
-  #   kms: String
-  #   price: Float
-  #   fuel: String!
-  #   ownerObservations: String
-  #   "infoAutoSpecs: [VehicleFeatureInput]!"
-  #   words: String
-  #   slug: String!
-  #   "changes: [PublicationChangeInput]"
-  #   conversationThreadIds: [ID]
-  #   "photoAlbum: PublicationPhotoAlbumInput"
-  #   ownerId: ID!
-  # ): Publication
+  createPublication(input: NewPublicationInput): Publication!
+
+
   "Update an existing publication"
   updatePublication(
     id: ID!
@@ -326,7 +311,7 @@ type Mutation {
     kms: String
     price: Float
     fuel: String
-    
+
     ownerObservations: String
     "infoAutoSpecs: [VehicleFeatureInput]"
     words: String
@@ -349,31 +334,6 @@ type Mutation {
   "Delete a publication change"
   deletePublicationChange(id: ID!): Boolean
 
-  # Publication photo album
-  "Add photos to publication photo album"
-  addPhotosToPublication(
-    image1: String
-    image2: String
-    image3: String
-    image4: String
-    image5: String
-    image6: String
-    image7: String
-    image8: String
-    image9: String
-    image10: String
-    image11: String
-    image12: String
-    image13: String
-    image14: String
-    image15: String
-    image16: String
-    image17: String
-    image18: String
-    image19: String
-    image20: String
-  ): Publication
-  
   # User
   "Update user information"
   updateUser(id: ID!, input: UpdateUserInput!): User!
@@ -387,7 +347,6 @@ type Mutation {
   login(input: LoginInput!): AuthResponse
 }
 
-
 input RegisterInput {
   first_name: String!
   last_name: String!
@@ -400,6 +359,12 @@ input LoginInput {
   password: String!
 }
 
+input NewPublicationInput {
+  vehicle_brand: String!
+  vehicle_group: String
+  vehicle_version: String
+  vehicle_codia_id: ID
+}
 
 input UpdateUserInput {
   email: String
