@@ -1,7 +1,7 @@
 // TODO: Migrate apollo-server-express v1.4.0 to apollo/server
 import express from "express";
 
-import { auth } from "./authRouter.js";
+import { publication } from "./publicationRouter.js";
 
 import { loginController, loginAdmin } from "../controllers/old/auth.js";
 import passport from "passport";
