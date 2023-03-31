@@ -37,7 +37,7 @@ export const publication = {
       );
 
       const slug = uriUtils.generateSlug(
-        input.vehicle_brand + input.vehicle_version
+        input.vehicle_brand + "-" + input.vehicle_version
       );
 
       const newPublication = await PublicationModel.create({

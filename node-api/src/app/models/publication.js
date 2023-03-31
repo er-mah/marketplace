@@ -94,7 +94,7 @@ export const PublicationModel = db.define(
     },
     owner_observations: { type: DataTypes.TEXT },
     info_auto_specs: { type: DataTypes.JSON },
-    photosUrls: { type: DataTypes.JSON },
+    photos_urls: { type: DataTypes.JSON },
     slug: { type: DataTypes.STRING },
   },
   {

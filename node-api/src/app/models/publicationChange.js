@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { db } from "../../config/db.js";
+import {PublicationModel} from "./publication.js";
 
 // This model is an intermediate table that represents each change a publication suffers
 export const PublicationChangesModel = db.define(
@@ -27,11 +28,18 @@ export const PublicationChangesModel = db.define(
        * @returns {Promise<void>}
        */
       beforeCreate: async (attributes, options) => {
-        if (attributes.active) {
+        if (attributes.active && attributes.publication_id) {
+
+          // Check that the publication ID is valid before updating other records
+          const publication = await PublicationModel.findByPk(attributes.publication_id);
+          if (!publication) {
+            throw new Error(`Invalid publication ID: ${attributes.publication_id}`);
+          }
+
           // If active is true, update the other registers
           await PublicationChangesModel.update(
             { active: false },
-            { where: { active: true, publicationId: attributes.publicationId } }
+            { where: { active: true, publication_id: attributes.publication_id } }
           );
         }
       },

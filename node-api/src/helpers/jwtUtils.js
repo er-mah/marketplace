@@ -1,5 +1,5 @@
 import jsonwebtoken from "jsonwebtoken";
-import { JWTopts } from "../config/index.js";
+import { jwtOpts } from "../config/index.js";
 
 export const jwtUtils = {
   issueJWT: async (user) => {
@@ -10,8 +10,8 @@ export const jwtUtils = {
     };
 
     // Get signed token
-    return await jsonwebtoken.sign(payload, JWTopts.secretOrKey, {
-      expiresIn: JWTopts.expiresIn,
+    return await jsonwebtoken.sign(payload, jwtOpts.secretOrKey, {
+      expiresIn: jwtOpts.expiresIn,
     });
   },
   isTokenExpired: (token) => {

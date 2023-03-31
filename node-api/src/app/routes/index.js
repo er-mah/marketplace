@@ -1,14 +1,18 @@
-// TODO: Migrate apollo-server-express v1.4.0 to apollo/server
 import express from "express";
 
-import { publication } from "./publicationRouter.js";
+import { publicationRouter } from "./publicationRouter.js";
 
-import { loginController, loginAdmin } from "../controllers/old/auth.js";
-import passport from "passport";
-import AuthenticationError from "passport/lib/errors/authenticationerror.js";
-//import {changePassword, recoverPassword} from "../controllers/accountRecovery.js";
+export const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send("TechMo Marketplace API");
+});
+router.use(publicationRouter)
+
 
 /*
+
+
 
 const { loginAdmin, login } = require("../controllers/auth");
 const { recoverPassword, changePassword } = require("../controllers/accountRecovery");
@@ -28,19 +32,11 @@ const { uploadSliders, getSliders, deleteSlider } = require("../controllers/slid
 const { getProvinces, getTowns } = require("../controllers/addressInfo");
 
 
- */
 
-export const router = express.Router(); // TODO: We can refactor this
 
 // On every request made `/techmogql` the user from the token is stored by passport-jwt to req.user
 //router.use(  "/techmogql",  passport.authenticate("jwt", { session: false, optional: true }));router.use(    "/techmogql",    apolloServer.getMiddleware());
 
-
-router.get("/", (req, res) => {
-  res.send("TechMo Marketplace API");
-});
-
-/*
 router.post("/publication", upload.array("imageGroup", 8), createPublication);
 router.patch("/publication", upload.array("imageGroup", 8), editPublication);
 router.get("/getSoldPublications", getSoldPublications);
