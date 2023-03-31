@@ -1,7 +1,11 @@
 import multer from "multer";
 import multerS3 from "multer-s3";
-import { S3Client } from "@aws-sdk/client-s3";
+import {s3Client} from "./aws.js";
+import {config} from "dotenv";
 
+config()
+
+const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 /**
  *
  * multer: adds a body object and a file or files object to the request object.
@@ -15,16 +19,46 @@ import { S3Client } from "@aws-sdk/client-s3";
  */
 
 
-const upload = multer({
+export const uploadPublicationPhotosToS3 = multer({
   storage: multerS3({
-    s3: s3,
-    bucket: "NOMBRE_DE_TU_BUCKET",
+    limits: {files: 20},
+    // S3 bucket to store files
+    s3: s3Client,
+    bucket: AWS_S3_BUCKET_NAME,
+    // access level of the files --> publicly accessible
     acl: "public-read",
+    // generate file metadata
     metadata: (req, file, cb) => {
       cb(null, { fieldName: file.fieldname });
     },
-    key: (req, file, cb) => {
-      cb(null, Date.now().toString());
+    //
+    key: async (req, file, cb) => {
+
+
+      // Get the publication slug from the request parameters
+      const publicationSlug = req.params.slug;
+      // Generate a random number between 1 and 10000
+      const randomNumber = Math.floor(Math.random() * 10000) + 1;
+      // Get the current timestamp and convert it to a string
+      const today = new Date();
+      const timestamp = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+      // Get extension
+      const ext = file.originalname.split('.').pop();
+
+      // Create the filename by combining the timestamp, publication slug, and random number
+      let filename = `ar/marketplace/publications/${timestamp}-${publicationSlug}-${randomNumber}.${ext}`;
+
+      // Check if the filename already exists in S3
+      await s3Client.headObject({Key: filename}, function (err, metadata) {
+        if (!err) {
+          // If the file already exists, generate another random number
+          const randomNumber = Math.floor(Math.random() * 10000) + 1;
+          filename = `${timestamp}-${publicationSlug}-${randomNumber}.${ext}`;
+        }
+        cb(null, filename);
+      });
+
+      cb(null, filename);
     },
   }),
 });
