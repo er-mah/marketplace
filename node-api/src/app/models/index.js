@@ -91,16 +91,11 @@ PublicationModel.locality = PublicationModel.belongsTo(LocalityModel, {
 });
 
 // Many publications can have many states -> Intermediate table: PublicationChangesModel
-// We make available the changes register from "stateChanges"
-PublicationModel.belongsToMany(PublicationStateModel, {
-  through: PublicationChangesModel,
+PublicationChangesModel.belongsTo(PublicationModel, {
   foreignKey: "publication_id",
-  as: "stateChanges",
 });
-PublicationStateModel.belongsToMany(PublicationModel, {
-  through: PublicationChangesModel,
+PublicationChangesModel.belongsTo(PublicationStateModel, {
   foreignKey: "state_id",
-  as: "publicationsWithState",
 });
 
 // A user is from a locality

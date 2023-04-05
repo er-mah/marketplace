@@ -84,6 +84,8 @@ export const PublicationModel = db.define(
             "nafta",
             "nafta_gnc",
             "turbo_diesel",
+              "hibrido",
+              "electrico",
             "otro",
           ];
           if (!enums.includes(value)) {
@@ -95,7 +97,11 @@ export const PublicationModel = db.define(
     owner_observations: { type: DataTypes.TEXT },
     info_auto_specs: { type: DataTypes.JSON },
     photos_urls: { type: DataTypes.JSON },
-    slug: { type: DataTypes.STRING },
+    slug: { type: DataTypes.STRING, unique: true },
+    tags: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: [],
+    },
   },
   {
     paranoid: true,
