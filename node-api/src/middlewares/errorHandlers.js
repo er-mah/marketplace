@@ -4,7 +4,10 @@ to the server.
 middleware function in the chain. The purpose of this function is to provide a simple way to log errors in the server,
 allowing developers to quickly diagnose and fix issues.
  * */
+import {errorResponse} from "../utils/index.js";
+
 export function logErrorsMdw(err, req, res, next) {
+  console.error(err);
   next(err);
 }
 
@@ -19,7 +22,7 @@ export function clientErrorHandlerMdw(err, req, res, next) {
   if (req.xhr) {
     res
       .status(500)
-      .send({ error: "Something went wrong! Please try again later." });
+      .json(errorResponse("Something went wrong! Please try again later."));
   } else {
     next(err);
   }
@@ -32,5 +35,7 @@ middleware chain, so if none of the previous error handling middleware catch the
 * */
 export function errorHandlerMdw(err, req, res, next) {
   console.log(err);
-  res.status(500).send({ message: err.message });
+  errorResponse(err.message);
 }
+
+
