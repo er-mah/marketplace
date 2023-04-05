@@ -83,6 +83,8 @@ enum Fuel {
   nafta
   nafta_gnc
   turbo_diesel
+  hibrido
+  electrico
   otro
 }
 
@@ -104,7 +106,6 @@ type Publication {
   fuel: Fuel
   owner_observations: String
   info_auto_specs: ModelFeatures
-  words: String
   slug: String
   changes: [PublicationChanges]
   conversations_id: [Int]
@@ -177,11 +178,11 @@ type AuthResponse {
   token: String
 }
 
-
 type ModelsSearch {
   models: [VehicleModel]!
   pagination: Pagination!
 }
+
 type VehicleModel {
   position: Int!
   codia: Int!
@@ -192,10 +193,12 @@ type VehicleModel {
   prices_from: Int!
   prices_to: Int!
 }
+
 type VehicleBrand {
   id: Int!
   name: String!
 }
+
 type VehicleGroup {
   id: Int!
   name: String!
@@ -210,8 +213,6 @@ type Pagination {
   next_page: Int
   page_size: Int!
 }
-
-
 
 
 type Query {
@@ -295,6 +296,8 @@ type Mutation {
   # Publication
   "Create a new publication"
   createPublication(input: NewPublicationInput): Publication!
+  "Add additional information to publication"
+  addInfoToPublicationBySlug(slug: String, input: AdditionalPublicationInfoInput): Publication!
 
 
   "Update an existing publication"
@@ -347,6 +350,7 @@ type Mutation {
   login(input: LoginInput!): AuthResponse
 }
 
+
 input RegisterInput {
   first_name: String!
   last_name: String!
@@ -364,6 +368,19 @@ input NewPublicationInput {
   vehicle_group: String
   vehicle_version: String
   vehicle_codia_id: ID
+}
+
+input AdditionalPublicationInfoInput {
+  vehicle_state: VehicleState!
+  vehicle_year: Int!
+  vehicle_segment: VehicleSegment!
+  kms: Float!
+  fuel: Fuel!
+  owner_observations: String!
+  locality_id: ID!
+  currency: Currency!
+  price: Int!
+  tags: [String]!
 }
 
 input UpdateUserInput {
