@@ -3,7 +3,7 @@ import {PublicationStateModel} from "../app/models/index.js";
 const statesToCreate = [
   {
     "id" : 1,
-    "state_name" : "Pendiente"
+    "state_name" : "Creada"
   },
   {
     "id" : 2,
@@ -11,11 +11,11 @@ const statesToCreate = [
   },
   {
     "id" : 3,
-    "state_name" : "Destacada"
+    "state_name" : "Suspendida"
   },
   {
     "id" : 4,
-    "state_name" : "Suspendida"
+    "state_name" : "Destacada"
   },
   {
     "id" : 5,
@@ -32,10 +32,6 @@ const statesToCreate = [
   {
     "id" : 8,
     "state_name" : "Vencida"
-  },
-  {
-    "id" : 9,
-    "state_name" : "Apto para garantía"
   }
 ];
 
