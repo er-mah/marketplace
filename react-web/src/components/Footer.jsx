@@ -28,6 +28,7 @@ export default ({ history }) => (
           <hr />
           <p>© Copyright 2017/2018 - Todos los derechos reservados.</p>
         </div>
+
       </Row>
     </div>
   </footer>
