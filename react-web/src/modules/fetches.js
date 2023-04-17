@@ -3,6 +3,15 @@ import { server } from './params';
 import { loadState } from './localStorage';
 import { split } from 'split-object';
 
+
+/**
+ * Este código es un módulo de Javascript que exporta varias funciones que se utilizan para interactuar con una API web.
+ * Las funciones exportadas incluyen métodos para iniciar sesión, registrar usuarios, solicitar crédito, recuperar y
+ * cambiar contraseñas, y actualizar contraseñas.
+ *
+ */
+
+
 let token = '';
 
 if (loadState()) {
@@ -376,132 +385,8 @@ export const deleteSlider = (number) => {
         : responseData));
 };
 
-export const get123Provinces = () => {
-  const url = `${server}/get123Provinces`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const get123Towns = (province_id) => {
-  const url = `${server}/get123Localities/${province_id}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const get123Brands = () => {
-  const url = `${server}/get123Brands`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const get123Years = (brand_id) => {
-  const url = `${server}/get123Years/${brand_id}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const get123Family = (brand_id, year) => {
-  const url = `${server}/get123Family/${brand_id}/${year}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const get123Models = (brand_id, year, family_id) => {
-  const url = `${server}/get123Models/${brand_id}/${year}/${family_id}`;
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-
 export const addUserAndCarData = (data) => {
   const url = `${server}/addUserAndCarData`;
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-
-export const get123Quotes = (data) => {
-  const url = `${server}/get123Quotes`;
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  };
-  return fetch(url, options)
-    .then(response => response.json())
-    .then(responseData =>
-      (responseData.status === undefined || responseData.status === 'error'
-        ? Promise.reject(responseData.message)
-        : responseData));
-};
-export const assurance123Seguro = (data) => {
-  const url = `${server}/assurance123Seguro`;
   const options = {
     method: 'POST',
     headers: {
