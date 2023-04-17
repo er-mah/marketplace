@@ -5,8 +5,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* We define this margin-top to ensure no element is behind the header */
 body {
-    margin-top: 90px;
     font-family: 'Montserrat', sans-serif;
+}
+
+.todo {
+    background: red;
+}
+
+.bg-light-green {
+    background: rgba(40, 224, 204, 0.1);
 }
