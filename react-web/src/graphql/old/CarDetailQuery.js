@@ -1,6 +1,6 @@
-import gql from 'graphql-tag';
+import {gql} from "@apollo/client";
 
-const CarDetailQuery = gql`
+const CarDetailQuery = gql`#graphql
 query Publication($id: Int!) {
   Publication(id: $id) {
       CurrentState {
