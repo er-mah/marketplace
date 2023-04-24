@@ -1,6 +1,6 @@
 import {ResponseObj} from "./responseObject.js";
 
-const { generateMailAgenciaoParticular } = require("../../../mails/index.js");
+const { generateMailAgenciaoParticular } = require("../../../utils/templates/_old/index.js");
 const sgMail = require("@sendgrid/mail");
 const decode = require("jwt-decode");
 // TODO CHANGE THIS LIBRARY -> bcrypt or bcryptjs

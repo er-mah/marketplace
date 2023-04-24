@@ -6,15 +6,15 @@ const _ = require('lodash');
 const decode = require('jwt-decode');
 const graphql = require('graphql');
 const jwtDecode = require('jwt-decode');
-const { MessageType } = require('./MessageType');
+const { MessageType } = require('./MessageType.js');
 const { PubSub, withFilter } = require('graphql-subscriptions');
-const { PublicationType } = require('./PublicationType');
+const { PublicationType } = require('./PublicationType.js');
 const {
   CommentThread, User, Publication, Message,
-} = require('../../models').mah;
+} = require('../../../../models/index.js').mah;
 /* eslint camelcase: 0 */
 const pubsub = new PubSub();
-const { generateMailAgenciaoParticular, generateSinRegistro } = require('../../../mails');
+const { generateMailAgenciaoParticular, generateSinRegistro } = require('../../../../../utils/templates/_old/index.js');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);

@@ -1,7 +1,7 @@
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { HistoryState } = require('../../models').mah;
+const { HistoryState } = require('../../../../models/index.js').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,

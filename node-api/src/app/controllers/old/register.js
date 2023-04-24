@@ -1,7 +1,7 @@
 const {
   generateMailAgenciaoParticular,
   generateForAdmin,
-} = require("../../../mails/index.js");
+} = require("../../../utils/templates/_old/index.js");
 
 const { split } = require("split-object");
 const slugify = require("slugify");

@@ -3,7 +3,7 @@ const decode = require('jwt-decode');
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { PageTexts, User } = require('../../models').mah;
+const { PageTexts, User } = require('../../../../models/index.js').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,

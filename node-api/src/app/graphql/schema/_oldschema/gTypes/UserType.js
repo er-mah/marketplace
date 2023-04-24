@@ -2,15 +2,15 @@ const { attributeFields, resolver } = require('graphql-sequelize');
 const _ = require('lodash');
 const { UserError } = require('graphql-errors');
 const graphql = require('graphql');
-const { User, PublicationState } = require('../../models').mah;
+const { User, PublicationState } = require('../../../../models/index.js').mah;
 const jwtDecode = require('jwt-decode');
 
 
 // TODO CHANGE THIS LIBRARY -> bcrypt or bcryptjs
 const bcrypt = require('bcrypt-nodejs');
-const { ProvincesType } = require('./ProvincesType');
+const { ProvincesType } = require('./ProvincesType.js');
 const { TownType } = require('./TownType');
-const { Publication, CommentThread, sequelize } = require('../../models').mah;
+const { Publication, CommentThread, sequelize } = require('../../../../models/index.js').mah;
 
 const {
   GraphQLObjectType: ObjectGraph,

@@ -9,8 +9,8 @@ const { PubSub, withFilter } = require('graphql-subscriptions');
 const moment = require('moment');
 
 const graphql = require('graphql');
-const { Message, CommentThread, User } = require('../../models').mah;
-const { UserType } = require('./UserType');
+const { Message, CommentThread, User } = require('../../../../models/index.js').mah;
+const { UserType } = require('./UserType.js');
 
 
 const {

@@ -5,38 +5,38 @@ const _ = require("lodash");
 const { UserError, maskErrors } = require("graphql-errors");
 
 
-const { UserType, SearchUserResultType, SearchResumeType } = require('./gTypes/UserType');
-const { GruposType } = require('./gTypes/GruposType');
+const { UserType, SearchUserResultType, SearchResumeType } = require('./gTypes/UserType.js');
+const { GruposType } = require('./gTypes/GruposType.js');
 const { Tautos30type } = require('./gTypes/Tautos30type');
-const { DetailsType } = require('./gTypes/DetailsType');
+const { DetailsType } = require('./gTypes/DetailsType.js');
 const { TechnicalDataType } = require('./gTypes/TechnicalDataType');
-const { AdditionalsType } = require('./gTypes/AdditionalsType');
-const { PublicationType } = require('./gTypes/PublicationType');
-const { PublicationStateType } = require('./gTypes/PublicationStateType');
-const { CommentThreadType } = require('./gTypes/CommentThreadType');
-const { MessageType } = require('./gTypes/MessageType');
-const { PageTextsType } = require('./gTypes/PageTextType');
+const { AdditionalsType } = require('./gTypes/AdditionalsType.js');
+const { PublicationType } = require('./gTypes/PublicationType.js');
+const { PublicationStateType } = require('./gTypes/PublicationStateType.js');
+const { CommentThreadType } = require('./gTypes/CommentThreadType.js');
+const { MessageType } = require('./gTypes/MessageType.js');
+const { PageTextsType } = require('./gTypes/PageTextType.js');
 const { RatesType } = require('./gTypes/RatesType');
 
-const { infoAutoResolver } = require('../../helpers');
+const { infoAutoResolver } = require('../../../../utils/index.js');
 
 
 const {
   createCommentThread,
   deleteCommentThread,
-} = require('./gTypes/CommentThreadType').CommentThreadMutations;
+} = require('./gTypes/CommentThreadType.js').CommentThreadMutations;
 const {
   addMessage,
   deleteMessage,
   markThreadAsReaded,
-} = require('./gTypes/MessageType').MessageMutations;
+} = require('./gTypes/MessageType.js').MessageMutations;
 const {
   modifyUserData,
   updatePassword,
   resetPassword,
   deleteUser,
   searchUser,
-} = require('./gTypes/UserType').UserMutations;
+} = require('./gTypes/UserType.js').UserMutations;
 
 const {
   searchPublication,
@@ -47,15 +47,15 @@ const {
   adminUnHighlightPublication,
   aprovePublication,
   disaprovePublication,
-} = require('./gTypes/PublicationType').PublicationMutation;
+} = require('./gTypes/PublicationType.js').PublicationMutation;
 
-const { messageAdded } = require('./gTypes/MessageType').MessageSubscriptions;
+const { messageAdded } = require('./gTypes/MessageType.js').MessageSubscriptions;
 const {
   threadAdded,
-} = require('./gTypes/CommentThreadType').CommentThreadSubscriptions;
+} = require('./gTypes/CommentThreadType.js').CommentThreadSubscriptions;
 const {
   updateText,
-} = require('./gTypes/PageTextType').PageTextMutations;
+} = require('./gTypes/PageTextType.js').PageTextMutations;
 const {
   updateRates,
 } = require('./gTypes/RatesType').RateMutations;
@@ -69,14 +69,14 @@ const {
   sequelize,
   PageTexts,
   Rates,
-} = require('../models').mah;
+} = require('../../../models/index.js').mah;
 const {
   tautos30,
   grupos,
   extrad,
   extrad3,
   extrad2,
-} = require('../models').tauto;
+} = require('../../../models/index.js').tauto;
 
 const {
   GraphQLSchema: Schema,
@@ -119,7 +119,7 @@ export const schema = new Schema({
         },
         resolve: () => infoAutoResolver('brand'),
 
-        // resolver(tautos30, {
+        // resolvers(tautos30, {
         //   before: (options) => {
         //     options.attributes = ['ta3_marca', 'ta3_nmarc'];
         //     return options;
@@ -162,7 +162,7 @@ export const schema = new Schema({
         },
         resolve: (_, { ta3_cgrup, ta3_nmarc }) => infoAutoResolver('model', ta3_cgrup, ta3_nmarc),
 
-        // resolver(tautos30, {
+        // resolvers(tautos30, {
         //   before: (options) => {
         //     options.attributes = ['ta3_model', 'ta3_codia'];
         //     return options;
@@ -186,7 +186,7 @@ export const schema = new Schema({
         },
         resolve: (_, { ta3_codia }) => infoAutoResolver('prices', ta3_codia),
 
-        // resolver(tautos30, {
+        // resolvers(tautos30, {
         //   after: (result) => {
         //     const precios = [];
         //     let actualYear = parseInt(result[0].ta3_anioe, 10);
@@ -282,7 +282,7 @@ export const schema = new Schema({
               result.Users = res.rows;
               return result;
             });
-        }, /* resolver(User, {
+        }, /* resolvers(User, {
           before: (options, args) => {
             const LIMIT = 9;
             if (args.page) {
@@ -380,7 +380,7 @@ export const schema = new Schema({
               result.Users = res.rows;
               return result;
             });
-        }, /* resolver(User, {
+        }, /* resolvers(User, {
           before: (options, args) => {
             const LIMIT = 9;
             if (args.page) {

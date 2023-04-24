@@ -1,7 +1,7 @@
 const { attributeFields } = require('graphql-sequelize');
 const _ = require('lodash');
 const graphql = require('graphql');
-const { grupos } = require('../../models').tauto;
+const { grupos } = require('../../../../models/index.js').tauto;
 
 const {
   GraphQLObjectType: ObjectGraph,

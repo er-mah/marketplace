@@ -11,18 +11,18 @@ const {
   User,
   Provinces,
   sequelize,
-} = require('../../models').mah;
-const { ImageGroupType } = require('./ImageGroupType');
-const { HistoryStateType } = require('./HistoryStateType');
-const { PublicationStateType } = require('./PublicationStateType');
-const { PublicationDetailType } = require('./PublicationDetailType');
-const { ProvincesType } = require('./ProvincesType');
+} = require('../../../../models/index.js').mah;
+const { ImageGroupType } = require('./ImageGroupType.js');
+const { HistoryStateType } = require('./HistoryStateType.js');
+const { PublicationStateType } = require('./PublicationStateType.js');
+const { PublicationDetailType } = require('./PublicationDetailType.js');
+const { ProvincesType } = require('./ProvincesType.js');
 const { TownType } = require('./TownType');
-const { UserType } = require('./UserType');
+const { UserType } = require('./UserType.js');
 const {
   generateMailAgenciaoParticular,
   generateSinRegistro,
-} = require('../../../mails');
+} = require('../../../../../utils/templates/_old/index.js');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);

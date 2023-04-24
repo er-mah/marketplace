@@ -1,5 +1,5 @@
 const Graphql = require("graphql").graphql;
-const schema = require("../../schema/index-rename.js");
+const schema = require("../../graphql/schema/_oldschema/index-rename.js");
 
 export const httpGraphQLHandler = (req, res) => {
     const { query, variables, rootVals } = req.query;
