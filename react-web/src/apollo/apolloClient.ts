@@ -1,15 +1,16 @@
-import {ApolloClient, HttpLink, InMemoryCache} from "@apollo/client";
-
-
+import { ApolloClient } from "@apollo/client";
+import {cache} from "./apolloCache.ts";
+import {authLink, httpLink} from "./apolloHttpLink.js";
 
 /**
- *  La creación del cliente de Apollo se puede realizar en un archivo separado en la carpeta graphql, por
- *  ejemplo en un archivo llamado client.js.
- *
- *  -- Podemos crear httpLink y el cliente de apollo
+ * In this file it is contained apolloClient, the service that manages the requests to the GraphQL api.
  */
 
 
+export const client = new ApolloClient({
+  cache: cache,
+  link: authLink(cache).concat(httpLink),
+});
 
 /*
 
@@ -39,21 +40,3 @@ const link = split(
 );
 
  */
-
-
-
-
-
-const GRAPHQL_API_URI = process.env.REACT_APP_GRAPHQL_API_URI;
-
-// Set apollo client to point at the server we've created
-export const cache = new InMemoryCache();
-
-export const httpLink = new HttpLink({
-    uri: `${GRAPHQL_API_URI}`,
-});
-
-export const client = new ApolloClient({
-    cache: cache,
-    link: httpLink,
-});
