@@ -28,6 +28,13 @@ export const UserModel = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    is_email_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    verification_token: {
+      type: DataTypes.STRING,
+    },
     address: DataTypes.STRING,
     phone: DataTypes.STRING,
     profile_image: DataTypes.STRING,
@@ -37,7 +44,7 @@ export const UserModel = db.define(
       defaultValue: false,
     },
     is_agency_representative: DataTypes.BOOLEAN,
-    is_email_verified: {
+    has_provided_additional_data: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },

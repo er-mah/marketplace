@@ -1,6 +1,6 @@
 import axios from "axios";
 import { config } from "dotenv";
-import { jwtUtils } from "../../../helpers/index.js";
+import { jwtUtils } from "../../../utils/index.js";
 
 config();
 
