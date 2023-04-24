@@ -9,7 +9,7 @@ import { stringify } from 'query-string';
 ActiveFilters (agregar el filtro al if)
 FilterLists (Agregar el parseo correspondiente)
 Modificar en el api el switch de rounter/index.tsx:398 y el metodo en general getFiltersAndTotalResult
-Modificar la mutacion tanto en la api(dentro de PublicationTypes) como en old */
+Modificar la mutacion tanto en la api(dentro de PublicationTypes) como en _old */
 
 const ActiveFilters = ({ searchData, history }) => split(searchData).map((filter) => {
   if (filter.key === 'fuel' ||

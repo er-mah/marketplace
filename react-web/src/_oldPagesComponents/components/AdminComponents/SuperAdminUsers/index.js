@@ -10,11 +10,11 @@ import ScrollToTop from 'react-scroll-up';
 import { parse } from 'query-string';
 import _ from 'lodash';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import SuperAdminFilterUser from '../../../pages/old/SuperAdminFilterUser';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
-import SACardUser from '../../../pages/old/SACardUser';
-import { AllUsersQuery } from '../../../graphql/old/UserQuery';
+import AdminBar from '../../../pages/_old/AdminBar';
+import SuperAdminFilterUser from '../../../pages/_old/SuperAdminFilterUser';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
+import SACardUser from '../../../pages/_old/SACardUser';
+import { AllUsersQuery } from '../../../graphql/_old/UserQuery';
 import { isAdminLogged } from '../../../modules/sessionFunctions';
 
 class SuperAdminUsers extends React.Component {

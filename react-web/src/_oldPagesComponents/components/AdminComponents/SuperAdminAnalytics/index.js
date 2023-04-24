@@ -4,8 +4,8 @@
 import React, { Component } from "react";
 import { Col, Row } from "reactstrap";
 import { GoogleProvider, GoogleDataChart } from "react-analytics-widget";
-import AdminBar from "../../../pages/old/AdminBar";
-import SuperAdminSideBar from "../../../pages/old/SuperAdminSideBar";
+import AdminBar from "../../../pages/_old/AdminBar";
+import SuperAdminSideBar from "../../../pages/_old/SuperAdminSideBar";
 import { getUserToken } from "../../../modules/sessionFunctions";
 
 (function(w, d, s, g, js, fjs) {

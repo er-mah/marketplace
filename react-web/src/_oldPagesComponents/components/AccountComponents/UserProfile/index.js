@@ -11,9 +11,9 @@ import ReactGA from 'react-ga';
 import Select from 'react-select';
 
 
-import AdminBar from '../../../pages/old/AdminBar';
-import UserSideBar from '../../../pages/old/UserSideBar';
-import { UserDetailQuery, UserDataMutation, UserPasswordMutation } from '../../../graphql/old/UserProfileQuery';
+import AdminBar from '../../../pages/_old/AdminBar';
+import UserSideBar from '../../../pages/_old/UserSideBar';
+import { UserDetailQuery, UserDataMutation, UserPasswordMutation } from '../../../graphql/_old/UserProfileQuery';
 import { getUserToken, isUserLogged } from '../../../modules/sessionFunctions';
 import { getProvinces, getTowns } from '../../../modules/fetches';
 import { validate, prepareArraySelect } from '../../../modules/functions';

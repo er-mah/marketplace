@@ -9,16 +9,16 @@ import _ from 'lodash';
 import { branch, renderComponent } from 'recompose';
 import ReactGA from 'react-ga';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import UserSideBar from '../../../pages/old/UserSideBar';
-import CardMessagge from '../../../pages/old/CardMessagge';
-import NumberOfUnreads from '../../../pages/old/NumberOfUnreads';
+import AdminBar from '../../../pages/_old/AdminBar';
+import UserSideBar from '../../../pages/_old/UserSideBar';
+import CardMessagge from '../../../pages/_old/CardMessagge';
+import NumberOfUnreads from '../../../pages/_old/NumberOfUnreads';
 
 import {
   CommentThreadQuery,
   CountUnreadMessagesQuery,
   CommentThreadSubscription,
-} from '../../../graphql/old/UserInboxQuery';
+} from '../../../graphql/_old/UserInboxQuery';
 import { getUserToken, isUserLogged } from '../../../modules/sessionFunctions';
 import Login from '../../../pages/auth/Login';
 

@@ -11,7 +11,7 @@ import Select from 'react-select';
 import ReactGA from 'react-ga';
 import { scroller } from 'react-scroll';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
 import { AvForm, AvGroup, AvField } from 'availity-reactstrap-validation';
 import { validate } from '../../../modules/functions';
@@ -21,7 +21,7 @@ import {
   GroupsQuery,
   ModelsQuery,
   YearsQuery,
-} from '../../../graphql/old/TautosQuery';
+} from '../../../graphql/_old/TautosQuery';
 import {
   prepareArraySelect,
   thousands,

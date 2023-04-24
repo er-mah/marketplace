@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col, Button } from 'reactstrap';
-import { updateTextMutation } from '../../graphql/old/TextsQueries';
+import { updateTextMutation } from '../../graphql/_old/TextsQueries';
 // Todo: adapt this
 // import { graphql, compose } from 'react-apollo';
 import { branch, renderComponent } from 'recompose';

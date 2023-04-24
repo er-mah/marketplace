@@ -6,12 +6,12 @@ import {
   Redirect,
 } from 'react-router-dom';
 import ReactGA from 'react-ga';
-import RegisterBar from '../../../pages/old/RegisterBar';
-import BannerWithoutRegister from '../../../pages/old/BannerWithoutRegister';
-import FeaturesWithoutRegister from '../../../pages/old/FeaturesWithoutRegister';
-import Faq from '../../../pages/old/Faq';
+import RegisterBar from '../../../pages/_old/RegisterBar';
+import BannerWithoutRegister from '../../../pages/_old/BannerWithoutRegister';
+import FeaturesWithoutRegister from '../../../pages/_old/FeaturesWithoutRegister';
+import Faq from '../../../pages/_old/Faq';
 import Footer from '../../Footer';
-import Plans from '../../../pages/old/Plans';
+import Plans from '../../../pages/_old/Plans';
 import { isUserLogged } from '../../../modules/sessionFunctions';
 
 const WithoutRegister = ({ history, location }) => (

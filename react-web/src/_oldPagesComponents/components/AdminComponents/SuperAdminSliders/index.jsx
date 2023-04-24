@@ -9,13 +9,13 @@ import {
   ModalBody,
   ModalFooter,
 } from 'reactstrap';
-import ImageCrop from '../../../pages/old/ImageCrop';
+import ImageCrop from '../../../pages/_old/ImageCrop';
 import { Notification } from 'react-notification';
 
 
 import { getUserToken, isAdminLogged } from '../../../modules/sessionFunctions';
-import AdminBar from '../../../pages/old/AdminBar';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
+import AdminBar from '../../../pages/_old/AdminBar';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
 import { uploadSliders, getSliders, deleteSlider } from '../../../modules/fetches';
 
 class SuperAdminSliders extends Component {

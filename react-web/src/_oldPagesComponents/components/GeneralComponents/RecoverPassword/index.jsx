@@ -4,9 +4,9 @@ import { parse } from 'query-string';
 // Todo: adapt this
 // import { graphql, compose } from 'react-apollo';
 import ReactGA from 'react-ga';
-import { ResetPasswordMutation } from '../../../graphql/old/UserProfileQuery';
+import { ResetPasswordMutation } from '../../../graphql/_old/UserProfileQuery';
 
-import NotificationModal from '../../../pages/old/NotificationModal';
+import NotificationModal from '../../../pages/_old/NotificationModal';
 
 class RecoverPassword extends Component {
   constructor(props) {

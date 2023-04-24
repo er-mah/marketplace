@@ -4,7 +4,7 @@ import { ApolloProvider } from "@apollo/client";
 
 import registerServiceWorker from "./registerServiceWorker";
 import App from "./App";
-import {client} from "./graphql";
+import {client} from "./apollo";
 
 
 render(

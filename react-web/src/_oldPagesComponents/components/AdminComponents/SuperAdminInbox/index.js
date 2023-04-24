@@ -20,25 +20,25 @@ import jwtDecode from 'jwt-decode';
 import moment from 'moment';
 import { animateScroll as scroll } from 'react-scroll';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import NotificationModal from '../../../pages/old/NotificationModal';
+import AdminBar from '../../../pages/_old/AdminBar';
+import NotificationModal from '../../../pages/_old/NotificationModal';
 
 import {
   CommentThreadQuery,
   markThreadAsReaded,
-} from '../../../graphql/old/InboxQuery';
+} from '../../../graphql/_old/InboxQuery';
 import {
   MessageQuery,
   MessageSubscription,
   addMessageMutation,
-} from '../../../graphql/old/MessagesCarDetailQuery';
+} from '../../../graphql/_old/MessagesCarDetailQuery';
 
 import {
   getUserToken,
   getUserDataFromToken,
   isAdminLogged,
 } from '../../../modules/sessionFunctions';
-import { DeleteCT } from '../../../graphql/old/SuperAdminAllMessages';
+import { DeleteCT } from '../../../graphql/_old/SuperAdminAllMessages';
 import { thousands } from '../../../modules/functions';
 
 class SuperAdminInbox extends Component {

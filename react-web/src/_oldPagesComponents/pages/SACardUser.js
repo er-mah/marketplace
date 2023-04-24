@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 // Todo: adapt this
 // import { graphql, compose } from "react-apollo";
-import { DeleteUserMutation } from "../../graphql/old/UserQuery";
+import { DeleteUserMutation } from "../../graphql/_old/UserQuery";
 import { getUserToken } from "../../modules/sessionFunctions";
 import NotificationModal from "./NotificationModal";
 /* eslint react/jsx-filename-extension: 0 */

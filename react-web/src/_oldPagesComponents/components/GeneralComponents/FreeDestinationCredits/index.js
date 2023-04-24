@@ -22,8 +22,8 @@ import { AvForm, AvGroup, AvField } from 'availity-reactstrap-validation';
 import {validate} from '../../../modules/functions';
 
 import Header from '../../Header';
-import InputOrText from '../../../pages/old/InputOrText';
-import { GetTextsQuery } from '../../../graphql/old/TextsQueries';
+import InputOrText from '../../../pages/_old/InputOrText';
+import { GetTextsQuery } from '../../../graphql/_old/TextsQueries';
 import { isAdminLogged } from '../../../modules/sessionFunctions';
 import { requestCredit } from '../../../modules/fetches';
 

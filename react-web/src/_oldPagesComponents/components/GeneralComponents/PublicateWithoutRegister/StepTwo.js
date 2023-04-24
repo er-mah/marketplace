@@ -15,7 +15,7 @@ import { validate, prepareArraySelect } from '../../../modules/functions';
 import { saveState } from '../../../modules/localStorage';
 import { loginOrRegisterFacebook, getProvinces, getTowns } from '../../../modules/fetches';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
 //import ReactPixel from 'react-facebook-pixel';
 

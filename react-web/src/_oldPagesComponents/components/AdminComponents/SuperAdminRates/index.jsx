@@ -4,10 +4,10 @@ import { Col, Row } from 'reactstrap';
 // import { graphql, compose } from 'react-apollo';
 
 import { getUserToken, isAdminLogged } from '../../../modules/sessionFunctions';
-import AdminBar from '../../../pages/old/AdminBar';
-import InputRate from '../../../pages/old/InputRate';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
-import { RatesQuery } from '../../../graphql/old/RatesQuery';
+import AdminBar from '../../../pages/_old/AdminBar';
+import InputRate from '../../../pages/_old/InputRate';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
+import { RatesQuery } from '../../../graphql/_old/RatesQuery';
 
 class SuperAdminRates extends Component {
   constructor(props) {

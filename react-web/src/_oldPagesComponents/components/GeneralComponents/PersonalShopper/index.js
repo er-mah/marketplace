@@ -15,14 +15,14 @@ import { AvForm, AvGroup, AvField } from "availity-reactstrap-validation";
 import { validate } from "../../../modules/functions";
 
 import Header from "../../Header";
-import InputOrText from "../../../pages/old/InputOrText";
+import InputOrText from "../../../pages/_old/InputOrText";
 
-import { GetTextsQuery } from "../../../graphql/old/TextsQueries";
+import { GetTextsQuery } from "../../../graphql/_old/TextsQueries";
 import {
   AllBrandsQuery,
   GroupsQuery,
   ModelsQuery
-} from "../../../graphql/old/TautosQuery";
+} from "../../../graphql/_old/TautosQuery";
 import {
   prepareArraySelect,
   generateYearArray

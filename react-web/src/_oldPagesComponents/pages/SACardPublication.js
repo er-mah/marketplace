@@ -7,7 +7,7 @@ import moment from 'moment';
 import ProgressiveImage from 'react-progressive-image';
 import photoGaleryParser from '../../modules/photoGaleryParser';
 
-import { AprovePublicationMutation, DisaprovePublicationMutation, HightlightPublication, UnHightlightPublication, changeStateMutation } from '../../graphql/old/admin/AdminPublicationQueries';
+import { AprovePublicationMutation, DisaprovePublicationMutation, HightlightPublication, UnHightlightPublication, changeStateMutation } from '../../graphql/_old/admin/AdminPublicationQueries';
 import { getUserToken } from '../../modules/sessionFunctions';
 
 /* eslint react/jsx-filename-extension: 0 */

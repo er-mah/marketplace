@@ -3,12 +3,12 @@
 
 import React from 'react';
 import ReactGA from 'react-ga';
-import RegisterBar from '../../../pages/old/RegisterBar';
-import BannerRegister from '../../../pages/old/BannerRegister';
-import FeaturesRegister from '../../../pages/old/FeaturesRegister';
-import Faq from '../../../pages/old/Faq';
+import RegisterBar from '../../../pages/_old/RegisterBar';
+import BannerRegister from '../../../pages/_old/BannerRegister';
+import FeaturesRegister from '../../../pages/_old/FeaturesRegister';
+import Faq from '../../../pages/_old/Faq';
 import Footer from '../../Footer';
-import Plans from '../../../pages/old/Plans';
+import Plans from '../../../pages/_old/Plans';
 //import ReactPixel from 'react-facebook-pixel';
 
 const fpOptions = {

@@ -11,7 +11,7 @@ import Select from 'react-select';
 
 import { validate, prepareArraySelect } from '../../../modules/functions';
 
-import RegisterBar from '../../../pages/old/RegisterBar';
+import RegisterBar from '../../../pages/_old/RegisterBar';
 import { getProvinces, getTowns, registerUser } from '../../../modules/fetches';
 
 class StepTwo extends React.Component {

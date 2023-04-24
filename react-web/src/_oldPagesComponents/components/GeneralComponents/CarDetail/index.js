@@ -16,19 +16,19 @@ import {
   CarDetailQuery,
   CarSpecs,
   CommentThreadQuery,
-} from '../../../graphql/old/CarDetailQuery';
+} from '../../../graphql/_old/CarDetailQuery';
 
-import TopTopNav from '../../../pages/old/TopTopNav';
+import TopTopNav from '../../../pages/_old/TopTopNav';
 import Header from '../../Header';
 import Footer from '../../Footer';
-import BreadCrum from '../../../pages/old/BreadCrum';
-import PublicityBanner from '../../../pages/old/PublicityBanner';
-import CarCarousel from '../../../pages/old/CarCarousel';
-import CarSpecifications from '../../../pages/old/CarSpecifications';
-import MessageCarDetail from '../../../pages/old/MessagesCarDetail';
+import BreadCrum from '../../../pages/_old/BreadCrum';
+import PublicityBanner from '../../../pages/_old/PublicityBanner';
+import CarCarousel from '../../../pages/_old/CarCarousel';
+import CarSpecifications from '../../../pages/_old/CarSpecifications';
+import MessageCarDetail from '../../../pages/_old/MessagesCarDetail';
 
-import _404page from '../../../pages/old/404page';
-import LoadingComponent from '../../../pages/old/LoadingComponent';
+import _404page from '../../../pages/_old/404page';
+import LoadingComponent from '../../../pages/_old/LoadingComponent';
 
 import { thousands } from '../../../modules/functions';
 import photoGaleryParser from '../../../modules/photoGaleryParser';

@@ -4,7 +4,7 @@
 import React from 'react';
 import { Col, Row, Button, FormGroup, Label, Input } from 'reactstrap';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 import AdminSideBar from '../../../pages/AdminSideBar';
 
 

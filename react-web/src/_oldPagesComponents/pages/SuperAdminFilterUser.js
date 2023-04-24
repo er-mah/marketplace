@@ -5,7 +5,7 @@ import { parse, stringify } from 'query-string';
 // import { graphql, compose } from 'react-apollo';
 import { branch, renderComponent } from 'recompose';
 
-import { searchUserMutation } from '../../graphql/old/SuperAdminUsersQuery';
+import { searchUserMutation } from '../../graphql/_old/SuperAdminUsersQuery';
 
 /* eslint react/jsx-filename-extension: 0 */
 

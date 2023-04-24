@@ -3,7 +3,7 @@ import { Row, Col, Button, Alert, Input } from 'reactstrap';
 // Todo: adapt this
 // import { graphql, compose } from 'react-apollo';
 
-import { RatesMutation } from '../../graphql/old/RatesQuery';
+import { RatesMutation } from '../../graphql/_old/RatesQuery';
 import { getUserToken } from '../../modules/sessionFunctions';
 /* eslint react/jsx-filename-extension: 0 */
 

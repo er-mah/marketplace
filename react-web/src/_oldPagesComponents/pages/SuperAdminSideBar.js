@@ -5,7 +5,7 @@ import Select from 'react-select';
 // todo: adapt this
 //import { graphql, compose } from 'react-apollo';
 import { branch, renderComponent } from 'recompose';
-import { AllUsersMailsQuery } from '../../graphql/old/UserQuery';
+import { AllUsersMailsQuery } from '../../graphql/_old/UserQuery';
 import Login from '../auth/Login';
 import { isUserLogged } from '../../modules/sessionFunctions';
 

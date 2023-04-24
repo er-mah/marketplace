@@ -13,7 +13,7 @@ import Select from 'react-select';
 
 import { validate, prepareArraySelect } from '../../../modules/functions';
 import { getProvinces, getTowns } from '../../../modules/fetches';
-import RegisterBar from '../../../pages/old/RegisterBar';
+import RegisterBar from '../../../pages/_old/RegisterBar';
 
 
 class StepTwo extends React.Component {

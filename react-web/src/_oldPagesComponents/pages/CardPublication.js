@@ -12,7 +12,7 @@ import { getUserToken } from '../../modules/sessionFunctions';
 import {
   markAsSoldMutation,
   highlightPublication,
-} from '../../graphql/old/UserPublicationsQuery';
+} from '../../graphql/_old/UserPublicationsQuery';
 
 /* eslint react/jsx-filename-extension:0 */
 /* eslint class-methods-use-this: 0 */

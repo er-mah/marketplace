@@ -11,16 +11,16 @@ import _ from 'lodash';
 import ScrollToTop from 'react-scroll-up';
 import { animateScroll as scroll } from 'react-scroll';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
-import ImageCrop from '../../../pages/old/ImageCrop';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
+import ImageCrop from '../../../pages/_old/ImageCrop';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
 import { uploadAgencyImages, changePassword } from '../../../modules/fetches';
 import parseError from '../../../modules/errorParser';
-import Breadcrumb from '../../../pages/old/BreadCrum';
+import Breadcrumb from '../../../pages/_old/BreadCrum';
 
-import { AgencyDetailQuery } from '../../../graphql/old/AgencyProfileQuery';
-import { AdminUserDataMutation } from '../../../graphql/old/SuperadminMicrositeQuery';
+import { AgencyDetailQuery } from '../../../graphql/_old/AgencyProfileQuery';
+import { AdminUserDataMutation } from '../../../graphql/_old/SuperadminMicrositeQuery';
 
 import { getUserToken, getUserDataFromToken } from '../../../modules/sessionFunctions';
 

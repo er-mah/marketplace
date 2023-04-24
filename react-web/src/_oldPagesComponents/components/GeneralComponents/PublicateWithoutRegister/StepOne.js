@@ -8,8 +8,8 @@ import { parse, stringify } from 'query-string';
 // Todo: adapt this
 // import { withApollo } from 'react-apollo/withApollo';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import { InfoCarQuery } from '../../../graphql/old/TautosQuery';
+import AdminBar from '../../../pages/_old/AdminBar';
+import { InfoCarQuery } from '../../../graphql/_old/TautosQuery';
 
 //import ReactPixel from 'react-facebook-pixel';
 

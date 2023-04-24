@@ -5,7 +5,7 @@ import { parse, stringify } from 'query-string';
 // Todo: adapt this
 // import { graphql, compose } from 'react-apollo';
 
-import { searchPubMutation } from '../../graphql/old/SuperAdminPubQuery';
+import { searchPubMutation } from '../../graphql/_old/SuperAdminPubQuery';
 
 class SuperAdminFilter extends Component {
   constructor(props) {

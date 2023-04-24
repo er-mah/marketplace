@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { AvForm, AvGroup, AvField } from 'availity-reactstrap-validation';
 import {validate} from '../../../modules/functions';
 
-import RegisterBar from '../../../pages/old/RegisterBar';
+import RegisterBar from '../../../pages/_old/RegisterBar';
 
 class StepOne extends React.Component {
   constructor(props) {

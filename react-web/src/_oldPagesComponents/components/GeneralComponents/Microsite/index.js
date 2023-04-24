@@ -11,15 +11,15 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Helmet } from 'react-helmet';
 import ReactGA from 'react-ga';
 
-import SearchMutation from '../../../graphql/old/SearchMutation';
-import { GetAgencyDetail } from '../../../graphql/old/FriendlyAgencyQueries';
+import SearchMutation from '../../../graphql/_old/SearchMutation';
+import { GetAgencyDetail } from '../../../graphql/_old/FriendlyAgencyQueries';
 
-import CarResultContainer from '../../../pages/old/CarResultContainer';
-import CarResult from '../../../pages/old/CarResult';
+import CarResultContainer from '../../../pages/_old/CarResultContainer';
+import CarResult from '../../../pages/_old/CarResult';
 import Header from '../../Header';
-import TopTopNav from '../../../pages/old/TopTopNav';
-import NumberOfResult from '../../../pages/old/NumberOfResult';
-import HeaderAgency from '../../../pages/old/HeaderAgency';
+import TopTopNav from '../../../pages/_old/TopTopNav';
+import NumberOfResult from '../../../pages/_old/NumberOfResult';
+import HeaderAgency from '../../../pages/_old/HeaderAgency';
 
 import photoGaleryParser from '../../../modules/photoGaleryParser';
 

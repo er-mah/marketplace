@@ -4,7 +4,7 @@
 import React from 'react';
 import { Col, Row, Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 //import ReactPixel from 'react-facebook-pixel';
 
 const fpOptions = {

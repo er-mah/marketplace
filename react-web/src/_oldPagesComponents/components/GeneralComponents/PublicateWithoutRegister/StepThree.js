@@ -8,7 +8,7 @@ import DropzoneComponent from 'react-dropzone-component';
 import { Notification } from 'react-notification';
 
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 import { server } from '../../../modules/params';
 //import ReactPixel from 'react-facebook-pixel';
 

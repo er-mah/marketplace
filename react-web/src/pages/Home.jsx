@@ -14,8 +14,8 @@ import Footer from "../components/Footer";
 import {
   HomeQuery,
   LastPublicationsQuery,
-} from "../../../old/HomeQuery";
-import { GetTextsQuery } from "../../../old/TextsQueries";
+} from "../../../_old/HomeQuery";
+import { GetTextsQuery } from "../../../_old/TextsQueries";
 import CarHomeContainer from "../../../pages/CarHomeContainer";
 import PaymentBanner from "../../../pages/PaymentBanner";
 import CarResult from "../../../pages/CarResult";

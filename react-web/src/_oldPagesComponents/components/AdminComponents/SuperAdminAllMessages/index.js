@@ -8,13 +8,13 @@ import { Col, Row } from 'reactstrap';
 import _ from 'lodash';
 import { parse } from 'query-string';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
-import CardMessagge from '../../../pages/old/CardMessagge';
-import NumberOfUnreads from '../../../pages/old/NumberOfUnreads';
-import NotificationModal from '../../../pages/old/NotificationModal';
+import AdminBar from '../../../pages/_old/AdminBar';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
+import CardMessagge from '../../../pages/_old/CardMessagge';
+import NumberOfUnreads from '../../../pages/_old/NumberOfUnreads';
+import NotificationModal from '../../../pages/_old/NotificationModal';
 
-import { AdminAllCommentThreads } from '../../../graphql/old/SuperAdminAllMessages';
+import { AdminAllCommentThreads } from '../../../graphql/_old/SuperAdminAllMessages';
 import { getUserToken, isAdminLogged } from '../../../modules/sessionFunctions';
 
 class SuperAdminAllMessages extends Component {

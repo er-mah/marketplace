@@ -4,7 +4,7 @@ import "flowbite";
 
 import { Auth, NotFoundPage, HomePage } from "./pages";
 import "./index.css";
-
+import { DashboardPage } from "./pages/Dashboard.tsx";
 
 class App extends Component {
   render() {
@@ -13,7 +13,7 @@ class App extends Component {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path={"/auth/*"} element={<Auth />} />
-          <Route path={"/dashboard"}/>
+          <Route path={"/dashboard"} element={<DashboardPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

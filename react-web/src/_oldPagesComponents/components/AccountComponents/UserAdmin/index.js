@@ -28,15 +28,15 @@ import { branch, renderComponent } from 'recompose';
 import { Helmet } from 'react-helmet';
 import ReactGA from 'react-ga';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import UserSideBar from '../../../pages/old/UserSideBar';
+import AdminBar from '../../../pages/_old/AdminBar';
+import UserSideBar from '../../../pages/_old/UserSideBar';
 
-import LoadingComponent from '../../../pages/old/LoadingComponent';
+import LoadingComponent from '../../../pages/_old/LoadingComponent';
 import {
   CountUnreadMessagesQuery,
   CountActivePublications,
   CountHighLighPublications,
-} from '../../../graphql/old/admin/AdminHomeQuery';
+} from '../../../graphql/_old/admin/AdminHomeQuery';
 import {
   getUserToken,
   getUserDataFromToken,

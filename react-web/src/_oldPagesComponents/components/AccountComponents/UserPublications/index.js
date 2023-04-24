@@ -15,13 +15,13 @@ import _ from 'lodash';
 import ReactGA from 'react-ga';
 
 
-import AdminBar from '../../../pages/old/AdminBar';
-import UserSideBar from '../../../pages/old/UserSideBar';
-import AdminFilter from '../../../pages/old/AdminFilter';
-import CardPublication from '../../../pages/old/CardPublication';
-import NumberOfResult from '../../../pages/old/NumberOfResult';
+import AdminBar from '../../../pages/_old/AdminBar';
+import UserSideBar from '../../../pages/_old/UserSideBar';
+import AdminFilter from '../../../pages/_old/AdminFilter';
+import CardPublication from '../../../pages/_old/CardPublication';
+import NumberOfResult from '../../../pages/_old/NumberOfResult';
 import { isUserLogged, getUserDataFromToken } from '../../../modules/sessionFunctions';
-import { SearchUserPublicationQuery } from '../../../graphql/old/UserPublicationsQuery';
+import { SearchUserPublicationQuery } from '../../../graphql/_old/UserPublicationsQuery';
 
 import Login from '../../../pages/auth/Login';
 

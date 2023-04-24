@@ -28,9 +28,9 @@ import {validate} from '../../../modules/functions';
 
 import Header from "../../Header";
 import { thousands } from "../../../modules/functions";
-import InputOrText from "../../../pages/old/InputOrText";
-import { GetTextsQuery } from "../../../graphql/old/TextsQueries";
-import { RatesQuery } from "../../../graphql/old/RatesQuery";
+import InputOrText from "../../../pages/_old/InputOrText";
+import { GetTextsQuery } from "../../../graphql/_old/TextsQueries";
+import { RatesQuery } from "../../../graphql/_old/RatesQuery";
 import { isAdminLogged } from "../../../modules/sessionFunctions";
 import { requestCredit } from "../../../modules/fetches";
 

@@ -6,7 +6,7 @@ import { stringify } from 'query-string';
 import Select from 'react-select';
 import ReactGA from 'react-ga';
 
-import { AllBrandsQuery, GroupsQuery } from '../../graphql/old/TautosQuery';
+import { AllBrandsQuery, GroupsQuery } from '../../graphql/_old/TautosQuery';
 import { prepareArraySelect } from '../../modules/functions';
 import InputOrText from './InputOrText';
 

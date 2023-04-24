@@ -12,17 +12,17 @@ import jwtDecode from 'jwt-decode';
 import moment from 'moment';
 import { branch, renderComponent } from 'recompose';
 import Login from '../../../pages/auth/Login';
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
 import {
   CommentThreadQuery,
   markThreadAsReaded,
-} from '../../../graphql/old/InboxQuery';
+} from '../../../graphql/_old/InboxQuery';
 import {
   MessageQuery,
   MessageSubscription,
   addMessageMutation,
-} from '../../../graphql/old/MessagesCarDetailQuery';
+} from '../../../graphql/_old/MessagesCarDetailQuery';
 
 import {
   getUserToken,

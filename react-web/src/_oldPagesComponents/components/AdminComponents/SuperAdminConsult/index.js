@@ -10,10 +10,10 @@ import Select from 'react-select';
 
 import ReactGA from 'react-ga';
 import { find } from 'lodash';
-import AdminBar from '../../../pages/old/AdminBar';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
+import AdminBar from '../../../pages/_old/AdminBar';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
 import { isAdminLogged } from '../../../modules/sessionFunctions';
-import { AllBrandsQuery, GroupsQuery, ModelsQuery, YearsQuery } from '../../../graphql/old/TautosQuery';
+import { AllBrandsQuery, GroupsQuery, ModelsQuery, YearsQuery } from '../../../graphql/_old/TautosQuery';
 import { prepareArraySelect, thousands, generateYearPerModel } from '../../../modules/functions';
 import Login from '../../../pages/auth/Login';
 

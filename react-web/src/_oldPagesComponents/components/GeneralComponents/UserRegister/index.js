@@ -3,12 +3,12 @@
 
 import React from 'react';
 import ReactGA from 'react-ga';
-import RegisterBar from '../../../pages/old/RegisterBar';
-import BannerUser from '../../../pages/old/BannerUser';
-import FeaturesUser from '../../../pages/old/FeaturesUser';
-import Faq from '../../../pages/old/Faq';
+import RegisterBar from '../../../pages/_old/RegisterBar';
+import BannerUser from '../../../pages/_old/BannerUser';
+import FeaturesUser from '../../../pages/_old/FeaturesUser';
+import Faq from '../../../pages/_old/Faq';
 import Footer from '../../Footer';
-import Plans from '../../../pages/old/Plans';
+import Plans from '../../../pages/_old/Plans';
 
 const Home = ({ history }) => (
   <div>

@@ -17,7 +17,7 @@ import Gallery from 'react-photo-gallery';
 import { Notification } from 'react-notification';
 
 import { getImages, editPublicationWithoutImages } from '../../../modules/fetches';
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 import { isAdminLogged, getUserToken } from '../../../modules/sessionFunctions';
 import { server } from '../../../modules/params';
 

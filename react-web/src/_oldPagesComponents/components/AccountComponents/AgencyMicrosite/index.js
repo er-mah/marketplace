@@ -9,15 +9,15 @@ import _ from 'lodash';
 import ScrollToTop from 'react-scroll-up';
 import ReactGA from 'react-ga';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
-import ImageCrop from '../../../pages/old/ImageCrop';
-import UserSideBar from '../../../pages/old/UserSideBar';
+import ImageCrop from '../../../pages/_old/ImageCrop';
+import UserSideBar from '../../../pages/_old/UserSideBar';
 import { uploadAgencyImages } from '../../../modules/fetches';
 import parseError from '../../../modules/errorParser';
 
-import { AgencyDetailQuery } from '../../../graphql/old/AgencyProfileQuery';
-import { UserDataMutation } from '../../../graphql/old/UserProfileQuery';
+import { AgencyDetailQuery } from '../../../graphql/_old/AgencyProfileQuery';
+import { UserDataMutation } from '../../../graphql/_old/UserProfileQuery';
 
 import { getUserToken, getUserDataFromToken } from '../../../modules/sessionFunctions';
 

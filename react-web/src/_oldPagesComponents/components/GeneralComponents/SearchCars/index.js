@@ -21,18 +21,18 @@ import { animateScroll as scroll } from 'react-scroll';
 import InfiniteScroll from 'react-infinite-scroller';
 import ReactGA from 'react-ga';
 import ScrollToTop from 'react-scroll-up';
-import SearchMutation from '../../../graphql/old/SearchMutation';
+import SearchMutation from '../../../graphql/_old/SearchMutation';
 import Footer from '../../Footer';
-import BreadCrum from '../../../pages/old/BreadCrum';
-import PublicityBanner from '../../../pages/old/PublicityBanner';
-import FiltersList from '../../../pages/old/filtersList';
-import CarResultContainer from '../../../pages/old/CarResultContainer';
-import CarResult from '../../../pages/old/CarResult';
+import BreadCrum from '../../../pages/_old/BreadCrum';
+import PublicityBanner from '../../../pages/_old/PublicityBanner';
+import FiltersList from '../../../pages/_old/filtersList';
+import CarResultContainer from '../../../pages/_old/CarResultContainer';
+import CarResult from '../../../pages/_old/CarResult';
 import Header from '../../Header';
-import TopTopNav from '../../../pages/old/TopTopNav';
-import NumberOfResult from '../../../pages/old/NumberOfResult';
+import TopTopNav from '../../../pages/_old/TopTopNav';
+import NumberOfResult from '../../../pages/_old/NumberOfResult';
 
-import ActiveFilters from '../../../pages/old/ActiveFilters';
+import ActiveFilters from '../../../pages/_old/ActiveFilters';
 
 
 import photoGaleryParser from '../../../modules/photoGaleryParser';

@@ -14,14 +14,14 @@ import ReactGA from 'react-ga';
 import { AvForm, AvGroup, AvField } from 'availity-reactstrap-validation';
 import { validate } from '../../../modules/functions';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
 import {
   AllBrandsQuery,
   GroupsQuery,
   ModelsQuery,
   YearsQuery,
-} from '../../../graphql/old/TautosQuery';
+} from '../../../graphql/_old/TautosQuery';
 
 import Login from '../../../pages/auth/Login';
 import { isUserLogged } from '../../../modules/sessionFunctions';

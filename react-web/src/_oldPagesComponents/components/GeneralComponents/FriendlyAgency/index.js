@@ -13,12 +13,12 @@ import {scroller} from 'react-scroll';
 import { AvForm, AvGroup, AvField } from 'availity-reactstrap-validation';
 import {validate} from '../../../modules/functions';
 
-import TopTopNav from '../../../pages/old/TopTopNav';
+import TopTopNav from '../../../pages/_old/TopTopNav';
 import Header from '../../Header';
-import PublicityBanner from '../../../pages/old/PublicityBanner';
-import CardAgency from '../../../pages/old/CardAgency';
+import PublicityBanner from '../../../pages/_old/PublicityBanner';
+import CardAgency from '../../../pages/_old/CardAgency';
 import Footer from '../../Footer';
-import { GetAllAgencies } from '../../../graphql/old/FriendlyAgencyQueries';
+import { GetAllAgencies } from '../../../graphql/_old/FriendlyAgencyQueries';
 
 class FriendlyAgency extends Component {
   constructor(props) {

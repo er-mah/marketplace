@@ -12,12 +12,12 @@ import { animateScroll as scroll } from 'react-scroll';
 import { Helmet } from 'react-helmet';
 import ScrollToTop from 'react-scroll-up';
 
-import AdminBar from '../../../pages/old/AdminBar';
-import SuperAdminFilter from '../../../pages/old/SuperAdminFilter';
-import SuperAdminSideBar from '../../../pages/old/SuperAdminSideBar';
-import SACardPublication from '../../../pages/old/SACardPublication';
+import AdminBar from '../../../pages/_old/AdminBar';
+import SuperAdminFilter from '../../../pages/_old/SuperAdminFilter';
+import SuperAdminSideBar from '../../../pages/_old/SuperAdminSideBar';
+import SACardPublication from '../../../pages/_old/SACardPublication';
 import { isAdminLogged } from '../../../modules/sessionFunctions';
-import { SearchUserPublicationQuery } from '../../../graphql/old/UserPublicationsQuery';
+import { SearchUserPublicationQuery } from '../../../graphql/_old/UserPublicationsQuery';
 
 class SuperAdminPublications extends React.Component {
   constructor(props) {

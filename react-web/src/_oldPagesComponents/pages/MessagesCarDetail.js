@@ -15,7 +15,7 @@ import {
   MessageSubscription,
   addMessageMutation,
   createCommentThread,
-} from '../../graphql/old/MessagesCarDetailQuery';
+} from '../../graphql/_old/MessagesCarDetailQuery';
 
 /* eslint react/jsx-filename-extension: 0 */
 /* eslint camelcase: 0 */

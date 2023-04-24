@@ -6,7 +6,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { thousands } from '../../modules/functions';
 import NotificationModal from './NotificationModal';
-import { DeleteCT } from '../../graphql/old/SuperAdminAllMessages';
+import { DeleteCT } from '../../graphql/_old/SuperAdminAllMessages';
 import { getUserToken } from '../../modules/sessionFunctions';
 /* eslint react/jsx-filename-extension: 0 */
 

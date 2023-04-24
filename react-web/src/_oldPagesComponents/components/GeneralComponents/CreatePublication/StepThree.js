@@ -5,7 +5,7 @@ import React from 'react';
 import { Col, Row, Button } from 'reactstrap';
 import { parse } from 'query-string';
 
-import AdminBar from '../../../pages/old/AdminBar';
+import AdminBar from '../../../pages/_old/AdminBar';
 
 
 class CreatePublication extends React.Component {

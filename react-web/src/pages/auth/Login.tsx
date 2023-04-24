@@ -3,11 +3,11 @@ import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { FetchResult, useMutation } from "@apollo/client";
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom";
 
 import { Alert } from "../../components/Alert.tsx";
-import { AuthCacheManager } from "../../graphql/auth";
+import { AuthCacheManager } from "../../apollo/authCacheManager.ts";
+
 import { LOGIN_MUTATION } from "../../graphql/auth";
 
 interface LoginFormValues {
@@ -68,6 +68,7 @@ const Login = () => {
    */
   function onLoginSubmit(values: LoginFormValues) {
     setErrorInForm("");
+
     signIn({
       variables: {
         input: {
@@ -76,13 +77,16 @@ const Login = () => {
         },
       },
     })
-      .then(async (result: FetchResult<ServerResponse>) => {
+      .then((result: FetchResult<ServerResponse>) => {
+        const tokenFromApi = result.data?.login.token;
 
         // Store token in cache
-        await cacheManager.storeToken(result.data?.login.token);
+        cacheManager.storeToken(tokenFromApi);
 
-        navigate("/");
+        //Me quiero traer el usuario para despues guardarlo en la cache para despues verlo en el dashboard
+        cacheManager.fetchAndStoreUser();
 
+        navigate("/dashboard");
       })
       .catch((error) => {
         switch (error.message) {

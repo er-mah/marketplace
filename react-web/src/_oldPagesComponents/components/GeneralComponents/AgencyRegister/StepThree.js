@@ -9,7 +9,7 @@ import {validate} from '../../../modules/functions';
 import {scroller} from 'react-scroll';
 import _ from 'lodash';
 
-import RegisterBar from '../../../pages/old/RegisterBar';
+import RegisterBar from '../../../pages/_old/RegisterBar';
 import { registerAgency } from '../../../modules/fetches';
 
 
