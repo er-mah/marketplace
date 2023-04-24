@@ -2,23 +2,22 @@ import Pool from "pg-pool";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import { config } from "dotenv";
-import { db, dbData } from "./db.js";
+import {configuration} from "./db.js";
 
 config();
 
 const env = process.env.NODE_ENV || "development";
-const configuration = dbData[env];
 
 export const expressSessionInstance = async () => {
   try {
 
     // Connection to database with pg
     const pool = new Pool({
-      user: configuration.username,
-      host: configuration.host,
-      database: configuration.database,
-      password: configuration.password,
-      port: configuration.port,
+      user: configuration[env].username,
+      host: configuration[env].host,
+      database: configuration[env].database,
+      password: configuration[env].password,
+      port: configuration[env].port,
     });
 
     // Express-session storage with postgres

@@ -5,8 +5,15 @@ import * as fs from "fs";
 
 config();
 
-export const dbData = {
+export const configuration = {
   development: {
+    username: process.env.DEV_DB_USER,
+    password: process.env.DEV_DB_PASSWORD,
+    database: process.env.DEV_DB_NAME,
+    host: process.env.DEV_DB_HOST,
+    port: process.env.DEV_DB_PORT,
+  },
+  test: {
     username: process.env.DEV_DB_USER,
     password: process.env.DEV_DB_PASSWORD,
     database: process.env.DEV_DB_NAME,
@@ -23,30 +30,14 @@ export const dbData = {
 };
 
 const env = process.env.NODE_ENV || "development";
-const configuration = dbData[env];
 
 export const db = new Sequelize(
-  configuration.database,
-  configuration.username,
-  configuration.password,
+  configuration[env].database,
+  configuration[env].username,
+  configuration[env].password,
   {
-    host: configuration.host,
+    host: configuration[env].host,
     dialect: "postgres",
-    logging: (query) => {
-      const currentDirectoryPath = path.dirname(
-        new URL(import.meta.url).pathname
-      );
-      const logsDirectory = path.resolve(currentDirectoryPath, "../logs");
-
-      const logFilePath = path.join(logsDirectory, "sequelize.log");
-      const logMessage = `New query: ${query}\n`;
-
-      if (!fs.existsSync(logFilePath)) {
-        fs.writeFileSync(logFilePath, "");
-      }
-
-      fs.appendFileSync(logFilePath, logMessage);
-    },
     define: {
       underscored: true,
     },
