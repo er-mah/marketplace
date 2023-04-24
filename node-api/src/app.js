@@ -30,7 +30,10 @@ import {
 } from "@apollo/server/plugin/landingPage/default";
 import morgan from "morgan";
 import { expressSessionInstance, passport } from "./config/index.js";
-import {authenticateRequest, omitAuthenticationCheck} from "./config/passport.js";
+import {
+  authenticateRequest,
+  omitAuthenticationCheck,
+} from "./config/passport.js";
 
 function loadEnvVariables() {
   config();
@@ -90,13 +93,6 @@ async function start() {
     // Passport.js - authentication middleware
     app.use(passport.initialize({})); // Reload middleware in every route --> in order it doesn't get stale
     app.use(passport.session({})); // Express session related
-
-    /*
-    //app.use(jwtMdw);
-
-
-     */
-
     app.use(router); // Define routes
 
     app.use(
