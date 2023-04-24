@@ -1,4 +1,4 @@
-export const typeDefs = `#graphql
+export const types = `#graphql
 
 "'Agency' type represents the agency that has vehicle publications associated"
 type Agency {
@@ -41,8 +41,6 @@ type ConversationThread {
 type Department {
   id: ID!
   name: String
-  #localities: [Locality!]!
-  #province: Province!
 }
 
 "'Locality' represents a locality that belongs to a department inside a province"
@@ -149,13 +147,13 @@ type ModelFeatures {
 type User {
   id: ID!
   email: String!
-  password: String!
   first_name: String!
   last_name: String!
   address: String
   phone: String
   profile_image: String
   dni: String
+  locality_id: ID
   is_admin: Boolean
   is_agency_representative: Boolean
   is_email_verified: Boolean
@@ -213,7 +211,8 @@ type Pagination {
   next_page: Int
   page_size: Int!
 }
-
+`
+export const queries = `#graphql
 
 type Query {
   # Agency
@@ -243,110 +242,57 @@ type Query {
   # Users
   "Get a user by their ID"
   getUserById(id: ID!): User
-  "Get all users"
-  getAllUsers: [User!]!
+  #"Get all users"
+  #getAllUsers: [User!]!
+  "Get user"
+  me: User!
 
+  # Publication
+  "Search vehicle models by searching in InfoAuto API"
   searchVehicleModel(query: String!, page: Int, pageSize: Int): ModelsSearch!
+
+  "Get additional vehicle info from InfoAuto"
   getVehicleModelFeatures(modelId: Int!): ModelFeatures!
 
 }
+`
+export const mutations = `#graphql
 
 type Mutation {
 
   # Agency
-  "Create an agency"
-  createAgency(
-    name: String!
-    address: String!
-    email: String!
-    phone: String!
-    bannerImage: String!
-    representativeIds: [ID]!
-  ): Agency
+  # "Create an agency"
 
-  "Update agency information"
-  updateAgency(
-    id: ID!
-    name: String
-    address: String
-    email: String
-    phone: String
-    bannerImage: String
-    representativeIds: [ID]
-  ): Agency
-  "Safe delete agency information"
-  deleteAgency(id: ID!): Boolean
+  # "Update agency information"
 
   # Conversation
   # Thread
-  "Start a conversation"
-  createConversationThread(
-    participant1Id: ID!
-    participant2Id: ID!
-    publicationId: ID!
-  ): ConversationThread
+  # "Start a conversation"
   # Message
-  "Add a new message to the conversation"
-  createConversationMessage(
-    content: String!
-    userId: ID!
-    threadId: ID!
-  ): ConversationMessage
+  #  "Add a new message to the conversation"
+
+
+
+  # "Update an existing publication"
+  # "Delete a publication"
+
+  # Publication change
+  # "Create a new publication change"
+  # "Update an existing publication change"
+  # "Delete a publication change"
+
 
   # Publication
   "Create a new publication"
   createPublication(input: NewPublicationInput): Publication!
   "Add additional information to publication"
   addInfoToPublicationBySlug(slug: String, input: AdditionalPublicationInfoInput): Publication!
-
-
-  "Update an existing publication"
-  updatePublication(
-    id: ID!
-    vehicleYear: String
-    vehicleBrand: String
-    vehicleModel: String
-    vehicleVersion: String
-    vehicleCodiaId: Int
-    vehicleState: String
-    vehicleGroup: String
-    localityId: ID
-    kms: String
-    price: Float
-    fuel: String
-
-    ownerObservations: String
-    "infoAutoSpecs: [VehicleFeatureInput]"
-    words: String
-    "photoAlbum: PublicationPhotoAlbumInput"
-    slug: String
-    "changes: [PublicationChangeInput]"
-    conversationThreadIds: [ID]
-  ): Publication
-  "Delete a publication"
-  deletePublication(id: ID!): Boolean
-
-  # Publication change
-  "Create a new publication change"
-  createPublicationChange(
-    publicationId: ID!
-    active: Boolean
-  ): PublicationChanges
-  "Update an existing publication change"
-  updatePublicationChange(id: ID!, active: Boolean): PublicationChanges
-  "Delete a publication change"
-  deletePublicationChange(id: ID!): Boolean
-
-  # User
-  "Update user information"
-  updateUser(id: ID!, input: UpdateUserInput!): User!
-  "Safe delete account user"
-  deleteUser(id: ID!): User!
-
-
+  
   # Authentication 
   "Register new user"
   register(input: RegisterInput!): BasicUser!
+  
+  "Logs user with correct credentials"
   login(input: LoginInput!): AuthResponse
 }
 
@@ -383,18 +329,7 @@ input AdditionalPublicationInfoInput {
   tags: [String]!
 }
 
-input UpdateUserInput {
-  email: String
-  password: String
-  first_name: String
-  last_name: String
-  address: String
-  phone: String
-  profile_image: String
-  dni: String
-  is_admin: Boolean
-  is_agency_representative: Boolean
-  is_email_verified: Boolean
-  is_account_disabled: Boolean
-}
+
 `;
+
+export const typeDefs = types + queries + mutations;

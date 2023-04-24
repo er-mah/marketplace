@@ -9,7 +9,7 @@ import {
   PublicationChangeService,
   PublicationService,
 } from "../../../services/index.js";
-import { uriUtils } from "../../../../helpers/index.js";
+import { uriUtils } from "../../../../utils/index.js";
 
 export const publication = {
   Query: {
