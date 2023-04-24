@@ -71,7 +71,7 @@ router.post(
 
 
 router.use("/images", express.static(`${__dirname}/images`));
-router.use("/logo", express.static(`${__dirname}/mails/logo.png`));
+router.use("/logo", express.static(`${__dirname}/templates/logo.png`));
 
 // TODO FIX Migrate apollo-server-express v1.4.0 to apollo/server
 router.use("/graphql", graphiqlExpress({
