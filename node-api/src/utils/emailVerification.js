@@ -1,8 +1,9 @@
 import jsonwebtoken from "jsonwebtoken";
 import { jwtOpts } from "../config/index.js";
+import {UserRepository} from "../app/repositories/index.js";
 
 export const emailVerificationUtils = {
-  generateEmailVerificationToken: async (user) => {
+  generateEmailVerificationToken: (user) => {
     // Define JWT payload
     const payload = {
       sub: user.id,
@@ -10,30 +11,21 @@ export const emailVerificationUtils = {
       iat: Date.now(),
     };
 
-
     // Get signed token
-    return await jsonwebtoken.sign(payload, jwtOpts.emailSecretOrKey, {
+    return jsonwebtoken.sign(payload, jwtOpts.emailSecretOrKey, {
       expiresIn: jwtOpts.emailExpiresIn,
     });
   },
-  // Used in query
-  isTokenExpired: (token) => {
-    return (
-      Date.now() >=
-      JSON.parse(Buffer.from(token.split(".")[1], "base64").toString()).exp *
-        1000
-    );
-  },
-  // Used in query
+
+
+  // Used in mutation
   decodeEmailVerificationToken: (token) => {
-    try {
-      return jsonwebtoken.verify(token, jwtOpts.emailSecretOrKey); // Decodificar el token utilizando la clave secreta
-    } catch (err) {
-      console.error(
-        "There has been an error verifying the token:",
-        err.message
-      );
-      return null;
-    }
+    return jsonwebtoken.verify(token, jwtOpts.emailSecretOrKey); // Decodificar el token utilizando la clave secreta
   },
+
+  // Used in mutation
+  isTokenExpired: (exp) => {
+    return exp < Date.now() / 1000
+  },
+
 };
