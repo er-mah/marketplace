@@ -1,8 +1,8 @@
-import { department } from "./departmentResolver.js";
-import { province } from "./provinceResolver.js";
-import { agency } from "./agencyResolver.js";
-import { auth } from "./authResolver.js";
-import { publication } from "./publicationResolver.js";
-import { user } from "./userResolver.js";
+import { department } from "./department.js";
+import { province } from "./province.js";
+import { agency } from "./agency.js";
+import { auth } from "./auth.js";
+import { publication } from "./publication.js";
+import { user } from "./user.js";
 
 export { department, province, agency, auth, publication, user };

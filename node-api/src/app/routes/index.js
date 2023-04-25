@@ -1,6 +1,6 @@
 import express from "express";
 
-import { publicationRouter } from "./publicationRouter.js";
+import { publicationRouter } from "./publication.js";
 
 export const router = express.Router();
 

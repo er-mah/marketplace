@@ -1,15 +1,13 @@
-import {
-  PublicationChangesModel,
-  PublicationModel,
-  PublicationStateModel,
-} from "../../../models/index.js";
 import { GraphQLError } from "graphql";
-import {
-  InfoAutoService,
-  PublicationChangeService,
-  PublicationService,
-} from "../../../services/index.js";
+import { InfoAutoService } from "../../../services/index.js";
 import { uriUtils } from "../../../../utils/index.js";
+import {
+  PublicationChangeRepository,
+  PublicationRepository,
+} from "../../../repositories/index.js";
+
+const publicationRepo = new PublicationRepository();
+const publicationChangeRepo = new PublicationChangeRepository();
 
 export const publication = {
   Query: {
@@ -51,7 +49,7 @@ export const publication = {
       );
 
       // Add new publication
-      const newPublication = await PublicationService.addNewPublication({
+      const newPublication = await publicationRepo.createPublication({
         ...input,
         user_id: user.id,
         info_auto_specs: modelFeatures,
@@ -59,12 +57,12 @@ export const publication = {
       });
 
       // Register new publication change
-      await PublicationService.setPublicationToPending(newPublication.id);
+      await publicationRepo.setPublicationToPending(newPublication.id);
 
       // Add user data
       newPublication.owner = user;
       newPublication.changes =
-        await PublicationChangeService.getAllChangesByPublicationId(
+        await publicationChangeRepo.getAllChangesByPublicationId(
           newPublication.id
         );
 
@@ -84,7 +82,7 @@ export const publication = {
 
       try {
         // Check if publication exists with the given slug
-        const publication = await PublicationService.getPublicationBySlug(slug);
+        const publication = await publicationRepo.getPublicationBySlug(slug);
 
         if (!publication) {
           return Promise.reject(
@@ -107,13 +105,14 @@ export const publication = {
 
         try {
           // Add information to publication
-          await PublicationService.updatePublication(publication, input);
+          await publicationRepo.updatePublicationById(publication.id, input);
 
           // Change state to "Publicada"
-          await PublicationService.setPublicationToPosted(publication.id);
+          await publicationRepo.setPublicationToPosted(publication.id);
 
           // Get updated publication
-          const updatedPublication = await PublicationService.getPublicationBySlug(slug);
+          const updatedPublication =
+            await PublicationService.getPublicationBySlug(slug);
 
           // Show user data and changes
           updatedPublication.changes =
@@ -124,11 +123,11 @@ export const publication = {
 
           return updatedPublication;
         } catch (e) {
-          console.log(e)
+          console.log(e);
           return Promise.reject(new GraphQLError("ERROR: " + e));
         }
       } catch (e) {
-        console.log(e)
+        console.log(e);
         return Promise.reject(new GraphQLError("ERROR: " + e));
       }
     },

@@ -172,8 +172,7 @@ type BasicUser {
 }
 
 type AuthResponse {
-  id: ID!
-  token: String
+  token: String!
 }
 
 type ModelsSearch {
@@ -211,7 +210,7 @@ type Pagination {
   next_page: Int
   page_size: Int!
 }
-`
+`;
 export const queries = `#graphql
 
 type Query {
@@ -255,7 +254,7 @@ type Query {
   getVehicleModelFeatures(modelId: Int!): ModelFeatures!
 
 }
-`
+`;
 export const mutations = `#graphql
 
 type Mutation {
@@ -291,9 +290,18 @@ type Mutation {
   # Authentication 
   "Register new user"
   register(input: RegisterInput!): BasicUser!
+
+  "Verify newly created account with token"
+  verifyAccount(verification_token: String!): BasicUser!
+
+  "Resend account verification email"
+  resendVerificationEmail(email: String!): String
   
   "Logs user with correct credentials"
-  login(input: LoginInput!): AuthResponse
+  login(input: LoginInput!): AuthResponse!
+  
+  "User adds aditional required data"
+  verifiedUserAddsRemainingData(input: AdditionalUserDataInput!): BasicUser!
 }
 
 
@@ -308,6 +316,17 @@ input LoginInput {
   email: String!
   password: String!
 }
+
+input AdditionalUserDataInput {
+  address: String
+  phone: String
+  profile_image: String
+  dni: String
+  is_agency_representative: Boolean
+  agency_id: ID
+  locality_id: ID
+}
+
 
 input NewPublicationInput {
   vehicle_brand: String!
@@ -328,6 +347,7 @@ input AdditionalPublicationInfoInput {
   price: Int!
   tags: [String]!
 }
+
 
 
 `;
