@@ -55,8 +55,6 @@ export const auth = {
       { input: { first_name, last_name, email, password } }
     ) => {
       try {
-        const emailService = new EmailService();
-
         // Check if the user does not already exist
         await userRepository.getUserByEmail(email).then((user) => {
           if (user) {
@@ -95,10 +93,10 @@ export const auth = {
           verificationUrl: `https://${MARKETPLACE_MAIN_URL}/cuenta/verificar$c=${newUser.dataValues.verification_token}`,
         };
 
-        emailService
+        await emailService
           .sendVerificationEmail(newUser.dataValues.email, emailContext)
           .catch((reason) =>
-            console.log("(Continuando) Error al enviar mail: ", reason)
+            console.log("(Continuing...) Error sending email: ", reason)
           );
 
         return Promise.resolve(newUser.dataValues);
@@ -107,30 +105,112 @@ export const auth = {
       }
     },
 
-    login: async (_, { input: { email, password } }, { req }) => {
-      return await UserModel.findOne({ where: { email: email } })
-        .then(async (user) => {
-          if (!user) {
-            return Promise.reject(new GraphQLError("Could not find user."));
-          }
+    verifyAccount: async (_, { verification_token }) => {
+      try {
+        const userByToken = await userRepository.getUserByVerificationToken(
+          verification_token
+        );
 
-          const passwordsAreValid = await passwordsUtils.arePasswordsMatching(
-            password,
-            user.password
+        // Verify token signature
+        const decoded =
+          emailVerificationUtils.decodeEmailVerificationToken(
+            verification_token
           );
 
-          if (passwordsAreValid) {
-            return {
-              id: user.id,
-              token: await jwtUtils.issueJWT(user),
-            };
-          } else {
-            return Promise.reject(new GraphQLError("Wrong credentials."));
-          }
-        })
-        .catch((err) => {
-          return Promise.reject(new GraphQLError(err));
-        });
+        // Is there an email like the given one?
+        if (userByToken.dataValues.email !== decoded.email) {
+          return new GraphQLError("Invalid token.");
+        }
+
+        // Has it expired?
+        if (emailVerificationUtils.isTokenExpired(decoded.exp)) {
+          // Send another verification token to the email
+          userByToken.verification_token =
+            await emailVerificationUtils.generateEmailVerificationToken({
+              id: userByToken.dataValues.id,
+              email: userByToken.dataValues.email,
+            });
+
+          await userByToken.save();
+
+          // set the context for email verification
+          const emailContext = {
+            typeOfAction: "creación de cuenta",
+            user: {
+              first_name: userByToken.dataValues.first_name,
+              last_name: userByToken.dataValues.last_name,
+            },
+            verificationUrl: `https://${MARKETPLACE_MAIN_URL}/cuenta/verificar$c=${userByToken.dataValues.verification_token}`,
+          };
+
+          await emailService
+            .sendVerificationEmail(userByToken.dataValues.email, emailContext)
+            .catch((reason) =>
+              console.log("(Continuing...) Error sending email: ", reason)
+            );
+
+          return new GraphQLError(
+            "The token is expired. Don't worry, we've sent you another code for you to verify."
+          );
+        }
+
+        userByToken.is_email_verified = true;
+        await userByToken.save();
+
+        return userByToken.dataValues;
+      } catch (e) {
+        return new GraphQLError(e.message);
+      }
     },
+
+    resendVerificationEmail: async (_, { email }) => {
+      const userByEmail = await userRepository.getUserByEmail(email);
+
+      if (!userByEmail) {
+        return "Email not sent";
+      }
+
+      // Generate a new token
+      userByEmail.verification_token =
+        await emailVerificationUtils.generateEmailVerificationToken({
+          id: userByEmail.dataValues.id,
+          email: userByEmail.dataValues.email,
+        });
+
+      await userByEmail.save();
+
+      // set the context for email verification
+      const emailContext = {
+        typeOfAction: "creación de cuenta",
+        user: {
+          first_name: userByEmail.dataValues.first_name,
+          last_name: userByEmail.dataValues.last_name,
+        },
+        verificationUrl: `https://${MARKETPLACE_MAIN_URL}/cuenta/verificar$c=${userByEmail.dataValues.verification_token}`,
+      };
+
+      await emailService
+        .sendVerificationEmail(userByEmail.dataValues.email, emailContext)
+        .catch((reason) =>
+          console.log("(Continuing...) Error sending email: ", reason)
+        );
+
+      return "Email sent";
+    },
+
+    verifiedUserAddsRemainingData: (
+      _,
+      {
+        input: {
+          address,
+          phone,
+          profile_image,
+          dni,
+          is_agency_representative,
+          agency_id,
+          locality_id,
+        },
+      }
+    ) => {},
   },
 };
