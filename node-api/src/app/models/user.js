@@ -43,7 +43,10 @@ export const UserModel = db.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    is_agency_representative: DataTypes.BOOLEAN,
+    is_agency_representative: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     has_provided_additional_data: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
