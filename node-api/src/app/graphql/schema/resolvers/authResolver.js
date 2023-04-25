@@ -4,11 +4,52 @@ import { UserModel } from "../../../models/index.js";
 import { jwtUtils, passwordsUtils } from "../../../../utils/index.js";
 import { EmailService } from "../../../services/email.js";
 import { emailVerificationUtils } from "../../../../utils/emailVerification.js";
+import { UserRepository } from "../../../repositories/index.js";
+import { extensions } from "sequelize/lib/utils/validator-extras";
 
 const MARKETPLACE_MAIN_URL = process.env.MARKETPLACE_MAIN_URL;
 
+const emailService = new EmailService();
+const userRepository = new UserRepository();
+
 export const auth = {
   Mutation: {
+    login: async (_, { input: { email, password } }) => {
+      try {
+        const userFromEmail = await userRepository.getUserByEmail(email);
+
+        if (!userFromEmail) {
+          return new GraphQLError("Could not find user.");
+        }
+
+        const passwordsAreValid = await passwordsUtils.arePasswordsMatching(
+          password,
+          userFromEmail.dataValues.password
+        );
+
+        if (passwordsAreValid) {
+          // Check if email was verified
+          if (!userFromEmail.dataValues.is_email_verified) {
+            return new GraphQLError(
+              "Please check your inbox for a verification code.",
+              {
+                extensions: {
+                  code: "EMAIL_VERIFICATION_ERROR",
+                },
+              }
+            );
+          }
+          return {
+            token: await jwtUtils.issueJWT(userFromEmail),
+          };
+        } else {
+          return Promise.reject(new GraphQLError("Wrong credentials."));
+        }
+      } catch (e) {
+        return Promise.reject(new GraphQLError(e));
+      }
+    },
+
     register: async (
       _,
       { input: { first_name, last_name, email, password } }
@@ -17,7 +58,7 @@ export const auth = {
         const emailService = new EmailService();
 
         // Check if the user does not already exist
-        await UserModel.findOne({ where: { email: email } }).then((user) => {
+        await userRepository.getUserByEmail(email).then((user) => {
           if (user) {
             return Promise.reject(
               new GraphQLError("This email address is already registered.")
@@ -29,12 +70,12 @@ export const auth = {
         const pwdHash = await passwordsUtils.getHashedPassword(password);
 
         // Store new user in the database
-        const newUser = await UserModel.create({
+        const newUser = await userRepository.createUser(
           first_name,
           last_name,
           email,
-          password: pwdHash,
-        });
+          pwdHash
+        );
 
         newUser.verification_token =
           await emailVerificationUtils.generateEmailVerificationToken({
