@@ -1,25 +1,53 @@
+import {UserModel} from "../models/index.js";
+
 export class UserRepository {
-    constructor() {
-        this.db = database;
-    }
+  constructor() {
+    this.model = UserModel;
+  }
 
-    async getUserById(id) {
-        return this.db.query('SELECT * FROM users WHERE id = ?', [id]);
-    }
+  async getUserById(id) {
+    //return this.model.query('SELECT * FROM users WHERE id = ?', [id]);
+  }
 
-    async getUserByEmail(email) {
-        return this.db.query('SELECT * FROM users WHERE email = ?', [email]);
+  async getUserByEmail(email) {
+    try {
+      return await UserModel.findOne({where: {email: email}});
+    } catch (e) {
+      console.error(e);
     }
+  }
 
-    async createUser(user) {
-        return this.db.query('INSERT INTO users SET ?', [user]);
+  async createUser(first_name, last_name, email, pwdHash) {
+    try {
+      return await UserModel.create({
+        first_name,
+        last_name,
+        email,
+        password: pwdHash,
+      });
+    } catch (e) {
+      console.error(e);
     }
+  }
 
-    async updateUser(id, user) {
-        return this.db.query('UPDATE users SET ? WHERE id = ?', [user, id]);
-    }
+  async updateUserById(id, data) {
+      try {
+          return await UserModel.update(...data, { where: { email: id } });
+      } catch (e) {
+          console.error(e);
+      }
+    //return this.db.query('UPDATE users SET ? WHERE id = ?', [user, id]);
+  }
 
-    async deleteUser(id) {
-        return this.db.query('DELETE FROM users WHERE id = ?', [id]);
+  async deleteUser(id) {
+    //return this.db.query('DELETE FROM users WHERE id = ?', [id]);
+  }
+
+  async getUserByVerificationToken(token) {
+    try {
+      return await UserModel.findOne({ where: { verification_token: token } });
+    } catch (e) {
+      console.error(e);
     }
+  }
 }
