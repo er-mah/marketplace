@@ -54,10 +54,11 @@ export const auth = {
           verificationUrl: `https://${MARKETPLACE_MAIN_URL}/cuenta/verificar$c=${newUser.dataValues.verification_token}`,
         };
 
-        await emailService.sendVerificationEmail(
-          newUser.dataValues.email,
-          emailContext
-        );
+        emailService
+          .sendVerificationEmail(newUser.dataValues.email, emailContext)
+          .catch((reason) =>
+            console.log("(Continuando) Error al enviar mail: ", reason)
+          );
 
         return Promise.resolve(newUser.dataValues);
       } catch (e) {

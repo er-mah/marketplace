@@ -325,7 +325,7 @@ export const dynamicEmailHtmlUtils = {
                   style="display: inline-block"
                 >
                   <img
-                    src="https://i-static.techmo.global/uploads/techmo-small.svg"
+                    src="https://i-static.techmo.global/uploads/techmo-small.jpg"
                     alt="Logo"
                     border="0"
                     width="48"
