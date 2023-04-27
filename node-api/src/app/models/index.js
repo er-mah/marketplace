@@ -18,6 +18,10 @@ AgencyModel.representatives = AgencyModel.hasMany(UserModel, {
   foreignKey: "agency_id",
 });
 
+AgencyModel.locality = AgencyModel.belongsTo(LocalityModel, {
+    foreignKey: "locality_id",
+});
+
 // A message is emitted by a user
 ConversationMessageModel.user = ConversationMessageModel.belongsTo(UserModel, {
   foreignKey: "from_id",
