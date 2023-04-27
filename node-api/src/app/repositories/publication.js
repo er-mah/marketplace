@@ -9,7 +9,7 @@ export class PublicationRepository {
 
   async getPublicationById(id) {
     try {
-      return PublicationModel.findByPk(id);
+      return this.model.findByPk(id);
     } catch (e) {
       console.error(e);
     }
@@ -27,7 +27,7 @@ export class PublicationRepository {
 
   async createPublication(values) {
     try {
-      return PublicationModel.create(values);
+      return this.model.create(values);
     } catch (e) {
       console.error(e);
     }

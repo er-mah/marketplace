@@ -1,25 +1,25 @@
-import {UserModel} from "../models/index.js";
+import { UserModel } from "../models/index.js";
 
 export class UserRepository {
   constructor() {
     this.model = UserModel;
   }
 
-  async getUserById(id) {
-    //return this.model.query('SELECT * FROM users WHERE id = ?', [id]);
+  getUserById(id) {
+    return this.model.findOne({ where: { id: id } });
   }
 
-  async getUserByEmail(email) {
+  getUserByEmail(email) {
     try {
-      return await UserModel.findOne({where: {email: email}});
+      return this.model.findOne({ where: { email: email } });
     } catch (e) {
       console.error(e);
     }
   }
 
-  async createUser(first_name, last_name, email, pwdHash) {
+  createUser(first_name, last_name, email, pwdHash) {
     try {
-      return await UserModel.create({
+      return this.model.create({
         first_name,
         last_name,
         email,
@@ -30,22 +30,22 @@ export class UserRepository {
     }
   }
 
-  async updateUserById(id, data) {
-      try {
-          return await UserModel.update(...data, { where: { email: id } });
-      } catch (e) {
-          console.error(e);
-      }
-    //return this.db.query('UPDATE users SET ? WHERE id = ?', [user, id]);
+  async updateUser(id, values) {
+    try {
+      await this.model.update(values, { where: { id: id } });
+      return this.getUserById(id);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  async deleteUser(id) {
+  deleteUser(id) {
     //return this.db.query('DELETE FROM users WHERE id = ?', [id]);
   }
 
-  async getUserByVerificationToken(token) {
+  getUserByVerificationToken(token) {
     try {
-      return await UserModel.findOne({ where: { verification_token: token } });
+      return this.model.findOne({ where: { verification_token: token } });
     } catch (e) {
       console.error(e);
     }
