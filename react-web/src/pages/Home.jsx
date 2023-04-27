@@ -1,57 +1,13 @@
 import React from "react";
-import ReactGA from "react-ga";
-import { hotjar } from "react-hotjar";
-import { Helmet } from "react-helmet";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-/*
-// Todo: adapt this
-// import { graphql, compose } from "react-apollo";
-//import { mobilecheck } from "../../../modules/functions";
-
-import {
-  HomeQuery,
-  LastPublicationsQuery,
-} from "../../../_old/HomeQuery";
-import { GetTextsQuery } from "../../../_old/TextsQueries";
-import CarHomeContainer from "../../../pages/CarHomeContainer";
-import PaymentBanner from "../../../pages/PaymentBanner";
-import CarResult from "../../../pages/CarResult";
-import Banner from "../../../pages/Banner";
-import Card123Seguros from "../../../pages/Card123Seguros";
-import PubsCarousel from "../../../pages/PubsCarousel";
-import Services from "../../../pages/Services";
-import LastPublications from "../../../pages/LastPublications";
-import FriendlyCompanies from "../../../pages/FriendlyCompanies";
-import LoadingComponent from "../../../pages/LoadingComponent";
-
-import photoGaleryParser from "../../../modules/photoGaleryParser";
-
-// import ReactPixel from "react-facebook-pixel";
-
-const fpOptions = {
-  autoConfig: true,
-  debug: false,
-};
-ReactPixel.init("549275042176385", null, fpOptions);
-ReactPixel.pageView();
-
-const script = document.createElement("script");
-script.src = "//code.tidio.co/2adtbpujxsburoaa4sm7umttnp1j1wjr.js";
-script.async = true;
-!mobilecheck() && document.body.appendChild(script);
-*/
 
 const HomePage = ({ data, history, location, lastPubs, Texts }) => {
   return (
     <>
       <div>
-        <Helmet>
-          <meta charSet="utf-8" />
-          <title>Bienvenido a TechMo Marketplace</title>
-        </Helmet>
 
         {/* HEADER */}
         <Header history={history} location={location} />
@@ -108,56 +64,6 @@ const HomePage = ({ data, history, location, lastPubs, Texts }) => {
           </div>
         </section>
 
-        {/*
-        <Banner history={history} />
-
-
-
-        <Services history={history} location={location} />
-        <PaymentBanner />
-        {data.HighlightedPublications ? (
-          <div>
-            <div className="car-home">
-              <CarHomeContainer>
-                {data.HighlightedPublications.map((row) => (
-                  <CarResult
-                    photoGalery={photoGaleryParser(row.ImageGroup)}
-                    data={row}
-                    history={history}
-                  />
-                ))}
-              </CarHomeContainer>
-            </div>
-            <div className="car-home-responsive">
-              <CarHomeContainer mobile>
-                <PubsCarousel pubs={data.HighlightedPublications} />
-              </CarHomeContainer>
-            </div>
-          </div>
-        ) : (
-          <p>There are no highlighted publications</p>
-        )}
-        <PaymentBanner />
-        <LastPublications>
-          {
-            !lastPubs.loading ?
-            lastPubs.LastPublications.map(row => (
-              <CarResult
-                photoGalery={photoGaleryParser(row.ImageGroup)}
-                data={row}
-              />
-            ))
-            :
-            []
-          }
-        </LastPublications>
-        {/* <FriendlyCompanies>
-          <a href="http://www.mendoza.gov.ar/prevencionvial/"><img src="/assets/images/EA1.jpg" alt="prevencion" /></a>
-          <a href="http://www.pueblobenegas.com/"><img src="/assets/images/EA2.jpg" alt="benegas" /></a>
-          <a href="http://miautohoy.com/microsite?concesionaria=LM%20Automotores&c_id=26"><img src="/assets/images/EA3.jpg" alt="lm-automotores" /></a>
-          <a href="http://www.mktinversiones.com.ar/"><img src="/assets/images/EA4.jpg" alt="mkt" /></a>
-        </FriendlyCompanies>
-        */}
 
         <section>
           <div className="items-center px-8 py-12 mx-auto max-w-7xl lg:px-16 md:px-12 lg:py-24">
@@ -245,30 +151,6 @@ const HomePage = ({ data, history, location, lastPubs, Texts }) => {
       </div>
     </>
   );
-};
-/*
-const options = {
-  variables: {
-    limit: 12,
-    stateName: "Activas",
-  },
-};
-const withTextsQuery = graphql(GetTextsQuery, {
-  options: { variables: { route: "home" } },
-  name: "Texts",
-});
-const withHomeQuery = graphql(HomeQuery, { options });
-const withLastPublicationsQuery = graphql(LastPublicationsQuery, {
-  name: "lastPubs",
-});
-const Data = compose(
-  withLastPublicationsQuery,
-  withHomeQuery,
-  withTextsQuery
-);
-
-
-
- */
+}
 
 export default HomePage;
