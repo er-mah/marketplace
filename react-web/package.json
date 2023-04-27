@@ -6,8 +6,6 @@
     "@apollo/client": "^3.7.10",
     "@headlessui/react": "^1.7.13",
     "@heroicons/react": "^2.0.17",
-    "@reduxjs/toolkit": "^1.9.3",
-    "availity-reactstrap-validation": "^2.0.2",
     "body-parser": "^1.20.2",
     "dotenv": "^16.0.3",
     "dotenv-webpack": "^8.0.1",
@@ -24,9 +22,11 @@
     "nodemon": "^2.0.22",
     "postcss": "^8.4.21",
     "query-string": "^5.0.1",
-    "react": "^16.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
     "react-scripts": "^5.0.1",
+    "react-toastify": "^9.1.2",
     "tailwindcss": "^3.2.7",
     "typescript": "^5.0.4",
     "yup": "^1.1.0"
@@ -42,10 +42,11 @@
     "build-storybook": "build-storybook -s public"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^3.2.18",
-    "@storybook/addon-links": "^3.2.18",
-    "@storybook/react": "^3.2.18",
-    "uglify-js-brunch": "^2.10.0"
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-syntax-flow": "^7.14.5",
+    "@babel/plugin-transform-react-jsx": "^7.14.9",
+    "uglify-js-brunch": "^2.10.0",
+    "webpack": "^5.81.0"
   },
   "eslintConfig": {
     "extends": [
