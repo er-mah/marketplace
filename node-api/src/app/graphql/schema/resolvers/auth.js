@@ -1,11 +1,9 @@
 import { GraphQLError } from "graphql";
 
-import { UserModel } from "../../../models/index.js";
 import { jwtUtils, passwordsUtils } from "../../../../utils/index.js";
 import { EmailService } from "../../../services/email.js";
 import { emailVerificationUtils } from "../../../../utils/emailVerification.js";
 import { UserRepository } from "../../../repositories/index.js";
-import { extensions } from "sequelize/lib/utils/validator-extras";
 
 const MARKETPLACE_MAIN_URL = process.env.MARKETPLACE_MAIN_URL;
 
@@ -43,10 +41,10 @@ export const auth = {
             token: await jwtUtils.issueJWT(userFromEmail),
           };
         } else {
-          return Promise.reject(new GraphQLError("Wrong credentials."));
+          return new GraphQLError("Wrong credentials.");
         }
       } catch (e) {
-        return Promise.reject(new GraphQLError(e));
+        return new GraphQLError(e);
       }
     },
 
@@ -58,8 +56,8 @@ export const auth = {
         // Check if the user does not already exist
         await userRepository.getUserByEmail(email).then((user) => {
           if (user) {
-            return Promise.reject(
-              new GraphQLError("This email address is already registered.")
+            return new GraphQLError(
+              "This email address is already registered."
             );
           }
         });
@@ -99,9 +97,9 @@ export const auth = {
             console.log("(Continuing...) Error sending email: ", reason)
           );
 
-        return Promise.resolve(newUser.dataValues);
+        return newUser.dataValues;
       } catch (e) {
-        return Promise.reject(new GraphQLError(e.message));
+        return new GraphQLError(e.message);
       }
     },
 
@@ -197,20 +195,5 @@ export const auth = {
 
       return "Email sent";
     },
-
-    verifiedUserAddsRemainingData: (
-      _,
-      {
-        input: {
-          address,
-          phone,
-          profile_image,
-          dni,
-          is_agency_representative,
-          agency_id,
-          locality_id,
-        },
-      }
-    ) => {},
   },
 };

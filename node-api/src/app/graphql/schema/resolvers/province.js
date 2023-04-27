@@ -3,7 +3,7 @@ import { GraphQLError } from "graphql";
 
 export const province = {
   Query: {
-    getDepartmentsByProvinceId: async (_parent, { id }, {user}) => {
+    getDepartmentsByProvinceId: async (_parent, { id }, { user }) => {
       if (user) {
         try {
           // TODO REFACTOR TO REPOSITORY
@@ -12,39 +12,31 @@ export const province = {
             include: [{ model: DepartmentModel }],
           });
           if (!province) {
-            return Promise.reject(
-                new GraphQLError(
-                    "There are no departments with the provinceId " + id
-                )
+            return new GraphQLError(
+              "There are no departments with the provinceId " + id
             );
           }
           return province.Departments.map((department) => department.toJSON());
         } catch (error) {
-          return Promise.reject(new GraphQLError(error));
+          return new GraphQLError(error);
         }
       } else {
-
         // TODO REFACTOR TO UNIQUE OBJECT THAT HANDLES THE SAME ERROR
-        return Promise.reject(
-            new GraphQLError(
-                "You must be authenticated to access this resource.",
-                { extensions: { code: "AUTENTICATION_ERROR" } }
-            )
+        return new GraphQLError(
+          "You must be authenticated to access this resource.",
+          { extensions: { code: "AUTENTICATION_ERROR" } }
         );
       }
-
     },
     getAllProvinces: async () => {
       try {
         const provinces = await ProvinceModel.findAll();
         if (!provinces) {
-          return Promise.reject(
-            new GraphQLError("There are no registered provinces.")
-          );
+          return new GraphQLError("There are no registered provinces.");
         }
         return provinces.map((province) => province.toJSON());
       } catch (error) {
-        return Promise.reject(new GraphQLError(error));
+        return new GraphQLError(error);
       }
     },
   },

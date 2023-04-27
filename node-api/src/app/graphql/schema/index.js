@@ -22,7 +22,8 @@ const resolvers = {
     //...messagesResolvers.Mutation,
     ...auth.Mutation,
     ...publication.Mutation,
-
+    ...user.Mutation,
+    ...agency.Mutation
   },
 };
 

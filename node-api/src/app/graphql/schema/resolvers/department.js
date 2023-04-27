@@ -10,15 +10,13 @@ export const department = {
           include: [{ model: LocalityModel }],
         });
         if (!department) {
-          return Promise.reject(
-            new GraphQLError(
-              "There are no localities with the departmentId " + id
-            )
+          return new GraphQLError(
+            "There are no localities with the departmentId " + id
           );
         }
         return department.Localities.map((locality) => locality.toJSON());
       } catch (error) {
-        return Promise.reject(new GraphQLError(error));
+        return new GraphQLError(error);
       }
     },
   },

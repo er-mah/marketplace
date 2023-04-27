@@ -15,14 +15,14 @@ export const publication = {
       try {
         return await InfoAutoService.searchModel(query, page, pageSize);
       } catch (error) {
-        return Promise.reject(new GraphQLError(error));
+        return new GraphQLError(error);
       }
     },
     getVehicleModelFeatures: async (_parent, { modelId }, context) => {
       try {
         return await InfoAutoService.getModelFeatures(modelId);
       } catch (error) {
-        return Promise.reject(new GraphQLError(error));
+        return new GraphQLError(error);
       }
     },
   },
@@ -30,11 +30,9 @@ export const publication = {
     createPublication: async (_parent, { input }, { user }) => {
       // Check if user is authenticated
       if (!user) {
-        return Promise.reject(
-          new GraphQLError(
-            "You must be authenticated to access this resource.",
-            { extensions: { code: "AUTENTICATION_ERROR" } }
-          )
+        return new GraphQLError(
+          "You must be authenticated to access this resource.",
+          { extensions: { code: "AUTENTICATION_ERROR" } }
         );
       }
 
@@ -72,11 +70,9 @@ export const publication = {
     addInfoToPublicationBySlug: async (_parent, { slug, input }, { user }) => {
       // Check if user is authenticated
       if (!user) {
-        return Promise.reject(
-          new GraphQLError(
-            "You must be authenticated to access this resource.",
-            { extensions: { code: "AUTENTICATION_ERROR" } }
-          )
+        return new GraphQLError(
+          "You must be authenticated to access this resource.",
+          { extensions: { code: "AUTENTICATION_ERROR" } }
         );
       }
 
@@ -85,20 +81,17 @@ export const publication = {
         const publication = await publicationRepo.getPublicationBySlug(slug);
 
         if (!publication) {
-          return Promise.reject(
-            new GraphQLError("There is no publication with that slug.")
-          );
+          return;
+          new GraphQLError("There is no publication with that slug.");
         }
 
         // Check if user is an admin. If not, check if the user is the owner of the publication
         if (!user.is_admin) {
           if (publication.user_id !== user.id) {
             // If the user is not an admin or an owner --> return an error response
-            return Promise.reject(
-              new GraphQLError(
-                "You are not authorized to access this resource.",
-                { extensions: { code: "RESTRICTED" } }
-              )
+            return new GraphQLError(
+              "You are not authorized to access this resource.",
+              { extensions: { code: "RESTRICTED" } }
             );
           }
         }
@@ -112,11 +105,11 @@ export const publication = {
 
           // Get updated publication
           const updatedPublication =
-            await PublicationService.getPublicationBySlug(slug);
+            await publicationRepo.getPublicationBySlug(slug);
 
           // Show user data and changes
           updatedPublication.changes =
-            await PublicationChangeService.getAllChangesByPublicationId(
+            await publicationChangeRepo.getAllChangesByPublicationId(
               updatedPublication.id
             );
           updatedPublication.owner = user;
@@ -124,11 +117,11 @@ export const publication = {
           return updatedPublication;
         } catch (e) {
           console.log(e);
-          return Promise.reject(new GraphQLError("ERROR: " + e));
+          return new GraphQLError("ERROR: " + e);
         }
       } catch (e) {
         console.log(e);
-        return Promise.reject(new GraphQLError("ERROR: " + e));
+        return new GraphQLError("ERROR: " + e);
       }
     },
   },

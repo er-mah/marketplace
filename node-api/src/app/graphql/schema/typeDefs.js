@@ -3,12 +3,13 @@ export const types = `#graphql
 "'Agency' type represents the agency that has vehicle publications associated"
 type Agency {
   id: ID!
-  created_at: String
-  deleted_at: String
+  createdAt: String
+  deletedAt: String
   name: String
   address: String
   email: String
   phone: String
+  locality_id: ID
   bannerImage: String
   representatives: [User]
 }
@@ -16,8 +17,8 @@ type Agency {
 "'ConversationMessage' represents a message emitted by a user"
 type ConversationMessage {
   id: ID!
-  created_at: String
-  deleted_at: String
+  createdAt: String
+  deletedAt: String
   read_at: String
   content: String
   user: User!
@@ -28,8 +29,8 @@ type ConversationMessage {
 "'ConversationThread' represents the communication between a seller and a person interested in a vehicle"
 type ConversationThread {
   id: ID!
-  created_at: String
-  deleted_at: String
+  createdAt: String
+  deletedAt: String
   chat_token: String
   messages: [ConversationMessage]!
   participant_1: User!
@@ -89,8 +90,8 @@ enum Fuel {
 "'Publication' type represents a vehicle publication that users can interact with"
 type Publication {
   id: ID!
-  created_at: String
-  deleted_at: String
+  createdAt: String
+  deletedAt: String
   vehicle_year: String
   vehicle_brand: String!
   vehicle_version: String!
@@ -116,8 +117,8 @@ type PublicationChanges {
   id: ID!
   active: Boolean!
   state: PublicationState!
-  created_at: String
-  deleted_at: String
+  createdAt: String
+  deletedAt: String
 }
 
 type PublicationState {
@@ -153,6 +154,7 @@ type User {
   phone: String
   profile_image: String
   dni: String
+  agency_id: ID
   locality_id: ID
   is_admin: Boolean
   is_agency_representative: Boolean
@@ -260,7 +262,8 @@ export const mutations = `#graphql
 type Mutation {
 
   # Agency
-  # "Create an agency"
+  "Create an agency"
+  createAgency(input: NewAgencyInput): Agency!
 
   # "Update agency information"
 
@@ -301,7 +304,7 @@ type Mutation {
   login(input: LoginInput!): AuthResponse!
   
   "User adds aditional required data"
-  verifiedUserAddsRemainingData(input: AdditionalUserDataInput!): BasicUser!
+  completePersonalInformation(input: AdditionalUserDataInput!): User!
 }
 
 
@@ -318,21 +321,28 @@ input LoginInput {
 }
 
 input AdditionalUserDataInput {
-  address: String
-  phone: String
-  profile_image: String
-  dni: String
-  is_agency_representative: Boolean
+  address: String!
+  phone: String!
+  dni: String!
+  is_agency_representative: Boolean!
   agency_id: ID
-  locality_id: ID
+  locality_id: String!
 }
 
 
 input NewPublicationInput {
   vehicle_brand: String!
-  vehicle_group: String
-  vehicle_version: String
-  vehicle_codia_id: ID
+  vehicle_group: String!
+  vehicle_version: String!
+  vehicle_codia_id: ID!
+}
+
+input NewAgencyInput {
+  name: String!
+  address: String!
+  email: String!
+  phone: String!
+  locality_id: ID!
 }
 
 input AdditionalPublicationInfoInput {
