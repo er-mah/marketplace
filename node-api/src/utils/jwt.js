@@ -6,17 +6,19 @@ export const jwtUtils = {
     // Define JWT payload
     const payload = {
       sub: user.id,
-      iat: Date.now(),
+      iat: Math.floor(Date.now() / 1000),
     };
 
     // Get signed token
-    return await jsonwebtoken.sign(payload, jwtOpts.secretOrKey, {
+    return jsonwebtoken.sign(payload, jwtOpts.secretOrKey, {
       expiresIn: jwtOpts.expiresIn,
     });
   },
   isTokenExpired: (token) => {
-    return Date.now() >=
+    return (
+      Date.now() >=
       JSON.parse(Buffer.from(token.split(".")[1], "base64").toString()).exp *
         1000
+    );
   },
 };

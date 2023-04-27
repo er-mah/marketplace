@@ -8,7 +8,7 @@ export const emailVerificationUtils = {
     const payload = {
       sub: user.id,
       email: user.email,
-      iat: Date.now(),
+      iat: Math.floor(Date.now() / 1000),
     };
 
     // Get signed token
