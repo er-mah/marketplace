@@ -313,6 +313,7 @@ input RegisterInput {
   last_name: String!
   email: String!
   password: String!
+  repeat_password: String!
 }
 
 input LoginInput {

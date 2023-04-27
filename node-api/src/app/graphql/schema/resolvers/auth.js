@@ -4,6 +4,8 @@ import { jwtUtils, passwordsUtils } from "../../../../utils/index.js";
 import { EmailService } from "../../../services/email.js";
 import { emailVerificationUtils } from "../../../../utils/emailVerification.js";
 import { UserRepository } from "../../../repositories/index.js";
+import { AuthValidations } from "../../validations/index.js";
+import { extensions } from "sequelize/lib/utils/validator-extras";
 
 const MARKETPLACE_MAIN_URL = process.env.MARKETPLACE_MAIN_URL;
 
@@ -50,17 +52,39 @@ export const auth = {
 
     register: async (
       _,
-      { input: { first_name, last_name, email, password } }
+      { input: { first_name, last_name, email, password, repeat_password } }
     ) => {
       try {
+        const validationSchema = AuthValidations.registerSchema();
+
+        try {
+          const validatedInput = await validationSchema.validateAsync({
+            first_name,
+            last_name,
+            email,
+            password,
+            repeat_password,
+          }, {
+            context: { formName: "RegisterForm" } // Puedes cambiar "Nombre del formulario" por el nombre que desees
+          });
+        } catch (error) {
+
+          const errors = {};
+          error.details.forEach((detail) => {
+            errors[detail.context.key] = {
+              message: detail.message,
+            };
+          });
+          return new GraphQLError("Validation error on input form.", {
+            extensions: { code: "VALIDATION_ERROR", details: errors },
+          });
+        }
+
         // Check if the user does not already exist
-        await userRepository.getUserByEmail(email).then((user) => {
-          if (user) {
-            return new GraphQLError(
-              "This email address is already registered."
-            );
-          }
-        });
+        const user = await userRepository.getUserByEmail(email);
+        if (user) {
+          return new GraphQLError("This email address is already registered.");
+        }
 
         // Hash the plain text password
         const pwdHash = await passwordsUtils.getHashedPassword(password);
@@ -99,6 +123,7 @@ export const auth = {
 
         return newUser.dataValues;
       } catch (e) {
+        console.error(e);
         return new GraphQLError(e.message);
       }
     },
