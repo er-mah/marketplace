@@ -28,6 +28,10 @@ export const AgencyModel = db.define(
       allowNull: false,
     },
     banner_image: DataTypes.STRING,
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
   {
     timestamps: true,
