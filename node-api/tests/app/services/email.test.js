@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { EmailService } from "../../../src/app/services/email.js";
+import { EmailService } from "../../../src/app/services/index.js";
 import { dynamicEmailHtmlUtils } from "../../../src/utils/dynamicEmailTemplates.js";
 
 import HtmlValidator from "html-validator"

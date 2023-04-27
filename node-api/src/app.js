@@ -8,6 +8,7 @@ import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import fileUpload from "express-fileupload";
 
 import { config } from "dotenv";
 import {
@@ -84,6 +85,8 @@ async function start() {
     app.use(cors());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+
+    app.use(fileUpload({debug: true}))
 
     app.use(corsMdw);
     app.use(logErrorsMdw);

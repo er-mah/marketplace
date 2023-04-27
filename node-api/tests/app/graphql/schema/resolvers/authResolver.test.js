@@ -5,7 +5,7 @@ import {
 } from "../../../../../src/app/graphql/schema/index.js";
 import { emailVerificationUtils } from "../../../../../src/utils/emailVerification.js";
 import { UserRepository } from "../../../../../src/app/repositories/index.js";
-import { EmailService } from "../../../../../src/app/services/email.js";
+import { EmailService } from "../../../../../src/app/services/index.js";
 import { UserModel } from "../../../../../src/app/models/index.js";
 
 const userRepository = new UserRepository();
