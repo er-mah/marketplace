@@ -4,11 +4,14 @@ import { Strategy as JwtStrategy } from "passport-jwt";
 import { config } from "dotenv";
 
 import { UserModel } from "../app/models/index.js";
+import { UserRepository } from "../app/repositories/index.js";
 
 config();
 
 const secretKeyForJwt = process.env.SECRET_KEY_FOR_JWT;
 const secretKeyForEmail = process.env.SECRET_KEY_FOR_EMAIL;
+
+const userRepo = new UserRepository();
 
 export const options = {
   // ExtractJwt function - Helps extract token from HTTP Authentication header
@@ -20,21 +23,19 @@ export const options = {
   emailExpiresIn: "2h",
 };
 
-const verifyValidUser = (jwtPayload, done) => {
+const verifyValidUser = async (jwtPayload, done) => {
   // After the token is verified with `jsonwebtoken` library, we check if we found a valid user in the database
   // `sub` is the user id from the database. JWT payload also has iat and exp
-  UserModel.findOne({ where: { id: jwtPayload.sub } })
-    .then((user) => {
-      // Grab the user for passport to attach it to request.user
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    })
-    .catch((err) => {
-      return done(err, null);
-    });
+  try {
+    const user = await userRepo.getUserById(jwtPayload.sub);
+    if (user) {
+      return done(null, user);
+    } else {
+      return done(null, false);
+    }
+  } catch (err) {
+    return done(err, false);
+  }
 };
 
 const jwtStrategy = new JwtStrategy(options, verifyValidUser);

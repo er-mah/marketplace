@@ -1,14 +1,17 @@
 import express from "express";
 
 import { publicationRouter } from "./publication.js";
+import { userRouter } from "./user.js";
+import { agencyRouter } from "./agency.js";
 
 export const router = express.Router();
 
 router.get("/", (req, res) => {
   res.send("TechMo Marketplace API");
 });
-router.use(publicationRouter)
-
+router.use(publicationRouter);
+router.use(agencyRouter);
+router.use(userRouter);
 
 /*
 

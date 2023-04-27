@@ -1,58 +1,73 @@
 import { errorResponse, successResponse } from "../../utils/index.js";
-import { UserRepository} from "../repositories/index.js";
+import { UserRepository } from "../repositories/index.js";
+import { FileService } from "../services/index.js";
 
-export class PublicationController {
+export class UserController {
   constructor() {
     this.repository = new UserRepository();
   }
   async addProfilePictureToBucket(req, res) {
+    try {
+      const fileService = new FileService();
 
-    const user = req.user;
-
-    if (req.files) {
-      // Upload was successful
-      let locations = [];
-
-      // Store file locations in array
-      req.files.forEach((file) => {
-        locations.push(file.location);
-      });
-
-      // Store urls in database
-      try {
-        const publication = await this.repository.getPublicationBySlug(slug)
-
-        // Check if publication exists
-        if (!publication) {
-          return res
-            .status(500)
-            .send(errorResponse("Error finding post with slug:" + slug));
-        }
-
-        // Update publication photos_urls field with uploaded file locations
-        publication.photos_urls = locations;
-        await publication.save();
-
-      } catch (error) {
-        // Error finding or saving publication to database
+      if (!req.user) {
         return res
-          .status(500)
-          .send(errorResponse(`Error finding post with slug ${slug}:`));
+          .status(403)
+          .send(errorResponse("You must be authenticated."));
       }
 
-      // Send success response with uploaded file locations
-      return res.send(
-        successResponse(
-          "Successfully uploaded " + req.files.length + " files!",
-          { photosUrl: locations }
-        )
+      const user = req.user;
+
+      if (!req.files.profile) {
+        return res
+          .status(403)
+          .send(errorResponse(`You have not provided any files.`));
+      }
+
+      if (
+        req.files.profile.mimetype !== "image/jpeg" &&
+        req.files.profile.mimetype !== "image/png"
+      ) {
+        return res
+          .status(403)
+          .send(
+            errorResponse(
+              `The profile picture extension must be .jpeg or .png.`
+            )
+          );
+      }
+      // Redifine file
+      req.files.profile.buffer = await fileService.cropProfilePicture(
+        req.files.profile.data
       );
-    } else {
+
+      const url = await fileService.uploadProfilePicture(
+        req.files.profile,
+        user
+      );
+
+      if (url === "") {
+        return res
+          .status(500)
+          .send(errorResponse(`Error uploading profile picture`));
+      }
+
+      user.profile_image = url
+      user.save()
+
+      return res
+        .status(200)
+        .send(
+          successResponse(
+            `Picture successfully uploaded.`,
+            { url: url }
+          )
+        );
+    } catch (e) {
+      console.error(e);
       return res
         .status(500)
-        .send(
-          errorResponse("Error uploading files. The file path might be wrong.")
-        );
+        .send(errorResponse(`Error uploading profile picture`, e.message));
     }
   }
 }
