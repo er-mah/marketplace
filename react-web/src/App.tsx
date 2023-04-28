@@ -1,29 +1,32 @@
 import React, { Component } from "react";
-import {
-  BrowserRouter as Router,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
-import "flowbite";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import { Auth, NotFoundPage, HomePage } from "./pages";
+import routes from "./routes.js";
+
+// CSS
 import "./index.css";
+//import "flowbite";
 import "react-toastify/dist/ReactToastify.css";
-import { DashboardPage } from "./pages/Dashboard.tsx";
-import VerifyAccountPage from "./pages/user/VerifyAccount.tsx";
 
 class App extends Component {
   render() {
     return (
       <Router>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path={"/auth/*"} element={<Auth />} />
-          <Route path={"/dashboard"} element={<DashboardPage />} />
-          <Route path="/cuenta/verificar" element={<VerifyAccountPage />} />
-          <Route path="/not-found" element={<NotFoundPage />} />
-          <Route path="*" element={<Navigate to={"/not-found"} />} />
+          {routes.map((route) => (
+            // @ts-ignore
+            <Route key={route.path} path={route.path} element={route.element}>
+              {route.children &&
+                route.children.map((childRoute) => (
+                  <Route
+                    // @ts-ignore
+                    key={childRoute.path}
+                    path={childRoute.path}
+                    element={childRoute.element}
+                  />
+                ))}
+            </Route>
+          ))}
         </Routes>
       </Router>
     );
