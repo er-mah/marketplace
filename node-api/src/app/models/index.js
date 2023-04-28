@@ -9,6 +9,7 @@ import { ConversationThreadModel } from "./conversationThread.js";
 import { AgencyModel } from "./agency.js";
 import { DepartmentModel } from "./department.js";
 import { UserSessionModel } from "./userSession.js";
+import { EmailModel } from "./email.js";
 
 // RELATIONSHIPS
 // They are here to avoid circular references
@@ -19,7 +20,7 @@ AgencyModel.representatives = AgencyModel.hasMany(UserModel, {
 });
 
 AgencyModel.locality = AgencyModel.belongsTo(LocalityModel, {
-    foreignKey: "locality_id",
+  foreignKey: "locality_id",
 });
 
 // A message is emitted by a user
@@ -125,4 +126,5 @@ export {
   LocalityModel,
   DepartmentModel,
   ConversationThreadModel,
+  EmailModel,
 };
