@@ -1,7 +1,5 @@
 import { Sequelize } from "sequelize";
 import { config } from "dotenv";
-import path from "path";
-import * as fs from "fs";
 
 config();
 
@@ -38,6 +36,7 @@ export const db = new Sequelize(
   {
     host: configuration[env].host,
     dialect: "postgres",
+    logging: false,
     define: {
       underscored: true,
     },
