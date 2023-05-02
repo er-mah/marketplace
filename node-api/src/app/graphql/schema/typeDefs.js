@@ -298,7 +298,13 @@ type Mutation {
   verifyAccount(verification_token: String!): BasicUser!
 
   "Resend account verification email"
-  resendVerificationEmail(email: String!): String
+  resendAccountVerificationCode(email: String!): String
+
+  "Send password recovery email"
+  sendPasswordRecoveryEmail(email: String!): String
+
+  "Set new password with recovery token"
+  setNewPassword(recovery_token: String!, password: String!, repeat_password: String!): BasicUser!
   
   "Logs user with correct credentials"
   login(input: LoginInput!): AuthResponse!

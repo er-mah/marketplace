@@ -74,16 +74,37 @@ export class EmailService {
     try {
       const template = dynamicEmailHtmlUtils.generateVerificationEmailHtml();
       const text =
-        dynamicPlainTextEmailUtils.generateVerificationEmailPlainText(data);
+          dynamicPlainTextEmailUtils.generateVerificationEmailPlainText(data);
       data.text = text;
       const html = template(data);
 
       return await this.sendEmail(
-        to,
-        "ACCOUNT_VERIFICATION",
-        "Verifica tu cuenta",
-        text,
-        html
+          to,
+          "ACCOUNT_VERIFICATION",
+          "Verifica tu cuenta",
+          text,
+          html
+      );
+    } catch (e) {
+      console.error(e);
+      return Promise.reject(new Error(e.message));
+    }
+  }
+
+  async sendAccountRecoveryEmail(to, data) {
+    try {
+      const template = dynamicEmailHtmlUtils.generateAccountRecoveryEmailHtml();
+      const text =
+          dynamicPlainTextEmailUtils.generatedAccountRecoveryEmail(data);
+      data.text = text;
+      const html = template(data);
+
+      return await this.sendEmail(
+          to,
+          "PASSWORD_RESET",
+          "Recupera tu contraseña",
+          text,
+          html
       );
     } catch (e) {
       console.error(e);

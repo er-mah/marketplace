@@ -1,9 +1,6 @@
-import { AgencyModel, UserModel } from "../../../models/index.js";
-import { GraphQLError } from "graphql";
-import {
-  AgencyRepository,
-  LocalityRepository,
-} from "../../../repositories/index.js";
+import {AgencyModel, UserModel} from "../../../models/index.js";
+import {GraphQLError} from "graphql";
+import {AgencyRepository, LocalityRepository,} from "../../../repositories/index.js";
 import {format} from "date-fns";
 
 const localityRepo = new LocalityRepository();
@@ -79,15 +76,13 @@ export const agency = {
           });
         }
 
-        const newAgency = await agencyRepo.createAgency(
+        return await agencyRepo.createAgency(
             name,
             address,
             email,
             phone,
             locality_id
-        );
-        console.log(newAgency)
-        return newAgency
+        )
       } catch (e) {
         console.error(e);
         return new GraphQLError("Could not store information.", {
