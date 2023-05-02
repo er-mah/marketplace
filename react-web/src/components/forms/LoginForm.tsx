@@ -6,13 +6,17 @@ import React, { useState } from "react";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
-import {toast, ToastContainer} from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { AuthCacheManager } from "../../apollo/authCacheManager.ts";
 import { LOGIN_MUTATION } from "../../graphql/auth";
+import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../graphql/user/resendVerificationCodeMutation.ts";
 
 interface LoginFormValues {
   email: string;
   password: string;
+}
+interface VerificationCodeServerResponse {
+  resendVerificationCode: string;
 }
 
 interface ServerResponse {
@@ -21,6 +25,8 @@ interface ServerResponse {
     token: string;
   };
 }
+
+
 
 export default function LoginForm() {
   // This cacheManager is used to manage the logged user token
@@ -40,8 +46,16 @@ export default function LoginForm() {
   // This variable is used to toggle the visibility of the password input field between plain text and obscured characters.
   const [showPassword, setShowPassword] = useState(false);
 
+  const [showResend, setShowResend] = useState(false);
+
+  const [storedEmail, setStoredEmail] = useState("");
+
   // This code initializes a mutation function signIn using the useMutation hook provided by the Apollo Client
   const [signIn] = useMutation(LOGIN_MUTATION);
+
+  const [resendVerificationCode] = useMutation(
+    RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION
+  );
 
   // Show/hide password in plain text
   const toggleShowPassword = () => {
@@ -69,12 +83,12 @@ export default function LoginForm() {
         // Store token in cache
         cacheManager.storeToken(tokenFromApi);
 
-        //Me quiero traer el usuario para despues guardarlo en la cache para despues verlo en el dashboard
+        // Store the user in Apollo client cache
         cacheManager.fetchAndStoreUser();
 
         navigate("/dashboard");
       })
-      .catch((error) => {
+      .catch(async (error) => {
         switch (error.message) {
           case "Failed to fetch": {
             toast.error("Error con la conexión al servidor", {
@@ -102,8 +116,22 @@ export default function LoginForm() {
             setFormErrorsFromApi(newErrors);
             break;
           }
+          case "Please check your inbox for a verification code.": {
+            setShowResend(true);
+            await setStoredEmail(values.email);
+            toast.info(error.graphQLErrors[0].extensions.details.message, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            break;
+          }
           default: {
-            console.log(JSON.stringify(error))
             toast.error(error.message, {
               position: "top-right",
               autoClose: 5000,
@@ -120,6 +148,44 @@ export default function LoginForm() {
       });
   }
 
+  function handleResendButton() {
+    resendVerificationCode({
+      variables: {
+        email: storedEmail,
+      },
+    })
+      .then((_result: FetchResult<VerificationCodeServerResponse>) => {
+        toast.success(
+          "Enviamos a tu bandeja de correo el codigo de verificación",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
+      })
+      .catch((_error) => {
+        toast.success(
+          "Enviamos a tu bandeja de correo el codigo de verificación",
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
+      });
+  }
+
   return (
     <div className="my-5">
       <ToastContainer />
@@ -131,15 +197,21 @@ export default function LoginForm() {
         {({ errors, touched }) => (
           <Form className="space-y-5">
             <div>
-              <label className="font-medium">Correo electrónico</label>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Correo electrónico
+              </label>
               <Field
+                id="email"
                 name="email"
                 type="email"
-                className={`w-full mt-2 px-3 py-2 ${
+                className={`mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm ${
                   (errors.email && touched.email) || formErrorsFromApi.email
                     ? "bg-transparent outline-none border bg-red-50 border-red-500 text-red-900 placeholder-red-700 text-sm focus:ring-red-500 focus:border-red-500 p-2.5 dark:bg-red-100 dark:border-red-400"
                     : "text-gray-500 bg-transparent outline-none border focus:border-indigo-600 "
-                } shadow-sm rounded-lg`}
+                }`}
               />
 
               {(errors.email && touched.email) || formErrorsFromApi.email ? (
@@ -151,24 +223,57 @@ export default function LoginForm() {
                   </span>
                 </p>
               ) : null}
+
+              {showResend ? (
+                <div className="bg-white text-center lg:px-4 mt-4">
+                  <div
+                    className="p-2 bg-yellow-800 items-center text-yellow-100 leading-none lg:rounded-full flex lg:inline-flex cursor-pointer"
+                    role="alert"
+                    onClick={() => handleResendButton()}
+                  >
+                    <span className="flex rounded-full bg-yellow-500 uppercase px-2 py-1 text-xs font-bold mr-3">
+                      ?
+                    </span>
+                    <span className="font-semibold mr-2 text-left text-sm flex-auto">
+                      Reenviar codigo de verificación
+                    </span>
+                    <svg
+                      className="fill-current opacity-75 h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M12.95 10.707l.707-.707L8 4.343 6.586 5.757 10.828 10l-4.242 4.243L8 15.657l4.95-4.95z" />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             <div>
-              <label className="font-medium">Contraseña</label>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Contraseña
+              </label>
+
               <div className={"relative"}>
                 <Field
+                  id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  className={`w-full mt-2 px-3 py-2 ${
+                  className={`mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm ${
                     (errors.password && touched.password) ||
                     formErrorsFromApi.password
                       ? "bg-transparent outline-none border bg-red-50 border-red-500 text-red-900 placeholder-red-700 text-sm focus:ring-red-500 focus:border-red-500 p-2.5 dark:bg-red-100 dark:border-red-400"
                       : "text-gray-500 bg-transparent outline-none border focus:border-indigo-600 "
-                  } shadow-sm rounded-lg`}
+                  }`}
                 />
                 <span
                   onClick={toggleShowPassword}
-                  className="absolute top-7 right-3  cursor-pointer transform -translate-y-1/2 focus:outline-none"
+                  className="absolute top-6 right-3 cursor-pointer transform -translate-y-1/2 focus:outline-none"
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="h-5 w-5 text-gray-400" />
@@ -186,7 +291,7 @@ export default function LoginForm() {
 
             <Field
               type="submit"
-              className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150"
+              className="w-full px-4 py-2 text-white font-medium bg-green-600 hover:bg-green-500 active:bg-indigo-600 rounded-lg duration-150 cursor-pointer"
               name="loginButton"
               value="Iniciá sesión"
             />
