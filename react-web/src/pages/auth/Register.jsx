@@ -1,25 +1,26 @@
 import RegisterForm from "../../components/forms/RegisterForm";
+import {fullPaths} from "../../utils/routesConstants";
 
 const RegisterPage = () => {
   return (
     <>
-      <section className="bg-white">
+      <section className="bg-white select-none" >
         <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
           <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
             <img
               alt="Night"
               //
               src="https://i-static.techmo.global/uploads/institutional/registro3.png"
-              className="absolute inset-0 h-full w-full object-cover opacity-80"
+              className="absolute inset-0 h-full w-full object-cover opacity-80 pointer-events-none"
             />
 
             <div className="hidden lg:relative lg:block lg:p-12 bg-gradient-to-t from-gray-900 to-transparent w-full">
-              <a className="block text-white" href="/">
+              <a className="block text-white" href={fullPaths.home}>
                 <span className="sr-only">Home</span>
 
                 <img
                   src="https://i-static.techmo.global/uploads/techmo-small2.svg"
-                  className="h-8 sm:h-10"
+                  className="h-8 sm:h-10 pointer-events-none"
                   alt="TechMo logo"
                 />
               </a>
@@ -43,7 +44,7 @@ const RegisterPage = () => {
               <div className="relative -mt-16 block lg:hidden">
                 <a
                   className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white text-blue-600 sm:h-20 sm:w-20"
-                  href="/"
+                  href={fullPaths.home}
                 >
                   <span className="sr-only">Home</span>
                   <img

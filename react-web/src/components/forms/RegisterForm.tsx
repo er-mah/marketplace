@@ -6,6 +6,8 @@ import { REGISTER_MUTATION } from "../../graphql/auth";
 import { toast, ToastContainer } from "react-toastify";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
+import {fullPaths} from "../../utils/routesConstants.js"
+
 interface RegisterFormValues {
   first_name: string;
   last_name: string;
@@ -141,7 +143,7 @@ export default function RegisterForm() {
 
 
   return (
-    <div className={"w-full"}>
+    <div className={"w-full "}>
       <ToastContainer />
       <Formik
         initialValues={{
@@ -345,7 +347,7 @@ export default function RegisterForm() {
 
               <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                 ¿Ya tenés una cuenta?{" "}
-                <a href="/auth/login" className="text-gray-700 underline">
+                <a href={fullPaths.login} className="text-gray-700 underline">
                   Iniciar sesión
                 </a>
                 .
