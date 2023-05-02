@@ -32,7 +32,31 @@ export const RegisterSchema = Yup.object().shape({
       new RegExp(
         `(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,30}`
       ),
-      "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial"
+      "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, #, ? y &)"
+    )
+    .required("La contraseña es obligatoria")
+    .label("password"),
+  repeat_password: Yup.string().oneOf(
+    [Yup.ref("password"), undefined],
+    "Las contraseñas deben coincidir"
+  ),
+});
+
+export const RecoverPasswordSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Este no es el formato de un email valido")
+    .required("Este campo es requerido"),
+});
+
+export const SetNewPasswordSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "La contraseña debe tener al menos 8 caracteres")
+    .max(30, "La contraseña no puede tener más de 30 caracteres")
+    .matches(
+      new RegExp(
+        `(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,30}`
+      ),
+      "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un carácter especial (@, $, !, %, *, #, ? y &)"
     )
     .required("La contraseña es obligatoria")
     .label("password"),
