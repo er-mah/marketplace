@@ -10,6 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { AuthCacheManager } from "../../apollo/authCacheManager.ts";
 import { LOGIN_MUTATION } from "../../graphql/auth";
 import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../graphql/user/resendVerificationCodeMutation.ts";
+import { fullPaths } from "../../utils/routesConstants.js";
 
 interface LoginFormValues {
   email: string;
@@ -21,12 +22,10 @@ interface VerificationCodeServerResponse {
 
 interface ServerResponse {
   login: {
-    id: string;
     token: string;
+    pending_steps: string;
   };
 }
-
-
 
 export default function LoginForm() {
   // This cacheManager is used to manage the logged user token
@@ -77,16 +76,20 @@ export default function LoginForm() {
         },
       },
     })
-      .then((result: FetchResult<ServerResponse>) => {
-        const tokenFromApi = result.data?.login.token;
+      .then(async (result: FetchResult<ServerResponse>) => {
+        const response = result.data?.login;
 
         // Store token in cache
-        cacheManager.storeToken(tokenFromApi);
+        await cacheManager.storeToken(response?.token);
 
         // Store the user in Apollo client cache
-        cacheManager.fetchAndStoreUser();
+        await cacheManager.fetchAndStoreUser();
 
-        navigate("/dashboard");
+        if (response?.pending_steps === "provideAdditionalData") {
+          navigate(fullPaths.userAdditionalInfo);
+        } else if (response?.pending_steps === "no additional steps") {
+          navigate(fullPaths.dashboard);
+        }
       })
       .catch(async (error) => {
         switch (error.message) {
