@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { AuthCacheManager } from "../apollo/authCacheManager.ts";
 
+
+const authCacheManager = new AuthCacheManager();
+
 export const DashboardPage = () => {
   const [token, setToken] = useState("");
   const [user, setUser] = useState("");
 
-  const authCacheManager = new AuthCacheManager();
 
   useEffect(() => {
     authCacheManager.getToken().then((r) => {

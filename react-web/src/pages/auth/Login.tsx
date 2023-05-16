@@ -1,6 +1,7 @@
 import React from "react";
 import LoginForm from "../../components/forms/LoginForm.tsx";
-import {fullPaths} from "../../utils/routesConstants.js";
+import { fullPaths } from "../../utils/routesConstants.js";
+
 
 export const LoginPage = () => {
   return (
@@ -64,4 +65,3 @@ export const LoginPage = () => {
   );
 };
 
-export default LoginPage;

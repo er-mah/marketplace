@@ -12,7 +12,7 @@ interface VerificationCodeServerResponse {
   resendVerificationCode: string;
 }
 
-const VerifyAccountPage = () => {
+export const VerifyAccountPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -43,6 +43,8 @@ const VerifyAccountPage = () => {
           if (result.data) {
             setCorrectlyVerified(true);
           }
+
+          setLoading(false);
           return;
         })
         .catch(async (e) => {
@@ -53,7 +55,6 @@ const VerifyAccountPage = () => {
             setCorrectlyVerified(true);
 
             setLoading(false);
-            return;
           }
 
           if (e.graphQLErrors[0].message === "jwt expired") {
@@ -179,5 +180,3 @@ const VerifyAccountPage = () => {
     </div>
   );
 };
-
-export default VerifyAccountPage;

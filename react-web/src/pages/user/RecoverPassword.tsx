@@ -35,5 +35,3 @@ export const RecoverPasswordPage = () => {
     </main>
   );
 };
-
-export default RecoverPasswordPage;

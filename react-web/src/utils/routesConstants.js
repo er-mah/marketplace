@@ -5,4 +5,5 @@ export const fullPaths = {
     dashboard: "/dashboard",
     verifyAccount: "/cuenta/verificar",
     recoverPassword: "/cuenta/recuperar",
+    userAdditionalInfo: "/cuenta/agregar-informacion-adicional",
 };

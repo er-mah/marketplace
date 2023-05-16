@@ -1,7 +1,7 @@
 import RegisterForm from "../../components/forms/RegisterForm";
 import {fullPaths} from "../../utils/routesConstants";
 
-const RegisterPage = () => {
+export const RegisterPage = () => {
   return (
     <>
       <section className="bg-white select-none" >
@@ -97,4 +97,3 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;

@@ -1,13 +1,13 @@
-import { Buffer } from "buffer";
+import jwt_decode from "jwt-decode";
 
 export const jwtUtils = {
-  isTokenExpired: (token: string): boolean | void => {
-    if (token) {
-      return (
-        Date.now() >=
-        JSON.parse(Buffer.from(token.split(".")[1], "base64").toString()).exp *
-          1000
-      );
+  getEmailFromToken: async (token: string): Promise<string> => {
+    try {
+      const decodedToken = await jwt_decode(token);
+      return decodedToken.email;
+    } catch (error) {
+      console.error(error);
+      return "";
     }
   },
 };
