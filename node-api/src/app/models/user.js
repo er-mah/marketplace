@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { db } from "../../config/db.js";
-import bcrypt from "bcrypt";
 
 // This model represents a user that uses the system
 export const UserModel = db.define(
@@ -16,9 +15,15 @@ export const UserModel = db.define(
       allowNull: false,
       unique: true,
     },
+    provider: {
+      type: DataTypes.STRING,
+    },
+    firebase_uid: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     first_name: {
       type: DataTypes.STRING,
