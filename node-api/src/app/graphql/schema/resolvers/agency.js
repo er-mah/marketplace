@@ -1,7 +1,10 @@
-import {AgencyModel, UserModel} from "../../../models/index.js";
-import {GraphQLError} from "graphql";
-import {AgencyRepository, LocalityRepository,} from "../../../repositories/index.js";
-import {format} from "date-fns";
+import { AgencyModel, UserModel } from "../../../models/index.js";
+import { GraphQLError } from "graphql";
+import {
+  AgencyRepository,
+  LocalityRepository,
+} from "../../../repositories/index.js";
+import { format } from "date-fns";
 
 const localityRepo = new LocalityRepository();
 const agencyRepo = new AgencyRepository();
@@ -9,11 +12,11 @@ const agencyRepo = new AgencyRepository();
 export const agency = {
   Agency: {
     createdAt: (parent) =>
-        format(new Date(parseInt(parent.createdAt)), "dd/MM/yyyy HH:mm:ss"),
+      format(new Date(parseInt(parent.createdAt)), "dd/MM/yyyy HH:mm:ss"),
     updatedAt: (parent) =>
-        format(new Date(parseInt(parent.updatedAt)), "dd/MM/yyyy HH:mm:ss"),
+      format(new Date(parseInt(parent.updatedAt)), "dd/MM/yyyy HH:mm:ss"),
     deletedAt: (parent) =>
-        format(new Date(parseInt(parent.deletedAt)), "dd/MM/yyyy HH:mm:ss"),
+      format(new Date(parseInt(parent.deletedAt)), "dd/MM/yyyy HH:mm:ss"),
   },
   Query: {
     getAgencyById: async (_parent, { args: { id } }, context) => {
@@ -25,6 +28,13 @@ export const agency = {
           );
         }
         return agency;
+      } catch (error) {
+        return new GraphQLError(`Error looking for agency: ${error.message}`);
+      }
+    },
+    searchAgencies: async (_parent, { query }) => {
+      try {
+        return agencyRepo.searchAgenciesByName(query);
       } catch (error) {
         return new GraphQLError(`Error looking for agency: ${error.message}`);
       }
@@ -56,9 +66,18 @@ export const agency = {
   Mutation: {
     createAgency: async (
       _parent,
-      { input: { name, address, email, phone, locality_id } }
+      { input: { name, address, email, phone, locality_id } },
+      { user }
     ) => {
       try {
+        // Check if user is authenticated
+        if (!user) {
+          return new GraphQLError(
+            "You must be authenticated to access this resource.",
+            { extensions: { code: "AUTENTICATION_ERROR" } }
+          );
+        }
+
         const locality = await localityRepo.getLocalityById(locality_id);
         if (!locality) {
           return new GraphQLError(
@@ -77,12 +96,12 @@ export const agency = {
         }
 
         return await agencyRepo.createAgency(
-            name,
-            address,
-            email,
-            phone,
-            locality_id
-        )
+          name,
+          address,
+          email,
+          phone,
+          locality_id
+        );
       } catch (e) {
         console.error(e);
         return new GraphQLError("Could not store information.", {

@@ -3,15 +3,13 @@ export const types = `#graphql
 "'Agency' type represents the agency that has vehicle publications associated"
 type Agency {
   id: ID!
-  createdAt: String
-  deletedAt: String
   name: String
   address: String
   email: String
   phone: String
   locality_id: ID
   bannerImage: String
-  representatives: [User]
+  representatives: [BasicUser]
 }
 
 "'ConversationMessage' represents a message emitted by a user"
@@ -165,6 +163,11 @@ type User {
   deletedAt: String
 }
 
+type BasicAgency {
+  id: ID!
+  name: String!
+}
+
 
 type BasicUser {
   id: ID!
@@ -175,6 +178,7 @@ type BasicUser {
 
 type AuthResponse {
   token: String!
+  pending_steps: String!
 }
 
 type ModelsSearch {
@@ -221,6 +225,8 @@ type Query {
   getAgencyById(id: ID!): Agency
   "Get all agencies"
   getAllAgencies: [Agency]
+  "Search agencies by name"
+  searchAgencies(query: String!): [BasicAgency]
 
   # Conversation thread
   "Get a conversation thread by its ID"
@@ -290,6 +296,7 @@ type Mutation {
   "Add additional information to publication"
   addInfoToPublicationBySlug(slug: String, input: AdditionalPublicationInfoInput): Publication!
   
+    
   # Authentication 
   "Register new user"
   register(input: RegisterInput!): BasicUser!
@@ -308,6 +315,8 @@ type Mutation {
   
   "Logs user with correct credentials"
   login(input: LoginInput!): AuthResponse!
+
+  loginOrRegisterWithProvider(input: OAuthProviderInput!): AuthResponse!
   
   "User adds aditional required data"
   completePersonalInformation(input: AdditionalUserDataInput!): User!
@@ -326,6 +335,17 @@ input LoginInput {
   email: String!
   password: String!
 }
+
+input OAuthProviderInput {
+    firebase_uid: String!
+    provider: String!
+    first_name: String!
+    last_name: String!
+    photo_url: String!
+    email: String!
+    is_email_verified: Boolean!
+}
+
 
 input AdditionalUserDataInput {
   address: String!

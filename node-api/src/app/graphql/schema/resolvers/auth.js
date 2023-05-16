@@ -45,9 +45,25 @@ export const auth = {
               }
             );
           }
+
+
+          if (
+            userFromEmail.dataValues.is_email_verified &&
+            !userFromEmail.dataValues.has_provided_additional_data
+          ) {
+
+            return {
+              token: await jwtUtils.issueJWT(userFromEmail),
+              pending_steps: "provideAdditionalData",
+            };
+          }
+
           return {
             token: await jwtUtils.issueJWT(userFromEmail),
+            pending_steps: "no additional steps",
           };
+
+
         } else {
           return new GraphQLError("Wrong credentials.");
         }
@@ -120,7 +136,7 @@ export const auth = {
             first_name: newUser.dataValues.first_name,
             last_name: newUser.dataValues.last_name,
           },
-          verificationUrl: `https://${MARKETPLACE_MAIN_URL}${MARKETPLACE_PASSWORD_RECOVERY_ENDPOINT}?c=${newUser.dataValues.verification_token}`,
+          verificationUrl: `https://${MARKETPLACE_MAIN_URL}${MARKETPLACE_EMAIL_VERIFICATION_ENDPOINT}?c=${newUser.dataValues.verification_token}`,
         };
 
         await emailService
@@ -136,6 +152,12 @@ export const auth = {
       }
     },
 
+    loginOrRegisterWithProvider: (_, { input: { email, password } }) => {
+      // Validar token
+      // Si existe el usuario, añadir oauth capabilities
+      return;
+    },
+
     verifyAccount: async (_, { verification_token }) => {
       try {
         const userFromToken = await userRepository.getUserByVerificationToken(
@@ -149,7 +171,9 @@ export const auth = {
         }
 
         // Is the same token?
-        if (userFromToken.dataValues.verification_token !== verification_token) {
+        if (
+          userFromToken.dataValues.verification_token !== verification_token
+        ) {
           return new GraphQLError("Invalid token.", {
             extensions: { code: "INVALID_TOKEN" },
           });
@@ -194,7 +218,7 @@ export const auth = {
           };
 
           await emailService
-            .sendVerificationEmail(userByToken.dataValues.email, emailContext)
+            .sendVerificationEmail(userFromToken.dataValues.email, emailContext)
             .catch((reason) =>
               console.log("(Continuing...) Error sending email: ", reason)
             );
