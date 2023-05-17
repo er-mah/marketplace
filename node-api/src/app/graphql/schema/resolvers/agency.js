@@ -44,8 +44,9 @@ export const agency = {
         const agencies = await AgencyModel.findAll({
           include: [{ model: UserModel }],
         });
+
         if (!agencies || agencies.length === 0) {
-          return new GraphQLError("There are no registered agencies.");
+          return [];
         }
 
         return await Promise.all(
