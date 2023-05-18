@@ -67,7 +67,7 @@ export const agency = {
   Mutation: {
     createAgency: async (
       _parent,
-      { input: { name, address, email, phone, locality_id } },
+      { input: { name, address, email, phone, locality_id, zip_code } },
       { user }
     ) => {
       try {
@@ -77,6 +77,12 @@ export const agency = {
             "You must be authenticated to access this resource.",
             { extensions: { code: "AUTENTICATION_ERROR" } }
           );
+        }
+
+        if (user.is_agency_representative && user.agency_id) {
+          return new GraphQLError("You already are an agency representative.", {
+            extensions: { code: "INPUT_ERROR" },
+          });
         }
 
         const locality = await localityRepo.getLocalityById(locality_id);
@@ -96,16 +102,26 @@ export const agency = {
           });
         }
 
-        return await agencyRepo.createAgency(
+        const newAgency = await agencyRepo.createAgency(
           name,
           address,
           email,
           phone,
-          locality_id
+          locality_id,
+          zip_code
         );
+
+        user.is_agency_representative = true;
+        user.agency_id = newAgency.id;
+        await user.save();
+
+        const agency = await agencyRepo.getAgencyById(newAgency.id);
+        agency.representatives = agency.Users.map((rep) => rep.toJSON());
+
+        return agency;
       } catch (e) {
         console.error(e);
-        return new GraphQLError("Could not store information.", {
+        return new GraphQLError("Could not store information: " + e.message, {
           extensions: { code: "SERVER_ERROR" },
         });
       }
