@@ -3,8 +3,15 @@ import { useQuery } from "@apollo/client";
 import { SEARCH_AGENCIES_BY_NAME_QUERY } from "../../../graphql/agency";
 
 let debounceTimeout;
-export const SearchAgencies = ({setShowCreateAgency, setFieldValue }) => {
+export const SearchAgencies = ({
+  setShowCreateAgency,
+  setFieldValue,
+  agencyIdFromForm,
+  formErrorsFromApi,
+}) => {
   const [agencyNameQuery, setAgencyNameQuery] = useState("");
+  const [selectedAgencyMessage, setSelectedAgencyMessage] = useState("");
+  const [isTouched, setIsTouched] = useState(false);
 
   const {
     loading: agenciesLoading,
@@ -15,7 +22,9 @@ export const SearchAgencies = ({setShowCreateAgency, setFieldValue }) => {
     variables: { query: agencyNameQuery },
   });
 
-  const handleSearch = (query) => {
+  const handleSearch = (e) => {
+    const query = e.target.value;
+
     clearTimeout(debounceTimeout);
     setAgencyNameQuery(query);
     debounceTimeout = setTimeout(() => {
@@ -26,29 +35,39 @@ export const SearchAgencies = ({setShowCreateAgency, setFieldValue }) => {
   const handleCreate = () => {
     setAgencyNameQuery("");
     setShowCreateAgency(true);
+
+    setFieldValue("user_agency_id", -1);
+
+    setSelectedAgencyMessage("Estás creando la agencia que vas a representar");
+    setIsTouched(false);
   };
 
+  const handleSelect = (agency) => {
+    setFieldValue("user_agency_id", agency.id);
+    setAgencyNameQuery("");
+    setSelectedAgencyMessage("Agencia seleccionada: " + agency.name);
+    setShowCreateAgency(false);
+  };
   return (
     <>
       <div className="relative">
         <label
-            htmlFor="search_agency"
-            className="block text-sm font-medium text-gray-800"
+          htmlFor="search_agency"
+          className="block text-sm font-medium text-gray-800"
         >
           Agencia que represento
         </label>
-        <div className="flex rounded-md">
-
-          <input
-            className="mt-1 p-2 w-full rounded-md border-gray-400 bg-white text-sm text-gray-700 shadow-sm
+        <input
+          className="mt-1 p-2 w-full rounded-md border-gray-400 bg-white text-sm text-gray-700 shadow-sm
           bg-transparent outline-none border focus:border-indigo-600"
-            type="text"
-            id={"search_agency"}
-            placeholder="Buscar agencias (Ej: miautohoy.com)"
-            value={agencyNameQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-        </div>
+          type="text"
+          id={"search_agency"}
+          placeholder="Buscar agencias (Ej: miautohoy.com)"
+          value={agencyNameQuery}
+          onChange={handleSearch}
+          onFocus={() => setIsTouched(true)}
+          onBlur={() => setIsTouched(true)}
+        />
         <div className="absolute z-10 w-full bg-white rounded-b-md shadow-lg border-gray-400 text-sm text-gray-700">
           {agencyNameQuery ? (
             <>
@@ -63,10 +82,7 @@ export const SearchAgencies = ({setShowCreateAgency, setFieldValue }) => {
                       <button
                         type="button"
                         className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                        onClick={() => {
-                          setFieldValue('user_agency_id', agency.id);
-                          setAgencyNameQuery("");
-                        }}
+                        onClick={() => handleSelect(agency)}
                       >
                         {agency.name}
                       </button>
@@ -82,12 +98,64 @@ export const SearchAgencies = ({setShowCreateAgency, setFieldValue }) => {
                     Crear nueva agencia
                   </button>
                 </li>
+
+                {/*
+                Tailwind lists
+
+
+                <ul role="list">
+                  {#each people as person}
+                    <li class="group/item hover:bg-slate-100 ...">
+                      <img src="{person.imageUrl}" alt="" />
+                      <div>
+                        <a href="{person.url}">{person.name}</a>
+                        <p>{person.title}</p>
+                      </div>
+                      <a class="group/edit invisible hover:bg-slate-200 group-hover/item:visible ..." href="tel:{person.phone}">
+                        <span class="group-hover/edit:text-gray-700 ...">Call</span>
+                        <svg class="group-hover/edit:translate-x-0.5 group-hover/edit:text-slate-500 ...">
+                          <!-- ... -->
+                        </svg>
+                      </a>
+                    </li>
+                  {/each}
+                </ul>
+
+
+
+
+                */}
               </ul>
             </>
           ) : (
             <></>
           )}
         </div>
+        {selectedAgencyMessage ? (
+          <div className={"my-3"}>
+            <p>
+              <strong>{selectedAgencyMessage}</strong>
+            </p>
+          </div>
+        ) : (
+          <></>
+        )}
+        {!agencyIdFromForm && isTouched ? (
+          <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+            <span className="font-bold">Oops!</span>{" "}
+            <span className="font-normal">
+              Tenés que seleccionar una agencia
+            </span>
+          </p>
+        ) : null}
+        {formErrorsFromApi.user_agency_id ? (
+          <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+            <span className="font-bold">Oops!</span>{" "}
+            <span className="font-normal">
+              {formErrorsFromApi.user_agency_id}
+            </span>
+          </p>
+        ) : null}
       </div>
     </>
   );
