@@ -33,6 +33,9 @@ export const UserModel = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    zip_code: {
+      type: DataTypes.STRING,
+    },
     is_email_verified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,

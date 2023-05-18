@@ -1,5 +1,5 @@
-import { AgencyModel } from "../models/index.js";
-import {Op} from "sequelize";
+import {AgencyModel, UserModel} from "../models/index.js";
+import { Op } from "sequelize";
 
 export class AgencyRepository {
   constructor() {
@@ -15,9 +15,9 @@ export class AgencyRepository {
     });
   }
 
-  createAgency(name, address, email, phone, locality_id) {
+  createAgency(name, address, email, phone, locality_id, zip_code) {
     try {
-      return this.model.create({ name, address, email, phone, locality_id });
+      return this.model.create({ name, address, email, phone, locality_id, zip_code });
     } catch (e) {
       console.error(e);
     }
@@ -25,7 +25,10 @@ export class AgencyRepository {
 
   getAgencyById(id) {
     try {
-      return this.model.findOne({ where: { id: id } });
+      return this.model.findOne({
+        where: { id: id },
+        include: [{ model: UserModel }],
+      });
     } catch (e) {
       console.error(e);
     }

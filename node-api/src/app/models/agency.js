@@ -23,6 +23,9 @@ export const AgencyModel = db.define(
       allowNull: false,
       unique: true,
     },
+    zip_code: {
+      type: DataTypes.STRING,
+    },
     phone: {
       type: DataTypes.STRING,
       allowNull: false,

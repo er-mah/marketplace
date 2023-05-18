@@ -9,6 +9,7 @@ type Agency {
   phone: String
   locality_id: ID
   bannerImage: String
+  zip_code: String
   representatives: [BasicUser]
 }
 
@@ -158,9 +159,6 @@ type User {
   is_agency_representative: Boolean
   is_email_verified: Boolean
   is_account_disabled: Boolean
-  createdAt: String!
-  updatedAt: String!
-  deletedAt: String
 }
 
 type BasicAgency {
@@ -370,6 +368,7 @@ input NewAgencyInput {
   email: String!
   phone: String!
   locality_id: ID!
+  zip_code: String!
 }
 
 input AdditionalPublicationInfoInput {
