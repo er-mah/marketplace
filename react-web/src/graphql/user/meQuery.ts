@@ -16,9 +16,6 @@ export const ME_QUERY = gql`
             is_agency_representative
             is_email_verified
             is_account_disabled
-            createdAt
-            updatedAt
-            deletedAt
             locality_id
         }
     }
