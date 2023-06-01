@@ -26,8 +26,7 @@ const routes = [
   { path: "/cuenta/nuevas-credenciales", element: <SetNewPasswordPage /> },
   {
     path: "/cuenta/agregar-informacion-adicional",
-    //element: <ProtectedRoute component={AddUserAdditionalInfoPage} />,
-    element: <AddUserAdditionalInfoPage />,
+    element: <ProtectedRoute component={AddUserAdditionalInfoPage} />,
   },
   { path: "/not-found", element: <NotFoundPage /> },
   { path: "*", element: <Navigate to={"/not-found"} replace /> },
