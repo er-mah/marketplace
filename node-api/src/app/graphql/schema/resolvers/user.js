@@ -78,6 +78,7 @@ export const user = {
           });
         }
 
+        // Check if locality id is valid
         const locality = await localityRepo.getLocalityById(locality_id);
         if (!locality) {
           return new GraphQLError(
@@ -88,15 +89,17 @@ export const user = {
           );
         }
 
+        // Check if agency id is valid
         if (is_agency_representative) {
-          if (!agency_id) {
+          if (!agency_id || agency_id === "") {
             return new GraphQLError("You must specify a valid agency_id.", {
               extensions: { code: "INPUT_ERROR" },
             });
           }
         }
 
-        if (agency_id) {
+        // Check if agency exists
+        if (agency_id !== "") {
           const agency = await agencyRepo.getAgencyById(agency_id);
 
           if (!agency) {
@@ -114,7 +117,7 @@ export const user = {
           phone,
           dni,
           is_agency_representative,
-          agency_id,
+          ...(agency_id !== "" && { agency_id }),   // Assure the agency_id is !== ""
           locality_id,
         });
 

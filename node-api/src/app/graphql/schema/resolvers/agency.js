@@ -111,6 +111,13 @@ export const agency = {
           zip_code
         );
 
+        if (!newAgency) {
+          return new GraphQLError("Please verify agency's information.", {
+            extensions: { code: "INPUT_ERROR" },
+          });
+        }
+
+
         user.is_agency_representative = true;
         user.agency_id = newAgency.id;
         await user.save();
@@ -119,6 +126,7 @@ export const agency = {
         agency.representatives = agency.Users.map((rep) => rep.toJSON());
 
         return agency;
+
       } catch (e) {
         console.error(e);
         return new GraphQLError("Could not store information: " + e.message, {
