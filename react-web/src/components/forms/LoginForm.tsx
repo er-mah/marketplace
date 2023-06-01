@@ -82,9 +82,6 @@ export default function LoginForm() {
         // Store token in cache
         await cacheManager.storeToken(response?.token);
 
-        // Store the user in Apollo client cache
-        await cacheManager.fetchAndStoreUser();
-
         if (response?.pending_steps === "provideAdditionalData") {
           navigate(fullPaths.userAdditionalInfo);
         } else if (response?.pending_steps === "no additional steps") {

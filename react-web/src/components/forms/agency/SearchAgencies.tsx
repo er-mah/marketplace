@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { SEARCH_AGENCIES_BY_NAME_QUERY } from "../../../graphql/agency";
+import {useFormikContext} from "formik";
 
 let debounceTimeout;
 export const SearchAgencies = ({
   setShowCreateAgency,
-  setFieldValue,
   agencyIdFromForm,
   formErrorsFromApi,
 }) => {
   const [agencyNameQuery, setAgencyNameQuery] = useState("");
   const [selectedAgencyMessage, setSelectedAgencyMessage] = useState("");
   const [isTouched, setIsTouched] = useState(false);
+
+  const formik = useFormikContext();
 
   const {
     loading: agenciesLoading,
@@ -33,20 +35,21 @@ export const SearchAgencies = ({
   };
 
   const handleCreate = () => {
-    setAgencyNameQuery("");
     setShowCreateAgency(true);
-
-    setFieldValue("user_agency_id", -1);
-
-    setSelectedAgencyMessage("Estás creando la agencia que vas a representar");
     setIsTouched(false);
+    setAgencyNameQuery("")
+    setSelectedAgencyMessage("Estás creando la agencia que vas a representar");
+    formik.setFieldValue("user_agency_id", "-1");
+    formik.setFieldValue("user_is_agency_representative", true);
   };
 
   const handleSelect = (agency) => {
-    setFieldValue("user_agency_id", agency.id);
-    setAgencyNameQuery("");
-    setSelectedAgencyMessage("Agencia seleccionada: " + agency.name);
     setShowCreateAgency(false);
+    setIsTouched(false);
+    setSelectedAgencyMessage("Agencia seleccionada: " + agency.name);
+
+    formik.setFieldValue("user_agency_id", agency.id);
+    formik.setFieldValue("user_is_agency_representative", true);
   };
   return (
     <>
@@ -69,7 +72,7 @@ export const SearchAgencies = ({
           onBlur={() => setIsTouched(true)}
         />
         <div className="absolute z-10 w-full bg-white rounded-b-md shadow-lg border-gray-400 text-sm text-gray-700">
-          {agencyNameQuery ? (
+          {agencyNameQuery && isTouched ? (
             <>
               <ul className="border-gray-400 text-sm text-gray-700">
                 {/* Listing search results */}
@@ -100,6 +103,8 @@ export const SearchAgencies = ({
                 </li>
 
                 {/*
+
+                TODO: APPLY WHEN WE HAVE ICONS
                 Tailwind lists
 
 

@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { AuthCacheManager } from "../apollo/authCacheManager";
-import { Navigate, Route } from "react-router-dom";
+import { Navigate, Route, useNavigate } from "react-router-dom";
 import { fullPaths } from "../utils/routesConstants";
 
 const authCacheManager = new AuthCacheManager();
 
-export function ProtectedRoute({ component: Component, ...rest }) {
-  const [authenticated, setAuthenticated] = useState(false);
+const isAuthenticated = async () => {
+  const token = await authCacheManager.getToken();
+  let user = await authCacheManager.getLoggedUser();
+
+  if (token && !user) {
+    await authCacheManager.fetchAndStoreUser();
+  }
+
+  user = await authCacheManager.getLoggedUser();
+
+  // Verifica si el token existe y si hay un usuario autenticado
+  return token && user;
+};
+
+export const ProtectedRoute = ({ component: Component, ...rest }) => {
+  const navigate = useNavigate();
+
+  const checkAuthentication = async () => {
+    const authenticated = await isAuthenticated();
+    if (!authenticated) {
+      navigate(fullPaths.login); // Redirige a la página de inicio de sesión si el usuario no está autenticado
+    }
+  };
 
   useEffect(() => {
-    authCacheManager
-      .getLoggedUser()
-      .then((response) => {
-        setAuthenticated(true);
-      })
-      .catch((e) => {
-        setAuthenticated(false);
-      });
+    checkAuthentication();
   });
 
-  return (
-    <>
-      {authenticated ? (
-        <Component />
-      ) : (
-        <Navigate to={fullPaths.login} replace />
-      )}
-    </>
-  );
-}
+  return <Component />;
+};

@@ -4,14 +4,22 @@ import {
   CompleteAdditionalInfoSchema,
   OnlyUserAdditionalInfoSchema,
 } from "../../utils/validationSchemas";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   GET_DEPARTMENTS_BY_PROVINCE_QUERY,
   GET_LOCALITIES_BY_DEPARTMENT_QUERY,
   GET_PROVINCES_QUERY,
 } from "../../graphql";
 import { SearchAgencies } from "./agency/SearchAgencies.tsx";
+import { CREATE_AGENCY_MUTATION } from "../../graphql/agency";
+import { COMPLETE_PERSONAL_INFORMATION_MUTATION } from "../../graphql/user";
+import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { fullPaths } from "../../utils/routesConstants.js";
+
 export const AddAdditionalInfoUserForm = () => {
+  const navigate = useNavigate();
+
   const [isAgencyRepresentative, setIsAgencyRepresentative] = useState(false);
 
   const [selectedUserProvinceId, setSelectedUserProvinceId] = useState(null);
@@ -67,36 +75,234 @@ export const AddAdditionalInfoUserForm = () => {
     variables: { departmentId: selectedAgencyDepartmentId },
   });
 
+  const [createAgency] = useMutation(CREATE_AGENCY_MUTATION);
+  const [completePersonalInfo] = useMutation(
+    COMPLETE_PERSONAL_INFORMATION_MUTATION
+  );
+
   const initialErrors = {
-    address: "",
-    phone: "",
-    is_agency_representative: "",
-    dni: "",
-    agency_id: "",
-    nestedDropdown: {
-      province_id: "",
-      department_id: "",
-      locality_id: "",
-    },
+    user_address: "",
+    user_phone: "",
+    user_is_agency_representative: "",
+    user_dni: "",
+    user_zip_code: "",
+    user_province_id: "",
+    user_department_id: "",
+    user_locality_id: "",
+    user_agency_id: "",
+
+    agency_name: "",
+    agency_phone: "",
+    agency_email: "",
+    agency_province_id: "",
+    agency_department_id: "",
+    agency_locality_id: "",
+    agency_address: "",
+    agency_zip_code: "",
   };
 
   const [formErrorsFromApi, setFormErrorsFromApi] = useState(initialErrors);
 
-  const handleSubmit = (values, { setSubmitting }) => {
-    console.log(values);
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      setFormErrorsFromApi({ ...initialErrors });
 
-    // Check if there's not a selected agency submitted
-    if (!values.user_agency_id) {
-      // Check if it is created
-      if (!showCreateAgency) {
-        setFormErrorsFromApi({
-          ...formErrorsFromApi,
-          user_agency_id: `Tenés que seleccionar una agencia o crearla haciendo click en el boton "Crear agencia" del menú desplegable de búsqueda.`,
-        });
+      const newAgency = values.user_agency_id === "-1";
+
+      const personalInfoVars = {
+        input: {
+          address: values.user_address,
+          dni: values.user_dni,
+          locality_id: values.user_locality_id,
+          phone: values.user_phone,
+          is_agency_representative: values.user_is_agency_representative,
+          agency_id: "",
+        },
+      };
+
+      // Check if the user is creating an agency
+
+      if (values.user_is_agency_representative) {
+        if (newAgency) {
+          await createAgency({
+            variables: {
+              input: {
+                address: values.agency_address,
+                email: values.agency_email,
+                locality_id: values.agency_locality_id,
+                name: values.agency_name,
+                phone: values.agency_phone,
+                zip_code: values.agency_zip_code,
+              },
+            },
+          })
+            .then((response) => {
+              personalInfoVars.input.agency_id =
+                response.data?.createAgency?.id;
+            })
+            .catch(async (error) => {
+              if (error.name === "ApolloError") {
+                switch (error.message) {
+                  case "You already are an agency representative.": {
+                    toast.error("Ya representás a una agencia", {
+                      position: "top-right",
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                    });
+                    break;
+                  }
+                  case "You have already completed this step.": {
+                    toast.error(
+                      "No es necesario que completes nuevamente este paso",
+                      {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                      }
+                    );
+                    break;
+                  }
+                  case "Email is already being used.": {
+                    const newErrors = { ...initialErrors };
+                    newErrors.agency_email = "Este email ya está siendo usado";
+                    setFormErrorsFromApi(newErrors);
+                    break;
+                  }
+                  default: {
+                    toast.error(error.message, {
+                      position: "top-right",
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                    });
+                    break;
+                  }
+                }
+              } else {
+                toast.error(error.message, {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+                });
+              }
+            });
+        } else {
+          personalInfoVars.input.agency_id = await values.user_agency_id;
+        }
       }
+
+      completePersonalInfo({
+        variables: personalInfoVars,
+      })
+        .then((_r) => {
+          toast.success("¡Perfecto! Ya recibimos tus datos", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          setTimeout(() => {
+            navigate(fullPaths.dashboard);
+          }, 5000);
+        })
+        .catch(async (error) => {
+          if (error.name === "ApolloError") {
+            switch (error.message) {
+              case "You have already completed this step.": {
+                toast.error(
+                  "No es necesario que completes nuevamente este paso",
+                  {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                  }
+                );
+                break;
+              }
+              case "You must specify a valid agency_id.": {
+                toast.error(
+                  "La agencia que especificaste es errónea o no existe",
+                  {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                  }
+                );
+                break;
+              }
+              case "Email is already being used.": {
+                const newErrors = { ...initialErrors };
+                newErrors.agency_email = "Este email ya está siendo usado";
+                setFormErrorsFromApi(newErrors);
+                break;
+              }
+              default: {
+                toast.error(error.message, {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "light",
+                });
+                break;
+              }
+            }
+          } else {
+            toast.error(error.message, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }
+        });
+
+      // Set submission as completed
+      setSubmitting(false);
+    } catch (e) {
+      console.error(e);
     }
-    // Set submission as completed
-    setSubmitting(false);
   };
 
   const onlyUserInitialValues = {
@@ -133,6 +339,7 @@ export const AddAdditionalInfoUserForm = () => {
 
   return (
     <>
+      <ToastContainer />
       <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
         <Formik
           initialValues={
@@ -144,23 +351,16 @@ export const AddAdditionalInfoUserForm = () => {
               ? CompleteAdditionalInfoSchema
               : OnlyUserAdditionalInfoSchema
           }
-          enableReinitialize={true}
+          enableReinitialize={false}
         >
-          {({ values, errors, touched, setFieldValue }) => (
+          {({ values, errors, touched }) => (
             <Form>
-              <code className="flex whitespace-normal overflow-auto text-sm todo">
-                {JSON.stringify(values)}
-              </code>
-              <code className="flex whitespace-normal overflow-auto text-sm todo">
-                {JSON.stringify(errors)}
-              </code>
-
               {/* IS AGENCY REPRESENTATIVE ? */}
               <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3 mt-5">
                 <div className="text-gray-600">
-                  <p className="font-medium text-lg">¿Sos agenciero?</p>
+                  <p className="font-medium text-lg">¿Tenés una agencia?</p>
                   <p>
-                    Especificá en caso de que representes una empresa, sus datos
+                    Especificá en caso de que representes a una agencia los datos
                     correspondientes.
                   </p>
                 </div>
@@ -186,7 +386,6 @@ export const AddAdditionalInfoUserForm = () => {
                       {isAgencyRepresentative ? (
                         <SearchAgencies
                           setShowCreateAgency={setShowCreateAgency}
-                          setFieldValue={setFieldValue}
                           agencyIdFromForm={values.user_agency_id}
                           formErrorsFromApi={formErrorsFromApi}
                         />
