@@ -1,47 +1,41 @@
-/*
- * Esta función recibe como parámetros un error (err), la solicitud (req), la respuesta (res) y la función next.
- * La función simplemente llama a next(err) para pasar el control al siguiente middleware. Se utiliza para registrar
- * el error en los registros de la aplicación.
- *
- * Esta función se utiliza para registrar errores en la consola. Es el primer middleware que se ejecuta
- * cuando se produce un error. Su propósito es simplemente registrar el error en la consola y luego pasar el
- * control al siguiente middleware. Esta función es útil para depurar la aplicación y para registrar errores que no
- * se han manejado en otros middleware.
- *
+/* logErrorsMdw function is an error-handling middleware function that logs any errors that occur in a request
+to the server.
+- It takes four parameters - err, req, res, and next - and simply calls next(err), which passes the error to the next
+middleware function in the chain. The purpose of this function is to provide a simple way to log errors in the server,
+allowing developers to quickly diagnose and fix issues.
  * */
-export function logErrors(err, req, res, next) {
-    next(err);
+import {errorResponse} from "../utils/index.js";
+
+export function logErrorsMdw(err, req, res, next) {
+  console.error(err);
+  next(err);
 }
 
 /*
- * Esta función recibe como parámetros un error (err), la solicitud (req), la respuesta (res) y la función next.
- * La función verifica si la solicitud es una solicitud XMLHttpRequest (XHR) y, si es así, envía una respuesta de error
- * en formato JSON. Si no es una solicitud XHR, llama a next(err) para pasar el control al siguiente middleware.
- *
- * Esta función se utiliza para manejar errores que se producen cuando se realizan solicitudes a través de
- * XMLHttpRequest (XHR). En lugar de mostrar una página de error completa, esta función devuelve una respuesta
- * JSON que indica que algo ha fallado y que se debe intentar de nuevo más tarde. Esta función es útil cuando se
- * construyen aplicaciones web de una sola página (SPA) que utilizan XHR para realizar solicitudes.
+ * clientErrorHandlerMdw that is used to handle errors that occur in the client-side requests.
+ * - If the request is an XMLHttpRequest (Ajax) request, it sends a JSON response with a 500 status code and an
+ * error message.
+ * - If the request is not an XMLHttpRequest, the error is passed to the next middleware in the chain for further
+ * processing.
  * */
-export function clientErrorHandler(err, req, res, next) {
-    if (req.xhr) {
-        res
-            .status(500)
-            .send({ error: "Something went wrong! Please try again later." });
-    } else {
-        next(err);
-    }
+export function clientErrorHandlerMdw(err, req, res, next) {
+  if (req.xhr) {
+    res
+      .status(500)
+      .json(errorResponse("Something went wrong! Please try again later."));
+  } else {
+    next(err);
+  }
 }
+
 /*
-* Esta función recibe como parámetros un error (err), la solicitud (req), la respuesta (res) y la función next.
-* La función envía una respuesta de error con un código de estado HTTP 500 y un mensaje de error en formato JSON.
-*
-* Esta función se utiliza para manejar errores que no se han manejado en otros middleware. Si se produce un error en
-* algún lugar de la aplicación y no se ha manejado en otros middleware, esta función se encarga de devolver una
-* respuesta de error adecuada al cliente. En este caso, la función devuelve una respuesta JSON que contiene un
-* mensaje de error y un código de estado HTTP 500 (Error interno del servidor).
+errorHandlerMdw is an error handling middleware that logs the error to the console and sends a response with a 500
+status code and an error message in the response body. It is designed to be the last error handling middleware in the
+middleware chain, so if none of the previous error handling middleware catch the error, this one will.
 * */
-export function errorHandler(err, req, res, next) {
-    console.log(err);
-    res.status(500).send({ message: err.message });
+export function errorHandlerMdw(err, req, res, next) {
+  console.log(err);
+  errorResponse(err.message);
 }
+
+

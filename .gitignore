@@ -1,8 +1,6 @@
-#node modules
-node_modules/
-.DS_Store
-package-lock.json
-images/
-seederGenerators/results/
-newrelic_agent.log
-node-api/.idea/
+*/node_modules/
+*/package-lock.json
+*/.idea/
+*/.env
+*/yarn-error.log
+*/yarn.lock

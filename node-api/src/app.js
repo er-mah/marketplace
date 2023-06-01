@@ -1,84 +1,135 @@
-require("newrelic");
-require("dotenv").config();
+// require("newrelic");
+import { createServer } from "http";
+import express from "express";
+import cors from "cors";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import fileUpload from "express-fileupload";
 
-const express = require("express");
-const jwt = require("express-jwt");
-const bodyParser = require("body-parser");
-const _ = require("lodash");
-const methodOverride = require("method-override");
-const morgan = require("morgan");
-const cors = require("cors");
-const schema = require("./schema");
-const { execute, subscribe } = require("graphql");
-const { createServer } = require("http");
-const { SubscriptionServer } = require("subscriptions-transport-ws");
+import { config } from "dotenv";
+import {
+  clientErrorHandlerMdw,
+  corsMdw,
+  errorHandlerMdw,
+  logErrorsMdw,
+} from "./middlewares/index.js";
+import { bulkDataInsert } from "./seeders/index.js";
 
-const { router, openRoutes } = require("./routes");
-const {logErrors, clientErrorHandler, errorHandler} = require("./middlewares/errorHandlers");
+import {} from "./app/models/index.js";
+import { db } from "./config/db.js";
 
-// SERVER CONFIGURATION ----------------------------------------------
+import { resolvers, typeDefs } from "./app/graphql/schema/index.js";
 
-const app = express();
+import { router } from "./app/routes/index.js";
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from "@apollo/server/plugin/landingPage/default";
+import morgan from "morgan";
+import { expressSessionInstance, passport } from "./config/index.js";
+import {
+  authenticateRequest,
+  omitAuthenticationCheck,
+} from "./config/passport.js";
 
-app.use(cors());
+function loadEnvVariables() {
+  config();
+}
 
-// HTTP request logger en consola para detalles adicionales de las solicitudes y las respuestas
-app.use(morgan("dev"));
+async function start() {
+  try {
+    loadEnvVariables();
 
+    const app = express();
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+    const httpServer = createServer(app);
+    const PORT = process.env.PORT || 4000;
+    const playgroundEnabled = process.env.NODE_ENV !== "production";
 
+    const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-// TODO VER BIEN ESTO DE SUSCRIPCIONES
+    // Instantiate Apollo Server
+    const apolloServer = new ApolloServer({
+      typeDefs,
+      resolvers,
+      includeStacktraceInErrorResponses: false,
+      introspection: playgroundEnabled,
+      plugins: [
+        ApolloServerPluginDrainHttpServer({ httpServer }),
+        process.env.NODE_ENV === "production"
+          ? ApolloServerPluginLandingPageProductionDefault()
+          : ApolloServerPluginLandingPageLocalDefault({ embed: false }),
+      ],
+    });
+    await apolloServer.start();
 
-// ROUTES --------------------------------------------------------------
-app.use(router);
+    // Establish connection with db
+    await db.authenticate();
+    console.log("Successfully connected to the db.");
 
-const ws = createServer(app);
+    // Sync models with db
+    await db.sync();
 
-// Set up the WebSocket for handling GraphQL subscriptions
-ws.listen(process.env.PORT || 4000, () => {
-  console.log(
-    `Running a GraphQL API server at http://localhost:${
-      process.env.PORT || 4000
-    }/graphiql`
-  );
+    await bulkDataInsert();
 
-  SubscriptionServer.create(
-    {
-      execute,
-      subscribe,
-      schema,
-    },
-    {
-      server: ws,
-      path: "/subscriptions",
-    }
-  );
+    // Middlewares
+    // Express session middleware
+    app.use(await expressSessionInstance());
+
+    app.use(morgan("dev"));
+
+    app.use(cors());
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+
+    app.use(fileUpload({debug: true}))
+
+    app.use(corsMdw);
+    app.use(logErrorsMdw);
+    app.use(clientErrorHandlerMdw);
+    app.use(errorHandlerMdw);
+
+    // Passport.js - authentication middleware
+    app.use(passport.initialize({})); // Reload middleware in every route --> in order it doesn't get stale
+    app.use(passport.session({})); // Express session related
+    app.use(router); // Define routes
+
+    app.use(
+      "/techmogql",
+      authenticateRequest,
+      omitAuthenticationCheck,
+      expressMiddleware(apolloServer, {
+        context: async ({ req }) => {
+          // Get authenticated user loaded in req object by passport-jwt
+
+          const user = req.user || null;
+          // Return user in the context
+          return { user };
+        },
+      })
+    );
+
+    // Set up the WebSocket for handling GraphQL subscriptions
+    const wsServer = new WebSocketServer({
+      server: httpServer,
+      path: "/techmogql", // Same path as Apollo Server
+    });
+
+    // Passing in an instance of a GraphQLSchema and telling the WebSocketServer to start listening
+    const serverCleanup = useServer({ schema }, wsServer);
+
+    app.listen(PORT);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+start().then(() => {
+  const PORT = process.env.PORT || 4000;
+  console.log(`Express server ready at http://localhost:${PORT}\nApollo server ready at http://localhost:${PORT}/techmogql
+  `);
 });
-
-
-// Utilizamos el middleware jwt para verificar tokens de autenticación en todas las rutas excepto en las que
-// se encuentran en el objeto unless.
-// TODO: CHANGE TO ENV VAR
-app.use(jwt({ secret: "MAH2018!#" }).unless({ path: openRoutes }));
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  next();
-});
-
-/* console.log(schema.getSubscriptionType().getFields().messageAdded) */
-
-/* Middleware that allows HTTP methods other than GET and POST to be used in HTTP requests. */
-app.use(methodOverride());
-
-// Error handling
-app.use(logErrors);
-app.use(clientErrorHandler);
-app.use(errorHandler);
