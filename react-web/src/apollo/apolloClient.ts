@@ -12,6 +12,35 @@ export const client = new ApolloClient({
   link: authLink(cache).concat(httpLink),
 });
 
+// Obtener y guardar solo las partes necesarias de la caché en localStorage
+const saveCacheState = () => {
+  const cacheData = {
+    ROOT_MUTATION: client.cache.extract().ROOT_MUTATION,
+    ROOT_QUERY: {
+      me: client.cache.extract().ROOT_QUERY?.me,
+      token: client.cache.extract().ROOT_QUERY?.token,
+    },
+  };
+  localStorage.setItem("cache", JSON.stringify(cacheData));
+};
+
+// Restaurar solo las partes necesarias de la caché desde localStorage
+const restoreCacheState = () => {
+  const cacheData = localStorage.getItem("cache");
+  if (cacheData) {
+    const parsedCacheData = JSON.parse(cacheData);
+    client.cache.restore({
+      ROOT_MUTATION: parsedCacheData.ROOT_MUTATION,
+      ROOT_QUERY: parsedCacheData.ROOT_QUERY,
+    });
+  }
+};
+
+// Llamar a restoreCacheState al iniciar la aplicación
+restoreCacheState();
+
+// Registrar un evento para guardar el estado de la caché antes de recargar la página
+window.addEventListener("beforeunload", saveCacheState);
 /*
 
 // TODO: CHECK APOLLO sockets
