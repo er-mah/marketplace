@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { AuthCacheManager } from "../../apollo/authCacheManager.ts";
 import { LOGIN_MUTATION } from "../../graphql/auth";
-import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../graphql/user/resendVerificationCodeMutation.ts";
+import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../graphql/user";
 import { fullPaths } from "../../utils/routesConstants.js";
 
 interface LoginFormValues {
@@ -82,10 +82,13 @@ export default function LoginForm() {
         // Store token in cache
         await cacheManager.storeToken(response?.token);
 
+        console.log(response?.pending_steps === "no additional steps")
+
         if (response?.pending_steps === "provideAdditionalData") {
           navigate(fullPaths.userAdditionalInfo);
-        } else if (response?.pending_steps === "no additional steps") {
-          navigate(fullPaths.dashboard);
+        }
+        if (response?.pending_steps === "no additional steps") {
+          navigate(fullPaths.dashboard.main);
         }
       })
       .catch(async (error) => {
