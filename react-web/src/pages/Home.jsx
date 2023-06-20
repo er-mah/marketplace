@@ -1,17 +1,18 @@
 import React from "react";
 
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import {Header} from "../components/Header";
+import {Footer} from "../components/Footer";
 
 
-const HomePage = ({ data, history, location, lastPubs, Texts }) => {
+const HomePage = ({ data, location, lastPubs, Texts }) => {
   return (
     <>
       <div>
 
         {/* HEADER */}
-        <Header history={history} location={location} />
+        <Header location={location} />
 
+        {/*
         <section className="bg-gray-50">
           <div className="p-8 md:p-12 lg:px-16 lg:py-24">
             <div className="mx-auto max-w-lg text-center">
@@ -147,7 +148,9 @@ const HomePage = ({ data, history, location, lastPubs, Texts }) => {
           </div>
         </section>
 
-        <Footer history={history} />
+        */}
+
+        <Footer />
       </div>
     </>
   );
