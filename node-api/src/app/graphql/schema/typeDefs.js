@@ -91,23 +91,21 @@ type Publication {
   id: ID!
   createdAt: String
   deletedAt: String
-  vehicle_year: String
+  vehicle_year: String!
   vehicle_brand: String!
   vehicle_version: String!
-  vehicle_group: String!
-  vehicle_codia_id: Int!
+  vehicle_model: String!
   vehicle_state: VehicleState
   vehicle_segment: VehicleSegment
   location: Locality
   kms: String
   price: Float
   fuel: Fuel
-  owner_observations: String
-  info_auto_specs: ModelFeatures
-  slug: String
+  details: String
+  slug: String!
   changes: [PublicationChanges]
-  conversations_id: [Int]
-  photos: [String]
+  conversations: [Int]
+  photos_urls: [String]
   owner: BasicUser
 }
 
@@ -115,14 +113,9 @@ type Publication {
 type PublicationChanges {
   id: ID!
   active: Boolean!
-  state: PublicationState!
+  name: String!
   createdAt: String
   deletedAt: String
-}
-
-type PublicationState {
-  id: ID!
-  state_name: String
 }
 
 "'Vehicle feature' type defines the data type InfoAuto uses to associate characteristics"
@@ -134,13 +127,6 @@ type VehicleFeature {
   length: Int
   value: String
   value_description: String
-}
-
-type ModelFeatures {
-  comfort: [VehicleFeature]!
-  technical_info: [VehicleFeature]!
-  engine_transmission:[VehicleFeature]!
-  safety:[VehicleFeature]!
 }
 
 "'User' represents the different users the system interacts with"
@@ -179,11 +165,6 @@ type AuthResponse {
   pending_steps: String!
 }
 
-type ModelsSearch {
-  models: [VehicleModel]!
-  pagination: Pagination!
-}
-
 type VehicleModel {
   position: Int!
   codia: Int!
@@ -214,6 +195,13 @@ type Pagination {
   next_page: Int
   page_size: Int!
 }
+
+type CCAResponse {
+  id: ID
+  name: String
+  version: String
+  precio: String
+}
 `;
 export const queries = `#graphql
 
@@ -243,6 +231,15 @@ type Query {
   getPublicationById(id: ID!): Publication
   "Get all publications"
   getAllPublications: [Publication]
+  
+  "Get available brands from CCA API"
+  getVehicleBrands: [CCAResponse]
+  "Get available models by a brand from CCA API"
+  getVehicleModelsByBrandName(brand: String!): [CCAResponse]
+  "Get available years of a model from CCA API"
+  getVehicleYearsByModelID(modelId: ID!): [CCAResponse]
+  "Get available versions in an specific year from CCA API"
+  getVehicleVersionsByYear(year: String!, modelId: ID!): [CCAResponse]
 
   # Users
   "Get a user by their ID"
@@ -251,13 +248,6 @@ type Query {
   #getAllUsers: [User!]!
   "Get user"
   me: User!
-
-  # Publication
-  "Search vehicle models by searching in InfoAuto API"
-  searchVehicleModel(query: String!, page: Int, pageSize: Int): ModelsSearch!
-
-  "Get additional vehicle info from InfoAuto"
-  getVehicleModelFeatures(modelId: Int!): ModelFeatures!
 
 }
 `;
@@ -291,6 +281,7 @@ type Mutation {
   # Publication
   "Create a new publication"
   createPublication(input: NewPublicationInput): Publication!
+  
   "Add additional information to publication"
   addInfoToPublicationBySlug(slug: String, input: AdditionalPublicationInfoInput): Publication!
   
@@ -355,13 +346,6 @@ input AdditionalUserDataInput {
 }
 
 
-input NewPublicationInput {
-  vehicle_brand: String!
-  vehicle_group: String!
-  vehicle_version: String!
-  vehicle_codia_id: ID!
-}
-
 input NewAgencyInput {
   name: String!
   address: String!
@@ -371,17 +355,22 @@ input NewAgencyInput {
   zip_code: String!
 }
 
+input NewPublicationInput {
+  vehicle_brand: String!
+  vehicle_model: String!
+  vehicle_year: String!
+  vehicle_version: String!
+}
+
 input AdditionalPublicationInfoInput {
   vehicle_state: VehicleState!
-  vehicle_year: Int!
   vehicle_segment: VehicleSegment!
   kms: Float!
   fuel: Fuel!
-  owner_observations: String!
+  description: String!
   locality_id: ID!
   currency: Currency!
   price: Int!
-  tags: [String]!
 }
 
 
