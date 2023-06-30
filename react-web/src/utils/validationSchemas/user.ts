@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-// AdditionalInfo validation schema defines the form validation rules in AddAdditionalInfoUserForm
+// AdditionalInfo validation schema defines the form validation rules in CreatePublicationForm
 
 export const CompleteAdditionalInfoSchema = Yup.object().shape({
   user_address: Yup.string().max(50).required("Este campo es requerido"),
