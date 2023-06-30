@@ -1,6 +1,6 @@
-import {InfoAutoService} from "./integrations/infoAutoService.js";
 import {FileService} from "./file.js";
 import {EmailService} from "./email.js";
+import {CCAService} from "./integrations/ccaService.js";
 
 
-export {InfoAutoService, FileService, EmailService}
+export {CCAService, FileService, EmailService}
