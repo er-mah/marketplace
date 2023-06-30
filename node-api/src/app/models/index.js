@@ -10,6 +10,7 @@ import { AgencyModel } from "./agency.js";
 import { DepartmentModel } from "./department.js";
 import { UserSessionModel } from "./userSession.js";
 import { EmailModel } from "./email.js";
+import {PublicationDetailsModel} from "./publicationDetails.js";
 
 // RELATIONSHIPS
 // They are here to avoid circular references
@@ -92,8 +93,19 @@ PublicationModel.owner = PublicationModel.belongsTo(UserModel, {
 
 // A publication can have a locality
 PublicationModel.locality = PublicationModel.belongsTo(LocalityModel, {
-  foreignKey: "locality_id",
+    foreignKey: "locality_id",
 });
+
+// A publication can be from an agency
+PublicationModel.agency = PublicationModel.belongsTo(AgencyModel, {
+    foreignKey: "agency_id",
+});
+
+
+// Establish one-to-one association between PublicationModel and PublicationDetailsModel.
+PublicationModel.hasOne(PublicationDetailsModel);
+PublicationDetailsModel.belongsTo(PublicationModel);
+
 
 // Many publications can have many states -> Intermediate table: PublicationChangesModel
 PublicationChangesModel.belongsTo(PublicationModel, {
