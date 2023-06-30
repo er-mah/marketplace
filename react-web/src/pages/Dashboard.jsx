@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AuthCacheManager } from "../apollo/authCacheManager.ts";
 import { Header } from "../components/Header";
-import { useLocation, useNavigate } from "react-router-dom";
-import { fullPaths } from "../utils/routesConstants";
 import {Sidebar} from "./dashboard/Sidebar";
+import {ChipsMenu} from "./dashboard/ChipsMenu";
 
 const authCacheManager = new AuthCacheManager();
 
@@ -23,22 +22,28 @@ export const Dashboard = ({ ChildComponent }) => {
 
 
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
-      <div className="flex flex-grow ">
-        <div className="w-1/5">
-          <Sidebar />
+      <div className="flex flex-col h-screen">
+        <Header />
+
+        <div className="w-full md:hidden">
+          <ChipsMenu />
         </div>
-        <div className="w-4/5 overflow-y-auto bg-red-200">
-          <div className="p-4">
-            {ChildComponent ? (
-              <ChildComponent />
-            ) : (
-              <p>Selecciona un componente</p>
-            )}
+        <div className="flex flex-grow">
+          <div className="md:w-1/5">
+            <div className="hidden md:block h-full">
+              <Sidebar />
+            </div>
+          </div>
+          <div className="md:w-4/5 overflow-y-auto lg:h-auto flex flex-col">
+            <div className="p-4 flex-grow">
+              {ChildComponent ? (
+                  <ChildComponent />
+              ) : (
+                  <p>Selecciona un componente</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
