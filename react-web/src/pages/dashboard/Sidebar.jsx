@@ -16,7 +16,7 @@ export const Sidebar = () => {
         className={`block w-full text-center font-bold py-2 px-4 mb-2 rounded-lg ${
           isActive(fullPaths.dashboard.userPublications)
             ? "bg-green-200 text-green-800"
-            : "bg-gray-200 text-gray-800"
+            : "bg-white text-gray-800"
         } hover:bg-green-300`}
         onClick={() => navigate(fullPaths.dashboard.userPublications)}
       >
@@ -24,23 +24,23 @@ export const Sidebar = () => {
       </button>
       <button
         className={`block w-full text-center font-bold py-2 px-4 mb-2 rounded-lg ${
-          isActive(fullPaths.dashboard.profile)
-            ? "bg-green-200 text-green-800"
-            : "bg-gray-200 text-gray-800"
-        } hover:bg-green-300`}
-        onClick={() => navigate(fullPaths.dashboard.profile)}
-      >
-        Perfil
-      </button>
-      <button
-        className={`block w-full text-center font-bold py-2 px-4 mb-2 rounded-lg ${
           isActive(fullPaths.dashboard.createPublication)
             ? "bg-green-200 text-green-800"
-            : "bg-gray-200 text-gray-800"
+            : "bg-white text-gray-800"
         } hover:bg-green-300`}
         onClick={() => navigate(fullPaths.dashboard.createPublication)}
       >
         Crear publicación
+      </button>
+      <button
+        className={`block w-full text-center font-bold py-2 px-4 mb-2 rounded-lg ${
+          isActive(fullPaths.dashboard.profile)
+            ? "bg-green-200 text-green-800"
+            : "bg-white text-gray-800"
+        } hover:bg-green-300`}
+        onClick={() => navigate(fullPaths.dashboard.profile)}
+      >
+        Perfil
       </button>
     </div>
   );
