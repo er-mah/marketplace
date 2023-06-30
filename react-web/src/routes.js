@@ -12,6 +12,8 @@ import {UserPublications} from "./pages/dashboard/UserPublications";
 import {Profile} from "./pages/dashboard/Profile";
 import {CreatePublication} from "./pages/dashboard/CreatePublication";
 
+const MyPostsComponent = <Dashboard ChildComponent={UserPublications} />
+
 const routes = [
   { path: "/", element: <HomePage /> },
   {
@@ -26,13 +28,11 @@ const routes = [
   {
     path: "/dashboard/*",
     children: [
-      { path: "", element: <Navigate to="/dashboard/mis-publicaciones" /> },
-      { path: "mis-publicaciones", element: <Dashboard ChildComponent={UserPublications} /> },
-      { path: "mi-perfil", element: <Dashboard ChildComponent={Profile} /> },
-      {
-        path: "crear-publication",
-        element: <Dashboard ChildComponent={CreatePublication} />,
-      },
+      { path: "", element: <ProtectedRoute component={() => <Navigate to="/dashboard/mis-publicaciones" />} /> },
+      { path: "mis-publicaciones", element: <ProtectedRoute component={() => <Dashboard ChildComponent={UserPublications} />} /> },
+      { path: "mi-perfil", element: <ProtectedRoute component={() => <Dashboard ChildComponent={Profile} />} /> },
+      { path: "crear-publication",
+        element: <ProtectedRoute component={() => <Dashboard ChildComponent={CreatePublication} />} />, },
       { path: "*", element: <Navigate to="/auth" replace /> },
     ],
   },
