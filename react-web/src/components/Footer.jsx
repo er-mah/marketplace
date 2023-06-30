@@ -1,5 +1,5 @@
 import React from "react";
-import {fullPaths} from "../utils/routesConstants";
+import { fullPaths } from "../utils/routesConstants";
 export const Footer = () => (
   <footer aria-label="Site Footer" className="bg-white lg:grid lg:grid-cols-5">
     <div className="relative block h-32 lg:col-span-2 lg:h-full">
@@ -187,7 +187,7 @@ export const Footer = () => (
             <ul className="flex flex-wrap gap-4 text-xs">
               <li>
                 <a
-                  href="#"
+                  href={fullPaths.callToActionsToMainSite.termsAndConditions}
                   className="text-gray-500 transition hover:opacity-75"
                 >
                   Términos y condiciones
