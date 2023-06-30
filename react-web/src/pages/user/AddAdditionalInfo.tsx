@@ -1,5 +1,5 @@
 import React from "react";
-import {AddAdditionalInfoUserForm} from "../../components/forms/AddAdditionalInfoUserForm.tsx";
+import {AddAdditionalInfoUserForm} from "../../components/forms/user/AddAdditionalInfoUserForm.tsx";
 
 export const AddUserAdditionalInfoPage = () => {
   return (

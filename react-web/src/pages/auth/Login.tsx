@@ -1,5 +1,5 @@
 import React from "react";
-import LoginForm from "../../components/forms/LoginForm.tsx";
+import LoginForm from "../../components/forms/account/LoginForm.tsx";
 import { fullPaths } from "../../utils/routesConstants.js";
 
 

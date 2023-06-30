@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fullPaths } from "../../utils/routesConstants.js";
-import SetNewPasswordForm from "../../components/forms/SetNewPasswordForm.tsx";
+import SetNewPasswordForm from "../../components/forms/account/SetNewPasswordForm.tsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../../components/misc/LoadingSpinner.tsx";
 

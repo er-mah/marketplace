@@ -1,6 +1,6 @@
 import React from "react";
 import { fullPaths } from "../../utils/routesConstants.js";
-import RecoverPasswordForm from "../../components/forms/RecoverPasswordForm.tsx";
+import RecoverPasswordForm from "../../components/forms/account/RecoverPasswordForm.tsx";
 
 export const RecoverPasswordPage = () => {
   return (

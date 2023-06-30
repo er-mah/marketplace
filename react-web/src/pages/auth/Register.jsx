@@ -1,4 +1,4 @@
-import RegisterForm from "../../components/forms/RegisterForm";
+import RegisterForm from "../../components/forms/account/RegisterForm";
 import {fullPaths} from "../../utils/routesConstants";
 
 export const RegisterPage = () => {
