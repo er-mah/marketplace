@@ -1,5 +1,5 @@
 import { Field, Form, Formik } from "formik";
-import { LoginSchema } from "../../utils/validationSchemas";
+import { LoginSchema } from "../../../utils/validationSchemas";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 import React, { useState } from "react";
@@ -7,10 +7,10 @@ import { FetchResult, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
 import { toast, ToastContainer } from "react-toastify";
-import { AuthCacheManager } from "../../apollo/authCacheManager.ts";
-import { LOGIN_MUTATION } from "../../graphql/auth";
-import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../graphql/user";
-import { fullPaths } from "../../utils/routesConstants.js";
+import { AuthCacheManager } from "../../../apollo/authCacheManager.ts";
+import { LOGIN_MUTATION } from "../../../graphql/auth";
+import { RESEND_ACCOUNT_VERIFICATION_CODE_MUTATION } from "../../../graphql/user";
+import { fullPaths } from "../../../utils/routesConstants.js";
 
 interface LoginFormValues {
   email: string;

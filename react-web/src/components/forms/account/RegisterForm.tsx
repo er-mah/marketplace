@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Field, Form, Formik } from "formik";
-import { RegisterSchema } from "../../utils/validationSchemas";
+import { RegisterSchema } from "../../../utils/validationSchemas";
 import { FetchResult, useMutation } from "@apollo/client";
-import { REGISTER_MUTATION } from "../../graphql/auth";
+import { REGISTER_MUTATION } from "../../../graphql/auth";
 import { toast, ToastContainer } from "react-toastify";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
-import {fullPaths} from "../../utils/routesConstants.js"
+import {fullPaths} from "../../../utils/routesConstants.js"
 
 interface RegisterFormValues {
   first_name: string;

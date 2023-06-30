@@ -3,9 +3,9 @@ import { Field, Form, Formik } from "formik";
 import React from "react";
 
 import { toast, ToastContainer } from "react-toastify";
-import { SetNewPasswordSchema } from "../../utils/validationSchemas/auth.ts";
+import { SetNewPasswordSchema } from "../../../utils/validationSchemas/auth.ts";
 import { useMutation } from "@apollo/client";
-import { SET_NEW_PASSWORD_MUTATION } from "../../graphql/user/setNewPassword.ts";
+import { SET_NEW_PASSWORD_MUTATION } from "../../../graphql/user/setNewPassword.ts";
 
 export default function SetNewPasswordForm({ code }) {
   const [setNewPassword] = useMutation(SET_NEW_PASSWORD_MUTATION);
@@ -91,7 +91,7 @@ export default function SetNewPasswordForm({ code }) {
       <ToastContainer />
 
       <Formik
-        initialValues={{ password: "", recover_password: "" }}
+        initialValues={{ password: "", recover_password: "", repeat_password: "" }}
         onSubmit={onNewPasswordSubmit}
         validationSchema={SetNewPasswordSchema}
       >

@@ -3,9 +3,9 @@ import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 
 import { toast, ToastContainer } from "react-toastify";
-import { RecoverPasswordSchema } from "../../utils/validationSchemas/auth.ts";
+import { RecoverPasswordSchema } from "../../../utils/validationSchemas/auth.ts";
 import { useMutation } from "@apollo/client";
-import { SEND_PASSWORD_RECOVERY_MUTATION } from "../../graphql/user/sendPasswordRecoveryEmailMutation.ts";
+import { SEND_PASSWORD_RECOVERY_MUTATION } from "../../../graphql/user/sendPasswordRecoveryEmailMutation.ts";
 
 interface RecoverPasswordFormFormValues {
   email: string;
