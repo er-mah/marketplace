@@ -2,20 +2,19 @@ import React, { useState } from "react";
 import { Field, Form, Formik } from "formik";
 import {
   CompleteAdditionalInfoSchema,
-  OnlyUserAdditionalInfoSchema,
-} from "../../utils/validationSchemas";
+} from "../../../utils/validationSchemas";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   GET_DEPARTMENTS_BY_PROVINCE_QUERY,
   GET_LOCALITIES_BY_DEPARTMENT_QUERY,
   GET_PROVINCES_QUERY,
-} from "../../graphql";
-import { SearchAgencies } from "./agency/SearchAgencies.tsx";
-import { CREATE_AGENCY_MUTATION } from "../../graphql/agency";
-import { COMPLETE_PERSONAL_INFORMATION_MUTATION } from "../../graphql/user";
+} from "../../../graphql";
+import { SearchAgencies } from "../agency/SearchAgencies.tsx";
+import { CREATE_AGENCY_MUTATION } from "../../../graphql/agency";
+import { COMPLETE_PERSONAL_INFORMATION_MUTATION } from "../../../graphql/user";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { fullPaths } from "../../utils/routesConstants.js";
+import { fullPaths } from "../../../utils/routesConstants.js";
 
 export const AddAdditionalInfoUserForm = () => {
   const navigate = useNavigate();
@@ -90,7 +89,6 @@ export const AddAdditionalInfoUserForm = () => {
     user_department_id: "",
     user_locality_id: "",
     user_agency_id: "",
-
     agency_name: "",
     agency_phone: "",
     agency_email: "",
@@ -305,18 +303,6 @@ export const AddAdditionalInfoUserForm = () => {
     }
   };
 
-  const onlyUserInitialValues = {
-    user_address: "",
-    user_phone: "",
-    user_is_agency_representative: false,
-    user_dni: "",
-    user_agency_id: "",
-    user_zip_code: "",
-    user_province_id: "",
-    user_department_id: "",
-    user_locality_id: "",
-  };
-
   const completeInitialValues = {
     user_address: "",
     user_phone: "",
@@ -342,15 +328,9 @@ export const AddAdditionalInfoUserForm = () => {
       <ToastContainer />
       <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
         <Formik
-          initialValues={
-            showCreateAgency ? completeInitialValues : onlyUserInitialValues
-          }
+          initialValues={completeInitialValues}
           onSubmit={handleSubmit}
-          validationSchema={
-            showCreateAgency
-              ? CompleteAdditionalInfoSchema
-              : OnlyUserAdditionalInfoSchema
-          }
+          validationSchema={CompleteAdditionalInfoSchema}
           enableReinitialize={false}
         >
           {({ values, errors, touched }) => (
@@ -360,8 +340,8 @@ export const AddAdditionalInfoUserForm = () => {
                 <div className="text-gray-600">
                   <p className="font-medium text-lg">¿Tenés una agencia?</p>
                   <p>
-                    Especificá en caso de que representes a una agencia los datos
-                    correspondientes.
+                    Especificá en caso de que representes a una agencia los
+                    datos correspondientes.
                   </p>
                 </div>
 
@@ -555,7 +535,7 @@ export const AddAdditionalInfoUserForm = () => {
                                 <span className="font-bold">Oops!</span>{" "}
                                 <span className="font-normal">
                                   {errors.agency_province_id}
-                                  {provincesError}
+                                  {provincesError?.message}
                                 </span>
                               </p>
                             ) : null}
@@ -697,7 +677,7 @@ export const AddAdditionalInfoUserForm = () => {
                                 <span className="font-bold">Oops!</span>{" "}
                                 <span className="font-normal">
                                   {errors.agency_locality_id}
-                                  {agencyLocalitiesError}
+                                  {agencyLocalitiesError?.message}
                                 </span>
                               </p>
                             ) : null}
@@ -898,7 +878,7 @@ export const AddAdditionalInfoUserForm = () => {
                             <span className="font-bold">Oops!</span>{" "}
                             <span className="font-normal">
                               {errors.user_province_id}
-                              {provincesError}
+                              {provincesError?.message}
                             </span>
                           </p>
                         ) : null}
@@ -974,18 +954,18 @@ export const AddAdditionalInfoUserForm = () => {
                           type="text"
                           className={`mt-1 p-2 w-full rounded-md border-gray-400 bg-white text-sm text-gray-700 shadow-sm ${
                             (errors.user_zip_code && touched.user_zip_code) ||
-                            formErrorsFromApi.zip_code
+                            formErrorsFromApi.user_zip_code
                               ? "bg-transparent outline-none border bg-red-50 border-red-500 text-red-900 placeholder-red-700 text-sm focus:ring-red-500 focus:border-red-500 p-2 dark:bg-red-100 dark:border-red-400"
                               : "text-gray-500 bg-transparent outline-none border focus:border-indigo-600 "
                           }`}
                         />
                         {(errors.user_zip_code && touched.user_zip_code) ||
-                        formErrorsFromApi.zip_code ? (
+                        formErrorsFromApi.user_zip_code ? (
                           <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                             <span className="font-bold">Oops!</span>{" "}
                             <span className="font-normal">
                               {errors.user_zip_code}
-                              {formErrorsFromApi.zip_code}
+                              {formErrorsFromApi?.user_zip_code}
                             </span>
                           </p>
                         ) : null}
@@ -1063,12 +1043,12 @@ export const AddAdditionalInfoUserForm = () => {
                           }`}
                         />
                         {(errors.user_address && touched.user_address) ||
-                        formErrorsFromApi.address ? (
+                        formErrorsFromApi.user_address ? (
                           <p className="mt-2 text-sm text-red-600 dark:text-red-500">
                             <span className="font-bold">Oops!</span>{" "}
                             <span className="font-normal">
                               {errors.user_address}
-                              {formErrorsFromApi.address}
+                              {formErrorsFromApi.user_address}
                             </span>
                           </p>
                         ) : null}
