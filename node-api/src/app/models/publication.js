@@ -14,7 +14,7 @@ export const PublicationModel = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    vehicle_group: {
+    vehicle_model: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -23,10 +23,6 @@ export const PublicationModel = db.define(
     },
     vehicle_version: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    vehicle_codia_id: {
-      type: DataTypes.INTEGER,
       allowNull: false,
     },
     vehicle_state: {
@@ -94,14 +90,9 @@ export const PublicationModel = db.define(
         },
       },
     },
-    owner_observations: { type: DataTypes.TEXT },
-    info_auto_specs: { type: DataTypes.JSON },
+    description: { type: DataTypes.TEXT },
     photos_urls: { type: DataTypes.JSON },
     slug: { type: DataTypes.STRING, unique: true },
-    tags: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      defaultValue: [],
-    },
   },
   {
     paranoid: true,
