@@ -23,7 +23,7 @@ export const PublicationStateModel = db.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    state_name: DataTypes.STRING,
+    name: DataTypes.STRING,
   },
   {
     timestamps: false,
