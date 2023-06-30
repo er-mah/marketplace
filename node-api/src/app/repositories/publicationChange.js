@@ -1,4 +1,4 @@
-import { PublicationChangesModel } from "../models/index.js";
+import {PublicationChangesModel, PublicationStateModel} from "../models/index.js";
 
 export class PublicationChangeRepository {
   constructor() {
@@ -17,10 +17,10 @@ export class PublicationChangeRepository {
     }
   }
 
-  async getStateNameWithPublicationChange(pubChange) {
+  async getStateNameByPubChangeId(pubChangeId) {
     try {
-      pubChange.state = await this.model.findByPk(pubChange.state_id);
-      return pubChange;
+      const state = await PublicationStateModel.findByPk(pubChangeId);
+      return state.name;
     } catch (e) {
       console.error(e);
     }
@@ -28,19 +28,23 @@ export class PublicationChangeRepository {
 
   async getAllChangesByPublicationId(publicationId) {
     try {
-      return await this.model
+      let publicationChanges = [];
+
+      const changes = await this.model
         .findAll({
           where: { publication_id: publicationId },
         })
-        .then((changes) => {
-          let changesWithState = [];
-          changes.map((change) => {
-            changesWithState.push(
-              this.getStateNameWithPublicationChange(change)
-            );
-          });
-          return changesWithState;
-        });
+
+      const changesJSON = changes.map(change => change.toJSON());
+
+      for (const change of changesJSON) {
+        change.name = await this.getStateNameByPubChangeId(change.state_id);
+        publicationChanges.push(change);
+      }
+
+      console.log(publicationChanges);
+      return publicationChanges;
+
     } catch (e) {
       console.error(e);
     }
